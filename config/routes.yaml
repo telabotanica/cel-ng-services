@@ -1,0 +1,6 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+app_celv2:
+    path: /welcome
+    controller: App\Controller\Celv2Controller::welcome

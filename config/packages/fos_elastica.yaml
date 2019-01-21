@@ -1,0 +1,209 @@
+# For sortable properties, we must add a keyword type field which MUST be named <propertyname>'_keyword'.
+# Cause: "Fielddata is disabled on text fields by default. Set fielddata=true on [userSciName] in order to load fielddata in memory by uninverting the inverted index. 
+# *Note that this can however use significant memory*. Alternatively use a keyword field instead. [reason: all shards failed]"   
+fos_elastica:
+    clients:
+        default: { host: 127.0.0.1, port: 9200 }
+    indexes:
+        occurrences: 
+            index_name: cel2_occurrences
+            types:
+                occurrence:
+                    properties:
+                        id_keyword:   
+                            type: "keyword" 
+                        geom: 
+                            type: "geo_shape"
+                        userId: 
+                            type: "long"
+                        projectId:
+                            type: "long"
+                        projectLabel:
+                            type: "text"
+                        userEmail: ~
+                        userPseudo: ~
+                        observer: ~
+                        observerInstitution: ~
+                        # sortable property
+                        dateObserved: 
+                            type: "date"
+                            format: 'yyyy-MM-dd HH:mm:ss'
+                        dateObserved_keyword:   
+                            type: "keyword" 
+                        dateObservedYear:
+                            type: "long"
+                        dateObservedMonth:
+                            type: "long"
+                        dateObservedDay:
+                            type: "long"
+                        dateCreated: 
+                            type: "date"
+                            format: 'yyyy-MM-dd HH:mm:ss' 
+                        dateUpdated: 
+                            type: "date"
+                            format: 'yyyy-MM-dd HH:mm:ss' 
+                        datePublished: 
+                            type: "date"
+                            format: 'yyyy-MM-dd HH:mm:ss' 
+                        # sortable property
+                        userSciName: 
+                            type: "text"
+                        userSciName_keyword:
+                            type: "keyword" 
+                        userSciNameId: 
+                            type: "long"
+                        acceptedSciName: ~
+                        acceptedSciNameId: 
+                            type: "long"
+                        # sortable property
+                        family:
+                            type: "text"
+                        family_keyword:
+                            type: "keyword" 
+                        plantnetId:
+                            type: "long"
+                        taxoRepo: ~
+                        # sortable property
+                        certainty:
+                            type: "text"
+                        certainty_keyword:
+                            type: "keyword" 
+                        occurrenceType: ~
+                        isWild: 
+                            type: "boolean"
+                        coef: ~
+                        phenology: ~
+                        sampleHerbarium: 
+                            type: "boolean"
+                        bibliographySource: ~ 
+                        inputSource: ~
+                        isPublic: 
+                            type: "boolean"
+                        isPublic_keyword:   
+                            type: "keyword" 
+                        isVisibleInCel: 
+                            type: "boolean"
+                        isVisibleInVegLab: 
+                            type: "boolean"
+                        signature: ~
+                        # sortable property
+                        elevation:
+                            type: "text"
+                        elevation_keyword:
+                            type: "keyword" 
+                        geodatum: ~
+                        # sortable property
+                        locality:
+                            type: "text"
+                        locality_keyword:
+                            type: "keyword"
+                        sublocality: ~
+                        environment: ~
+                        localityConsistency: ~
+                        station: ~
+                        publishedLocation: ~
+                        locationAccuracy: ~
+                        osmCounty: ~
+                        osmState: ~
+                        osmPostcode: ~
+                        osmCountry: ~
+                        osmCountryCode: ~
+                        osmId: ~
+                        osmPlaceId: ~
+                            # sortable property
+                        identiplanteScore:
+                            type: "long"
+                        identiplanteScore_keyword:
+                            type: "keyword"
+                        isIdentiplanteValidated:
+                            type: "boolean"
+                        userOccurrenceTags:
+                            type: "nested"
+                            properties:
+                                id: ~
+                                userId: ~
+                                name: ~
+                                path: ~
+                    persistence:
+                        driver: orm
+                        model: App\Entity\Occurrence
+                        provider: ~
+                        finder: ~
+                        repository: App\Search\OccurrenceRepository
+                        model_to_elastica_transformer:
+                            service: app.search.occurrence_to_elastica_transformer
+        photos: 
+            index_name: cel2_photos
+            types:
+                photo:
+                    properties:
+                        userId: 
+                            type: "long"
+                        userEmail: ~
+                        userPseudo: ~
+                        originalName: ~
+                        # sortable property
+                        dateShot: 
+                            type: "date"
+                            format: 'yyyy-MM-dd HH:mm:ss' 
+                        dateShot_keyword:
+                            type: "keyword"
+                        dateShotYear:
+                            type: "long"
+                        dateShotMonth:
+                            type: "long"
+                        dateShotDay:
+                            type: "long"
+                        dateObserved: 
+                            type: "date"
+                            format: 'yyyy-MM-dd HH:mm:ss' 
+                        dateObservedYear:
+                            type: "long"
+                        dateObservedMonth:
+                            type: "long"
+                        dateObservedDay:
+                            type: "long"
+                        dateCreated: 
+                            type: "date"
+                            format: 'yyyy-MM-dd HH:mm:ss' 
+                        dateUpdated: 
+                            type: "date"
+                            format: 'yyyy-MM-dd HH:mm:ss' 
+                        userSciName: ~
+                        userSciNameId: 
+                            type: "long"
+                        # sortable property
+                        family:
+                            type: "text"
+                        family_keyword:
+                            type: "keyword"
+                        # sortable property
+                        certainty:
+                            type: "text"
+                        certainty_keyword:
+                            type: "keyword"
+                        isPublic: 
+                            type: "boolean"
+                        # sortable property
+                        locality:
+                            type: "text"
+                        locality_keyword:
+                            type: "keyword"
+                        osmCounty: ~
+                        osmCountry: ~
+                        osmCountryCode: ~
+                        photoTags:
+                            type: "nested"
+                            properties:
+                                id: ~
+                                userId: ~
+                                name: ~
+                                path: ~
+                    persistence:
+                        driver: orm
+                        model: App\Entity\Photo
+                        provider: ~
+                        finder: ~
+                        repository: App\Search\PhotoRepository
+                        model_to_elastica_transformer:
+                            service: app.search.photo_to_elastica_transformer
