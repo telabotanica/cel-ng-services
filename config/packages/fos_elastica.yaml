@@ -132,6 +132,13 @@ fos_elastica:
                         repository: App\Search\OccurrenceRepository
                         model_to_elastica_transformer:
                             service: app.search.occurrence_to_elastica_transformer
+                        # When deleting some entities then reloading, elasticsearch sometimes
+                        # sometimes cries because he cannot find corresponding Doctrine objects
+                        # when the index is queried before deletions are not yet effective on 
+                        # the index... 
+                        elastica_to_model_transformer:
+                            ignore_missing: true
+
         photos: 
             index_name: cel2_photos
             types:
