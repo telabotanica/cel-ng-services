@@ -112,8 +112,8 @@ DROP TABLE IF EXISTS `occurrence`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `occurrence` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `taxo_repo_id` int(11) DEFAULT NULL,
   `project_id` int(11) DEFAULT NULL,
+  `taxo_repo_id` int(11) DEFAULT NULL,
   `user_profile_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'id de l''utilisateur ayant saisi l''obs (seulement identification de tela, si utilisateur non inscrit ce champ est vide)',
   `user_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Email de l''utilisateur ayant saisi l''obs',
@@ -147,6 +147,7 @@ CREATE TABLE `occurrence` (
   `elevation` int(11) DEFAULT NULL COMMENT 'Altitude',
   `geodatum` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT 'WGS84' COMMENT 'Système géodésique',
   `locality` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Localité où se trouve l''obs',
+  `locality_insee_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Code INSEE de la localité où se trouve l''obs',
   `sublocality` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Lieu-dit',
   `environment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Milieu, type d''habitat',
   `locality_consistency` tinyint(1) DEFAULT NULL COMMENT 'Cohérence entre les coordonnées et la localité',
@@ -164,14 +165,14 @@ CREATE TABLE `occurrence` (
   `is_identiplante_validated` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Statut validé (ou non) de l''observation sur identiplante',
   `identification_author` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Nom de la personne ayant identifié l''espèce observée (si différente de l''observateur)',
   PRIMARY KEY (`id`),
-  KEY `IDX_BEFD81F37D81B3C` (`taxo_repo_id`),
   KEY `IDX_BEFD81F3166D1F9C` (`project_id`),
+  KEY `IDX_BEFD81F37D81B3C` (`taxo_repo_id`),
   KEY `IDX_BEFD81F36B9DD454` (`user_profile_id`),
   KEY `user_id_idx` (`user_id`),
-  CONSTRAINT `FK_BEFD81F3166D1F9C` FOREIGN KEY (`project_id`) REFERENCES `tb_project` (`id`),
+  CONSTRAINT `FK_BEFD81F3166D1F9C` FOREIGN KEY (`project_id`) REFERENCES `taxo_repos` (`id`),
   CONSTRAINT `FK_BEFD81F36B9DD454` FOREIGN KEY (`user_profile_id`) REFERENCES `user_profile_cel` (`id`),
-  CONSTRAINT `FK_BEFD81F37D81B3C` FOREIGN KEY (`taxo_repo_id`) REFERENCES `taxo_repos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `FK_BEFD81F37D81B3C` FOREIGN KEY (`taxo_repo_id`) REFERENCES `tb_project` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -190,7 +191,7 @@ CREATE TABLE `occurrence_user_occurrence_tag` (
   KEY `IDX_B06FBA58768D75C5` (`user_occurrence_tag_id`),
   CONSTRAINT `FK_B06FBA5830572FAC` FOREIGN KEY (`occurrence_id`) REFERENCES `occurrence` (`id`),
   CONSTRAINT `FK_B06FBA58768D75C5` FOREIGN KEY (`user_occurrence_tag_id`) REFERENCES `user_occurrence_tag` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table de jointure entre occurrence et user_occurrence_tag.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table de jointure entre occurrence et user_occurrence_tag.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -399,7 +400,7 @@ CREATE TABLE `user_occurrence_tag` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id__name` (`user_id`,`name`),
   KEY `user_id_idx` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur).';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur).';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -432,4 +433,4 @@ CREATE TABLE `user_profile_cel` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-01-23 13:10:42
+-- Dump completed on 2019-01-23 15:35:36
