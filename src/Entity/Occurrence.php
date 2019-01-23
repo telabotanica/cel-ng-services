@@ -389,6 +389,15 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
    private $locality = null;
 
    /**
+    * Localité où se trouve l'obs.
+    *
+    * @Groups({"read", "write"})
+    * @ORM\Column(type="string", nullable=true, options={"comment":"Code INSEE de la localité où se trouve l'obs"})
+    */
+   private $localityInseeCode = null;
+
+
+   /**
     * Lieu-dit.
     *
     * @Groups({"read", "write"})
@@ -536,7 +545,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      * @Groups({"read", "write"})
      * @ORM\ManyToOne(targetEntity="TelaBotanicaProject", inversedBy="occurrences")
      * @ORM\JoinColumn(name="taxo_repo_id", referencedColumnName="id")
-     * @ApiSubresource(maxDepth=1)
      */
     private $project;
 
@@ -1031,6 +1039,18 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
    public function setLocality(?string $locality): self
    {
        $this->locality = $locality;
+
+       return $this;
+   }
+
+   public function getLocalityInseeCode(): ?string
+   {
+       return $this->localityInseeCode;
+   }
+
+   public function setLocalityInseeCode(?string $localityInseeCode): self
+   {
+       $this->localityInseeCode = $localityInseeCode;
 
        return $this;
    }

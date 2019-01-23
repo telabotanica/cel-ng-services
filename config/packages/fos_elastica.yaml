@@ -97,6 +97,8 @@ fos_elastica:
                             type: "text"
                         locality_keyword:
                             type: "keyword"
+                        localityInseeCode:
+                            type: "text"
                         sublocality: ~
                         environment: ~
                         localityConsistency: ~

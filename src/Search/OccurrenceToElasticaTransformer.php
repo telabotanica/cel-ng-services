@@ -83,6 +83,7 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
         $data['elevation_keyword'] = $occ->getElevation();
         $data['geodatum'] = $occ->getGeodatum();
         $data['locality'] = $occ->getLocality();
+        $data['localityInseeCode'] = $occ->getLocalityInseeCode();
         $data['locality_keyword'] = $occ->getLocality();
         $data['sublocality'] = $occ->getSublocality();
         $data['environment'] = $occ->getEnvironment();
