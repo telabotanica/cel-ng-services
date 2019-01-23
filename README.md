@@ -35,7 +35,7 @@ CORS feature is managed by nelmio CORS bundle (https://github.com/nelmio/NelmioC
 
 ## Creating the database
 
-Run the sql script located in the app/sql folder of the project.
+Run the sql script located in the 'sql' folder of the project.
 
 ## Dev: launching the app on the test server
 
@@ -60,17 +60,8 @@ php bin/console server:stop
 
 ```
 
-
-## Prod: Building the file in prod mode
-
-```
-ng build --prod
-```
-
-Note: the --prod build mode is a bit touchier than the "standard" (dev) build...
-
 ## Prod: Deploying on server
 
 
-You can then follow the angular manual depending on the server you want to deploy: https://angular.io/guide/deployment.
+You can then follow the symfony manual depending on the server you want to deploy on: https://symfony.com/doc/current/deployment.html
 
