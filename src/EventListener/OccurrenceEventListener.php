@@ -24,7 +24,10 @@ class OccurrenceEventListener
         $efloreClient = new EfloreApiClient();
 
         if ( null !== $entity->getTaxoRepo() ){
-            $entity->setFamily($efloreClient->getFamilyName($entity->getUserSciNameId(), $entity->getTaxoRepo()->getName()));
+            $familyName = $efloreClient->getFamilyName($entity->getUserSciNameId(), $entity->getTaxoRepo()->getName());
+            if ( null !== $familyName ) {
+                $entity->setFamily($familyName);
+            }
         }
     }
 
