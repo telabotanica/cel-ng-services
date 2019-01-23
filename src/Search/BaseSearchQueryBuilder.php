@@ -2,6 +2,7 @@
 
 namespace App\Search;
 
+use App\Entity\Occurrence;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
@@ -9,9 +10,6 @@ use ApiPlatform\Core\DataoryManagerInterface;
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
 use Elastica\Query\Match;
-use App\Entity\Occurrence;
-
-use Psr\Log\LoggerInterface;
 
 // @todo swich to instance not static 
 abstract class BaseSearchQueryBuilder
@@ -36,7 +34,7 @@ abstract class BaseSearchQueryBuilder
         $query = null;
         $getttterName = 'get' . ucfirst($fieldName);
 
-        if (null !== $occSearch->$getttterName()) {
+        if ( (null !== $occSearch->$getttterName()) && ('' !== $occSearch->$getttterName()) ) {
             $query = new Match();
             $query->setField($fieldName, $occSearch->$getttterName());
             $fFilter->addMust($query);
@@ -95,7 +93,7 @@ abstract class BaseSearchQueryBuilder
 
         // handle the free text query : addShould filters  
         $freeTextStrQuery = $occSearch->getFreeTextQuery();
-        if ( null !== $freeTextStrQuery) {
+        if ( (null !== $freeTextStrQuery) && ('' !== $freeTextStrQuery) ) {
             $ftQuery = $this->buildFreeTextQuery($occSearch, $freeTextStrQuery);
             if ( null !== $ftQuery) {   
                 $globalQuery->addMust($ftQuery);
