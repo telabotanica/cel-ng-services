@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -38,6 +39,7 @@ class TaxoRepo
     * @ORM\Id
     * @ORM\GeneratedValue(strategy="IDENTITY")
     * @ORM\Column(type="integer")
+    * @Groups({"read"})
     */
    private $id = null;
 
@@ -46,8 +48,15 @@ class TaxoRepo
     *
     * @Assert\NotNull
     * @ORM\Column(name="name", type="string", nullable=false, options={"comment":"Nouveau score de l'observation sur identiplante"})
+    * @Groups({"read"})
     */
    private $name = null;
+
+    /**
+     * One TaxoRepo has Many Occurrences.
+     * @ORM\OneToMany(targetEntity="Occurrence", mappedBy="taxoRepo", cascade={"persist"})
+     */
+    private $occurrences;
 
 
    public function getId(): ?int

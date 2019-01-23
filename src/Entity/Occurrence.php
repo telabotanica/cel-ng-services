@@ -244,17 +244,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     */
    private $family = null;
 
-
-
-
-    /**
-     * Référentiel taxonomique
-     * 
-     * @Groups({"read", "write"})
-     * @ORM\ManyToOne(targetEntity=TaxoRepo::class)
-     */
-    private $taxoRepo;
-
    /**
     * Certitude de l'identification taxonomique.
     * 
@@ -530,12 +519,24 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     */
    private $identificationAuthor = null;
 
+
+    /**
+     * Référentiel taxonomique
+     * 
+     * @Groups({"read", "write"})
+     * @ORM\ManyToOne(targetEntity=TaxoRepo::class)
+     * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
+     * @ApiSubresource(maxDepth=1)
+     */
+    private $taxoRepo;
+
    /**
      * The tela botanica project the occurrence belongs to.
      *
      * @Groups({"read", "write"})
      * @ORM\ManyToOne(targetEntity="TelaBotanicaProject", inversedBy="occurrences")
-     * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="taxo_repo_id", referencedColumnName="id")
+     * @ApiSubresource(maxDepth=1)
      */
     private $project;
 
