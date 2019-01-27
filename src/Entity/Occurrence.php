@@ -490,7 +490,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Champ complété automatiquement par osm - id osm.
     *
     * @Groups({"read", "write"})
-    * @ORM\Column(name="osm_id", type="integer", nullable=true, options={"comment":"Champ complété automatiquement par osm - id osm"})
+    * @ORM\Column(name="osm_id", type="bigint", nullable=true, options={"comment":"Champ complété automatiquement par osm - id osm"})
     */
    private $osmId = null;
 
@@ -1210,12 +1210,12 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
        return $this;
    }
 
-   public function getOsmId(): ?int
+   public function getOsmId(): ?string
    {
        return $this->osmId;
    }
 
-   public function setOsmId(int $osmId): self
+   public function setOsmId(string $osmId): self
    {
        $this->osmId = $osmId;
 
