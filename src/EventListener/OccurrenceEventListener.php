@@ -14,12 +14,7 @@ class OccurrenceEventListener
     {
         $entity = $args->getEntity();
 
-        // only act on some "GenericEntity" entity
-        if (!$entity instanceof Occurrence) {
-            return;
-        }
-
-        $entity->generateSignature();
+        $this->doCommon($occ);
 
         $efloreClient = new EfloreApiClient();
 
@@ -34,15 +29,29 @@ class OccurrenceEventListener
     public function preUpdate(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
+        $this->doCommon($occ);
+
+
+    }
+
+    public function doCommon(Occurrence $occ)
+    {
+        $entity = $args->getEntity();
 
         // only act on some "GenericEntity" entity
         if (!$entity instanceof Occurrence) {
             return;
         }
+        // If the occurrence cannot be published:
+        if ( ! ($entity->isPublishable()) ) {
+            // Force it to be private:
+            $entity->setIsPublic(false);
+        }
 
         $entity->generateSignature();
 
     }
+
 /*
 
     public function persistRelatedPhotos(LifecycleEventArgs $args)

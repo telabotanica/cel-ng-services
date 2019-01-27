@@ -599,6 +599,16 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      */
     protected $userTagRelations;
 
+
+   public function isPublishable(): ?bool
+   {
+        return ( 
+            ( null !== $this->geometry) &&            
+            ( null !== $this->dateObserved) &&
+            ( null !== $this->certainty) );
+   }
+
+
    public function setId(?int $id): self
    {
        $this->id = $id;
