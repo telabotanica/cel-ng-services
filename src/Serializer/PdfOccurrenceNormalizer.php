@@ -2,11 +2,13 @@
 
 namespace App\Serializer;
 
+use App\Utils\LatLongGeoJsonExtractor;
+
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Normalizes Occurrence instances into arrays containing the data required to
+ * Normalizes Occurrence instances into arrays containing the data needed to
  * generate their PDF representation.
  */
 // @todo Why does this class handle single object AND array of objects!!!????
@@ -46,17 +48,19 @@ final class PdfOccurrenceNormalizer implements NormalizerInterface, Denormalizer
     public function normalize($object, $format = null, array $context = [])
     {
         $result = array();
+        $latLongExtractor = null;
 
         if (is_array($object)) {  
             foreach($object as $crtOcc) {
+                $latLongExtractor = new LatLongGeoJsonExtractor($crtOcc->getGeometry());
                 $crtOccAsArray = array();
                 $crtOccAsArray['id'] = $crtOcc->getId();
                 $crtOccAsArray['sublocality'] = $crtOcc->getSublocality();
                 $crtOccAsArray['locality'] = $crtOcc->getLocality();
                 $crtOccAsArray['certainty'] = $crtOcc->getCertainty();
                 $crtOccAsArray['annotation'] = $crtOcc->getAnnotation();
-                $crtOccAsArray['latitude'] = 90;
-                $crtOccAsArray['longitude'] = 90;
+                $crtOccAsArray['latitude'] = $latLongExtractor->extractLatitude();
+                $crtOccAsArray['longitude'] = $latLongExtractor->extractLongitude();
                 $crtOccAsArray['elevation'] = $crtOcc->getElevation();
                 $crtOccAsArray['station'] = $crtOcc->getStation();
                 $crtOccAsArray['environment'] = $crtOcc->getEnvironment();
@@ -70,12 +74,13 @@ final class PdfOccurrenceNormalizer implements NormalizerInterface, Denormalizer
             }           
         }
         else {
+            $latLongExtractor = new LatLongGeoJsonExtractor($crtOcc->getGeometry());
             $result['id'] = $object->getId();
             $result['sublocality'] = $object->getSublocality();
             $result['locality'] = $object->getLocality();
             $result['station'] = $object->getStation();
-            $result['latitude'] = 90;
-            $result['longitude'] = 90;
+            $crtOccAsArray['latitude'] = $latLongExtractor->extractLatitude();
+            $crtOccAsArray['longitude'] = $latLongExtractor->extractLongitude();
             $result['annotation'] = $object->getAnnotation();
             $result['environment'] = $object->getEnvironment();
             $result['certainty'] = $object->getCertainty();
@@ -87,10 +92,6 @@ final class PdfOccurrenceNormalizer implements NormalizerInterface, Denormalizer
             $result['userPseudo'] = $object->getUserPseudo();
             $result['dateObserved'] = $object->getDateObserved();
         }
-
-
-
-
         
         return $result;
     }
