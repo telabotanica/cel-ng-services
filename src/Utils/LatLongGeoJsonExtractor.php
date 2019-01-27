@@ -23,7 +23,6 @@ class LatLongGeoJsonExtractor
 
     public function __construct(string $strGeoJson)
     {
-echo $strGeoJson;
         $this->geoJson = json_decode($strGeoJson, true);
      }
 
