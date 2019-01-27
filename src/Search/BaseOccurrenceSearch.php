@@ -28,11 +28,19 @@ class BaseOccurrenceSearch
     }
 
     public function isPaginated() {
-		return ($this->page !== null && $this->perPage !== null );
+		return (
+            $this->page !== null && 
+            $this->perPage !== null &&
+            $this->page !== 'null' &&
+            $this->perPage !== 'null' );
 	}
 
     public function isSorted(){
-		return ($this->sortBy && $this->sortDirection);
+		return (
+            $this->sortBy !== null && 
+            $this->sortDirection !== null &&
+            $this->sortBy !== 'null' &&
+            $this->sortDirection !== 'null' );
 	}
 
 	public function getFreeTextQuery(){

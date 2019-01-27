@@ -4,7 +4,7 @@ namespace App\Search;
 
 use FOS\ElasticaBundle\Repository;
 use App\Search\OccurrenceSearchQueryBuilder;
-
+use Elastica\Query;
 //@todo rename to OccElasticRepo
 class OccurrenceRepository extends Repository
 {
@@ -25,6 +25,20 @@ class OccurrenceRepository extends Repository
         }
 
         return $this->find($esQuery,10000);
+    }
+
+    public function countWithRequest($request, $user)  
+    {
+
+        $search = new OccurrenceSearch($request);
+        $queryBuilder = new OccurrenceSearchQueryBuilder();
+        $esQuery = $queryBuilder->build($user, $search);
+        $results = $this->findPaginated($esQuery);
+        $results->setMaxPerPage(10);
+        $results->setCurrentPage(1);
+        echo "NB OF DOCS FOR THIS PAGE=" . sizeof($results->getCurrentPageResults()) ."\n";
+        echo "TOTAL NBR OF DOCS=" . $results->getNbResults()  ."\n";
+        return $results->getNbResults();
     }
 
 
