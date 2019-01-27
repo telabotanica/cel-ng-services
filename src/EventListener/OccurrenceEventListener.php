@@ -12,13 +12,24 @@ class OccurrenceEventListener
 {
     public function prePersist(LifecycleEventArgs $args)
     {
+
         $entity = $args->getEntity();
 
-        $this->doCommon($occ);
+        // only act on "Occurrence" entities
+        if (!$entity instanceof Occurrence) {
+            return;
+        }
 
-        $efloreClient = new EfloreApiClient();
+        $this->doCommon($entity);
+
+        // If isPublic status has been set to true, set the occurrence 
+        // datePublished to now:
+        if ( $entity->getIsPublic() ) {
+            $entity->setDatePublished((new \DateTime())->format('Y-m-d H:i:s'));
+        }
 
         if ( null !== $entity->getTaxoRepo() ){
+            $efloreClient = new EfloreApiClient();
             $familyName = $efloreClient->getFamilyName($entity->getUserSciNameId(), $entity->getTaxoRepo()->getName());
             if ( null !== $familyName ) {
                 $entity->setFamily($familyName);
@@ -28,27 +39,35 @@ class OccurrenceEventListener
 
     public function preUpdate(LifecycleEventArgs $args)
     {
+
         $entity = $args->getEntity();
-        $this->doCommon($occ);
+
+        // only act on "Occurrence" entities
+        if (!$entity instanceof Occurrence) {
+            return;
+        }
+
+        // If isPublic status has been changed to true, set the occurrence 
+        // datePublished to now:
+        if ($args->hasChangedField('isPublic') && $args->getNewValue('isPublic') == true) {
+            $entity->setDatePublished((new \DateTime())->format('Y-m-d H:i:s'));
+        }
+
+        $this->doCommon($entity);
 
 
     }
 
     public function doCommon(Occurrence $occ)
     {
-        $entity = $args->getEntity();
 
-        // only act on some "GenericEntity" entity
-        if (!$entity instanceof Occurrence) {
-            return;
-        }
         // If the occurrence cannot be published:
-        if ( ! ($entity->isPublishable()) ) {
+        if ( ! ($occ->isPublishable()) ) {
             // Force it to be private:
-            $entity->setIsPublic(false);
+            $occ->setIsPublic(false);
         }
 
-        $entity->generateSignature();
+        $occ->generateSignature();
 
     }
 
