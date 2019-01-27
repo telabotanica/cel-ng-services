@@ -16,10 +16,13 @@ fos_elastica:
                             type: "geo_shape"
                         userId: 
                             type: "long"
-                        projectId:
-                            type: "long"
-                        projectLabel:
-                            type: "text"
+                        project:
+                            type: "object"
+                            properties:
+                                id:
+                                    type: "long"
+                                label:
+                                    type: "text"
                         userEmail: ~
                         userPseudo: ~
                         observer: ~
@@ -64,7 +67,13 @@ fos_elastica:
                             type: "keyword" 
                         plantnetId:
                             type: "long"
-                        taxoRepo: ~
+                        taxoRepo:
+                            type: "object"
+                            properties:
+                                id:
+                                    type: "long"
+                                name:
+                                    type: "text"
                         # sortable property
                         certainty:
                             type: "text"
