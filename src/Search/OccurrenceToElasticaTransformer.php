@@ -49,11 +49,12 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
 		$data['observerInstitution'] = $occ->getObserverInstitution();
         $dateObserved = $occ->getFormattedDateObserved();
         $data['dateObserved'] = $dateObserved;
-        $data['dateObserved_keyword'] = $occ->getFormattedDateObserved();
+        $data['dateObserved_keyword'] = $dateObserved;
         $data['dateObservedMonth'] = $occ->getDateObservedMonth();
         $data['dateObservedDay'] = $occ->getDateObservedDay();
         $data['dateObservedYear'] = $occ->getDateObservedYear();
         $data['dateCreated'] = $occ->getFormattedDateCreated();
+        $data['dateCreated_keyword'] = $occ->getFormattedDateCreated();
         $data['dateUpdated'] = $occ->getFormattedDateUpdated();
         $data['datePublished'] = $occ->getFormattedDatePublished();
         $data['userSciName'] = $occ->getUserSciName();

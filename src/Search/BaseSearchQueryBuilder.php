@@ -99,13 +99,15 @@ abstract class BaseSearchQueryBuilder
                 $globalQuery->addMust($ftQuery);
             }
         }
-//throw new \Exception('************' . var_dump($globalQuery));
-        $esQuery->setQuery($globalQuery);
-
-        if ($occSearch->isSorted()) {
-            $esQuery = $this->customizeWithSortParameters($esQuery, $occSearch);
+        // @refactor: put these in conf
+        // No sort parameters provided, add default ones:
+        if ( ! $occSearch->isSorted() ) {
+            $occSearch->setSortDirection('DESC');
+            $occSearch->setSortBy('dateCreated');
         }
-//echo(var_dump($esQuery));
+
+        $esQuery = $this->customizeWithSortParameters($esQuery, $occSearch);
+
         return $esQuery;
     }
 
@@ -176,7 +178,7 @@ abstract class BaseSearchQueryBuilder
      */
     protected function customizeWithSortParameters($esQuery, $occSearch)
     {
-  
+        // We use the keyword typed version of the property for sorting:
         $esQuery->addSort(
             [ $occSearch->getSortBy() . '_keyword' => 
                 [

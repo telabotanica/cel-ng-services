@@ -63,6 +63,7 @@ class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface
             $data['dateObservedDay'] = $occ->getDateObservedDay();
             $data['dateObservedYear'] = $occ->getDateObservedYear();
             $data['dateCreated'] = $occ->getFormattedDateCreated();
+            $data['dateCreated_keyword'] = $occ->getFormattedDateCreated();
             $data['dateUpdated'] = $occ->getFormattedDateCreated();
             $data['datePublished'] = $occ->getFormattedDatePublished();
             $data['userSciName'] = $occ->getUserSciName();
