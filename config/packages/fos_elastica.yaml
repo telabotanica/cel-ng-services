@@ -215,6 +215,13 @@ fos_elastica:
                         osmCounty: ~
                         osmCountry: ~
                         osmCountryCode: ~
+                        project:
+                            type: "object"
+                            properties:
+                                id:
+                                    type: "long"
+                                label:
+                                    type: "text"
                         photoTags:
                             type: "nested"
                             properties:

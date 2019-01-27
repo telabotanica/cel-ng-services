@@ -9,10 +9,12 @@ use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
 use App\Entity\Photo;
 use App\Search\PhotoToElasticaTransformer;
  
-// @refactor move to a Transformer package
+// @refactor move to a Elastica/Transformer package
+/**
+ * Transforms Photo entities ot elastica documents.
+ */
 class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface
 {
-
  
 	/**
 	 * @param Occurrence  $post
@@ -81,9 +83,13 @@ class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface
 
             // Flatten Project associated with the Occurrence resource if any:
             if ( null !== $occ->getProject()) {
-        		$data['projectId'] = $occ->getProject()->getId();
-        		$data['projectLabel'] = $occ->getProject()->getLabel();
+                $project = [
+                    'id:' => $occ->getProject()->getId(),
+                    'label:' => $occ->getProject()->getLabel(),
+                ];
+                $data['project'] = $project;
             }
+
         }
 	
                    
