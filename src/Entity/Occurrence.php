@@ -117,7 +117,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     *
     * Idenfiant de l'utilisateur ayant publié l'observation (null si utilisateur anonyme).
     *
-    * @Groups({"read"})
     * @ORM\Column(name="user_id", type="integer", nullable=true, options={"comment":"id de l'utilisateur ayant saisi l'obs (seulement identification de tela, si utilisateur non inscrit ce champ est vide)"})
     */
    private $userId = null;
@@ -127,7 +126,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Email de l'utilisateur ayant saisi l'obs.
     *
     * @Assert\Email
-    * @Groups({"read"})
     * @ORM\Column(name="user_email", type="string", nullable=false, options={"comment":"Email de l'utilisateur ayant saisi l'obs"})
     */
    private $userEmail = null;
@@ -135,7 +133,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
    /**
     * Pseudo de l'utilisateur ayant saisi l'obs. Nom/Prénom si non renseigné.
     *
-    * @Groups({"read"})
     * @ORM\Column(name="user_pseudo", type="string", nullable=true, options={"comment":"Pseudo de l'utilisateur ayant saisi l'obs. Nom/Prénom si non renseigné."})
     */
    private $userPseudo = null;
