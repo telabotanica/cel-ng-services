@@ -32,15 +32,20 @@ class BaseOccurrenceSearch
             $this->page !== null && 
             $this->perPage !== null &&
             $this->page !== 'null' &&
-            $this->perPage !== 'null' );
+            $this->perPage !== 'null'&&
+            $this->page !== '' &&
+            $this->perPage !== ''  );
 	}
 
     public function isSorted(){
+
 		return (
             $this->sortBy !== null && 
             $this->sortDirection !== null &&
             $this->sortBy !== 'null' &&
-            $this->sortDirection !== 'null' );
+            $this->sortDirection !== 'null' &&
+            $this->sortBy !== '' &&
+            $this->sortDirection !== '' );
 	}
 
 	public function getFreeTextQuery(){
