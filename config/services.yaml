@@ -1,7 +1,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    locale: 'en'
+    locale: 'fr'
+
 
 services:
     # default configuration for services in *this* file
@@ -155,6 +156,25 @@ services:
         class: App\EventSubscriber\AddPhotoUrlSubscriber
         tags:
             - { name: jms_serializer.event_subscriber, event: onPreSerialize }
+
+
+    # ########################################################################
+    # RESPONSE EVENT LISTENERS
+    # ########################################################################
+
+    app.event.listener.xcount.response.listener:
+        class:      App\EventListener\XcountResponseListener
+        tags:
+           - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    # ########################################################################
+    # CUSTOM ELASTICA FINER
+    # ########################################################################
+
+    app.elastica.finder.altruist.transformed.finder:
+        class:      App\Search\AltruistTransformedFinder
+        tags:
+           - { name: fos_elastica.finder.class }
 
     # ########################################################################
     # VALIDATORS
