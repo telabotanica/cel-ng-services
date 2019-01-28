@@ -25,7 +25,7 @@ class OccurrenceEventListener
         // If isPublic status has been set to true, set the occurrence 
         // datePublished to now:
         if ( $entity->getIsPublic() ) {
-            $entity->setDatePublished((new \DateTime())->format('Y-m-d H:i:s'));
+            $entity->setDatePublished(new \DateTime());
         }
 
         if ( null !== $entity->getTaxoRepo() ){
@@ -50,7 +50,7 @@ class OccurrenceEventListener
         // If isPublic status has been changed to true, set the occurrence 
         // datePublished to now:
         if ($args->hasChangedField('isPublic') && $args->getNewValue('isPublic') == true) {
-            $entity->setDatePublished((new \DateTime())->format('Y-m-d H:i:s'));
+            $entity->setDatePublished(new \DateTime());
         }
 
         $this->doCommon($entity);
