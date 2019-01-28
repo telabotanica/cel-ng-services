@@ -39,7 +39,7 @@ class TaxoRepo
     * @ORM\Id
     * @ORM\GeneratedValue(strategy="IDENTITY")
     * @ORM\Column(type="integer")
-    * @Groups({"read"})
+    * @Groups({"read", "write"})
     */
    private $id = null;
 
@@ -48,7 +48,7 @@ class TaxoRepo
     *
     * @Assert\NotNull
     * @ORM\Column(name="name", type="string", nullable=false, options={"comment":"Nouveau score de l'observation sur identiplante"})
-    * @Groups({"read"})
+    * @Groups({"read", "write"})
     */
    private $name = null;
 

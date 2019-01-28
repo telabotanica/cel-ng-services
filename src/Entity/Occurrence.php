@@ -531,7 +531,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      * 
      * @Groups({"read", "write"})
      * @ORM\ManyToOne(targetEntity=TaxoRepo::class)
-     * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="taxo_repo_id", referencedColumnName="id")
      * @ApiSubresource(maxDepth=1)
      */
     private $taxoRepo;
@@ -541,7 +541,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      *
      * @Groups({"read", "write"})
      * @ORM\ManyToOne(targetEntity="TelaBotanicaProject", inversedBy="occurrences")
-     * @ORM\JoinColumn(name="taxo_repo_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
      */
     private $project;
 
