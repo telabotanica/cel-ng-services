@@ -16,15 +16,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * An entity representing a Photo.
+ * An entity representing a taxonomic repository (référentiel taxonomique).
  *
- * The API is read-only. Changes are made manually by tela devs using CLI or directly in DB.
+ * The associated API is read-only. Changes and deletions in the underlying 
+ * database are "manually" made by tela devs using CLI or directly in DB.
  *
  * @ApiResource(
  *      attributes={
  *          "normalization_context"={"groups"={"read"}},
  *          "denormalization_context"={"groups"={"write"}},
-
  *      },
  *      collectionOperations={"get"},
  *      itemOperations={"get"}
