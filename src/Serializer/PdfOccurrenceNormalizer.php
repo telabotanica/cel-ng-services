@@ -52,15 +52,28 @@ final class PdfOccurrenceNormalizer implements NormalizerInterface, Denormalizer
 
         if (is_array($object)) {  
             foreach($object as $crtOcc) {
-                $latLongExtractor = new LatLongGeoJsonExtractor($crtOcc->getGeometry());
-                $crtOccAsArray = array();
+                $crtOccAsArray = array();                
+                if ( null !== $crtOcc->getGeometry() ) {
+                    $latLongExtractor = new LatLongGeoJsonExtractor($crtOcc->getGeometry());
+                    if ( $latLongExtractor->isValidGeometry() && $latLongExtractor->isPoint()  ) {
+                        
+                        $crtOccAsArray['latitude'] = $latLongExtractor->extractLatitude();
+                        $crtOccAsArray['longitude'] = $latLongExtractor->extractLongitude();
+                    }
+                    else {
+                        $crtOccAsArray['latitude'] = '-';
+                        $crtOccAsArray['longitude'] = '-';
+                    }
+                }
+                else {
+                    $crtOccAsArray['latitude'] = '-';
+                    $crtOccAsArray['longitude'] = '-';
+                }
                 $crtOccAsArray['id'] = $crtOcc->getId();
                 $crtOccAsArray['sublocality'] = $crtOcc->getSublocality();
                 $crtOccAsArray['locality'] = $crtOcc->getLocality();
                 $crtOccAsArray['certainty'] = $crtOcc->getCertainty();
                 $crtOccAsArray['annotation'] = $crtOcc->getAnnotation();
-                $crtOccAsArray['latitude'] = $latLongExtractor->extractLatitude();
-                $crtOccAsArray['longitude'] = $latLongExtractor->extractLongitude();
                 $crtOccAsArray['elevation'] = $crtOcc->getElevation();
                 $crtOccAsArray['station'] = $crtOcc->getStation();
                 $crtOccAsArray['environment'] = $crtOcc->getEnvironment();
@@ -79,8 +92,22 @@ final class PdfOccurrenceNormalizer implements NormalizerInterface, Denormalizer
             $result['sublocality'] = $object->getSublocality();
             $result['locality'] = $object->getLocality();
             $result['station'] = $object->getStation();
-            $crtOccAsArray['latitude'] = $latLongExtractor->extractLatitude();
-            $crtOccAsArray['longitude'] = $latLongExtractor->extractLongitude();
+            if ( null !== $crtOcc->getGeometry() ) {
+                $latLongExtractor = new LatLongGeoJsonExtractor($crtOcc->getGeometry());
+                if ( $result->isValidGeometry() && $latLongExtractor->isPoint()  ) {
+                    
+                    $result['latitude'] = $latLongExtractor->extractLatitude();
+                    $result['longitude'] = $latLongExtractor->extractLongitude();
+                }
+                else {
+                    $result['latitude'] = '-';
+                    $result['longitude'] = '-';
+                }
+            }
+            else {
+                $result['latitude'] = '-';
+                $result['longitude'] = '-';
+            }
             $result['annotation'] = $object->getAnnotation();
             $result['environment'] = $object->getEnvironment();
             $result['certainty'] = $object->getCertainty();
