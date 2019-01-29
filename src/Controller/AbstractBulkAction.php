@@ -19,7 +19,7 @@ use App\Entity\Occurrence;
 
 /**
  * JSON-PATCH bulk operations. Currently, only 
- * 'remove', '' and 'copy' operations are offered. 
+ * 'remove', 'modify' and 'copy' operations are offered. 
  *
  * @todo improve return messages (e.g. no description for deleted records, wrong path for cloning  - not the cloned entity one).
  * @todo implement isValidPath(string $path) 
@@ -28,6 +28,7 @@ use App\Entity\Occurrence;
 // @see http://restlet.com/company/blog/2015/05/18/implementing-bulk-updates-within-restful-services/
 // @see https://tools.ietf.org/html/rfc6902
 // @see http://jsonpatch.com/
+// @refactor use generics
 abstract class AbstractBulkAction
 {
     protected $doctrine;
@@ -61,7 +62,7 @@ abstract class AbstractBulkAction
 
 
     private function isValidPath(string $path) {
-	return true;
+	    return true;
     }
 
     private function extractIdFromPath(string $path) {
@@ -162,7 +163,7 @@ abstract class AbstractBulkAction
 		    if ($op == 'remove') {
 
 	            if ( !$isValidPath ) {
-			        $this->jsonResp[] = $this->buildAtomicResponse($path, Response::HTTP_UNPROCESSABLE_ENTITY, 'Path ' . 'is either an invalid path (not starting by /api/occurrences) or a path that is not handled by the CEL2 API.');
+			        $this->jsonResp[] = $this->buildAtomicResponse($path, Response::HTTP_UNPROCESSABLE_ENTITY, 'Path ' . 'is either an invalid path or a path that is not handled by the CEL2 API.');
 			        return null;
 	            }
 			    $method = Request::METHOD_DELETE;
@@ -170,7 +171,7 @@ abstract class AbstractBulkAction
 		    else if ($op == 'replace') {
 
                 	    if ( !$isValidPath ) {
-			$this->jsonResp[] = $this->buildAtomicResponse($path, Response::HTTP_UNPROCESSABLE_ENTITY, 'Path ' . 'is either an invalid path (not starting by /api/occurrences) or a path that is not handled by the CEL2 API.');
+			$this->jsonResp[] = $this->buildAtomicResponse($path, Response::HTTP_UNPROCESSABLE_ENTITY, 'Path ' . 'is either an invalid path or a path that is not handled by the CEL2 API.');
 			return null;
 	    }
 			    $method = Request::METHOD_PATCH;
@@ -178,7 +179,7 @@ abstract class AbstractBulkAction
 		    else if ($op == 'copy') {
                 if ( null !== $from ) {
 	                if ( !$isValidPath ) {
-			            $this->jsonResp[] = $this->buildAtomicResponse($path, Response::HTTP_UNPROCESSABLE_ENTITY, 'Path ' . 'is either an invalid path (not starting by /api/occurrences) or a path that is not handled by the CEL2 API.');
+			            $this->jsonResp[] = $this->buildAtomicResponse($path, Response::HTTP_UNPROCESSABLE_ENTITY, 'Path ' . 'is either an invalid path or a path that is not handled by the CEL2 API.');
 			            return null;
 	                }
                     $fromId = $this->extractIdFromPath($from);
