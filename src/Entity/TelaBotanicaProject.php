@@ -21,7 +21,9 @@ use ApiPlatform\Core\Annotation\ApiResource;
  * Read-only resource Web API-wise. Create/update/delete actions will be 
  * handled by tela devs using CLI or direct SQL not via the Web API.
  *
- * @ApiResource(
+ * @ApiResource(attributes={
+ *      "normalization_context"={"groups"={"read"}},
+ *      "denormalization_context"={"groups"={"write"}}},
  *     collectionOperations={"get"},
  *     itemOperations={"get"}
  * )
@@ -40,6 +42,7 @@ class TelaBotanicaProject
 
     /**
      * A project can have a parent project.
+     * @Groups({"read"})
      * @ORM\OneToOne(targetEntity="TelaBotanicaProject")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      */
@@ -66,6 +69,7 @@ class TelaBotanicaProject
 
 
     /**
+     * @Groups({"read"})
      * One TelaBotanicaProject has Many ProjectSettings.
      * @ORM\OneToMany(targetEntity="ProjectSettings", mappedBy="project")
      */
@@ -73,11 +77,12 @@ class TelaBotanicaProject
 
     /**
      * One TelaBotanicaProject has Many Occurrences.
-     * @ORM\OneToMany(targetEntity="Occurrence", mappedBy="project", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Occurrence", mappedBy="project", cascade={"persist"}, fetch="LAZY")
      */
     private $occurrences;
 
     /**
+     * @Groups({"read"})
      * One TelaBotanicaProject has Many ExtendedFields.
      * @ORM\OneToMany(targetEntity="ExtendedField", mappedBy="project")
      */
