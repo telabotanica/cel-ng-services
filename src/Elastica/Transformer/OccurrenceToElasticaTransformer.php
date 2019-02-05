@@ -1,6 +1,6 @@
 <?php
-namespace App\Search;
-  
+
+namespace App\Elastica\Transformer;  
 
 use DateTime;
 use Elastica\Document;
@@ -40,7 +40,6 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
 
 		$data['id'] = $occ->getId();
 		$data['id_keyword'] = $occ->getId();
-//echo var_dump(strtolower($occ->getGeometry()));
         $data['geom'] = json_decode($occ->getGeometry());
 		$data['userId'] = $occ->getUserId();
 		$data['userEmail'] = $occ->getUserEmail();

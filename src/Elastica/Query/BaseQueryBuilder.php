@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Search;
+namespace App\Elastica\Query;
 
+use App\Security\User\TelaBotanicaUser;
 use App\Entity\Occurrence;
+
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
@@ -12,25 +14,25 @@ use Elastica\Query\BoolQuery;
 use Elastica\Query\Match;
 
 // @todo swich to instance not static 
-abstract class BaseSearchQueryBuilder
-{
+// holds the ACL business rules with voters.
+class BaseQueryBuilder implements QueryBuilderInteface {
 
-    // @todo put these in conf        
+    // The names of the filterable fields:
     protected $allowedFilterFields = array();
+    // The names of of the filterable fields (arrays):
     protected $allowedFilterArrayFields = array();
+    // The names of the fields the free text search concerns:
     protected $freeTextSearchFields = array();
 
     /**
      */
-    public function __construct(array $allowedFilterFields, array $freeTextSearchFields, array $allowedFilterArrayFields)
-    {
+    public function __construct(array $allowedFilterFields, array $freeTextSearchFields, array $allowedFilterArrayFields) {
         $this->allowedFilterFields = $allowedFilterFields;
         $this->freeTextSearchFields = $freeTextSearchFields;
         $this->allowedFilterArrayFields = $allowedFilterArrayFields;
     }
 
-    protected function addMustQueryIfNeeded($fFilter, $occSearch, $fieldName)
-    {
+    protected function addMustQueryIfNeeded($fFilter, $occSearch, $fieldName) {
         $query = null;
         $getttterName = 'get' . ucfirst($fieldName);
 
@@ -44,8 +46,7 @@ abstract class BaseSearchQueryBuilder
     }
 
 
-    protected function addMustArrayQueryIfNeeded($fFilter, $occSearch, $fieldName)
-    {
+    protected function addMustArrayQueryIfNeeded($fFilter, $occSearch, $fieldName) {
 
         $getttterName = 'get' . ucfirst($fieldName);
 
@@ -65,8 +66,7 @@ abstract class BaseSearchQueryBuilder
         return $fFilter;
     }
 
-    protected function addShouldQuery($fFilter, $strQuery, $fieldName)
-    {
+    protected function addShouldQuery($fFilter, $strQuery, $fieldName) {
         $query = new Match();
         $query->setField($fieldName, $strQuery);
         $fFilter->addShould($query);
@@ -74,11 +74,11 @@ abstract class BaseSearchQueryBuilder
         return $fFilter;
     }
 
-    public function build($user, $occSearch)
-    {
+    public function build(TelaBotanicaUser $user, QueryInterface $occSearch) : Query {
         $esQuery = new Query();
         $globalQuery = new BoolQuery();
         $acQuery = $this->buildAccessControlQuery($user);
+
 
         if ( null !== $acQuery) {   
             $globalQuery->addMust($acQuery);
@@ -99,6 +99,9 @@ abstract class BaseSearchQueryBuilder
                 $globalQuery->addMust($ftQuery);
             }
         }
+
+        $esQuery->setQuery($globalQuery);
+
         // @refactor: put these in conf
         // No sort parameters provided, add default ones:
         if ( ! $occSearch->isSorted() ) {
@@ -127,8 +130,7 @@ abstract class BaseSearchQueryBuilder
     /**
      *  
      */
-    protected function buildFilterQuery($occSearch)
-    {
+    protected function buildFilterQuery($occSearch) {
 
         $fFilter = new BoolQuery();
         // @todo put this in conf        
@@ -147,11 +149,9 @@ abstract class BaseSearchQueryBuilder
 
     /**
      */ 
-    protected function buildAccessControlQuery($user)
-    {
+    protected function buildAccessControlQuery($user) {
 
         $acQuery = null;
-
         if (!$user->isTelaBotanicaAdmin()) {
             // Project admins: limit to occurrence belonging to the project
             if ($user->isProjectAdmin()) {
@@ -160,6 +160,7 @@ abstract class BaseSearchQueryBuilder
             }
             // Simple users: limit to her/his occurrences
             else if (!is_null($user)){
+
                 $acQuery = new Match();
                 $acQuery->setField("userId", $user->getId());
             }
@@ -176,8 +177,7 @@ abstract class BaseSearchQueryBuilder
 
     /**
      */
-    protected function customizeWithSortParameters($esQuery, $occSearch)
-    {
+    protected function customizeWithSortParameters($esQuery, $occSearch) {
         // We use the keyword typed version of the property for sorting:
         $esQuery->addSort(
             [ $occSearch->getSortBy() . '_keyword' => 
@@ -189,7 +189,6 @@ abstract class BaseSearchQueryBuilder
 
         return $esQuery;
     }
-
 
 }
 

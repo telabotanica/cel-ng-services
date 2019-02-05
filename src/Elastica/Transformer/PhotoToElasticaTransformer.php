@@ -1,13 +1,12 @@
 <?php
-namespace App\Search;
-  
+
+namespace App\Elastica\Transformer;    
 
 use DateTime;
 use Elastica\Document;
 use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
 
 use App\Entity\Photo;
-use App\Search\PhotoToElasticaTransformer;
  
 // @refactor move to a Elastica/Transformer package
 /**

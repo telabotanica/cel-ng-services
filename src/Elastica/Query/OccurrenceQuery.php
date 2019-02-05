@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Search;
+namespace App\Elastica\Query;
 
 
-class OccurrenceSearch extends BaseOccurrenceSearch
+class OccurrenceQuery extends Query
 {
     private $dateObservedDay;
     private $dateObservedMonth;

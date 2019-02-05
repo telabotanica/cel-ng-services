@@ -143,7 +143,7 @@ fos_elastica:
                         provider: ~
                         finder: ~
                             # service: app.elastica.finder.altruist.transformed.finder
-                        repository: App\Search\OccurrenceRepository
+                        repository: App\Elastica\Repository\OccurrenceRepository
                         model_to_elastica_transformer:
                             service: app.search.occurrence_to_elastica_transformer
                         # When deleting some entities then reloading, elasticsearch sometimes
@@ -234,6 +234,6 @@ fos_elastica:
                         model: App\Entity\Photo
                         provider: ~
                         finder: ~
-                        repository: App\Search\PhotoRepository
+                        repository: App\Elastica\Repository\PhotoRepository
                         model_to_elastica_transformer:
                             service: app.search.photo_to_elastica_transformer

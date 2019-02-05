@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Search;
-
-use App\Search\PhotoSearchQueryBuilder;
-use App\Search\OccurrenceSearch;
+namespace App\Elastica\Query;
 
 /**
  * Represents a search query for Photo resource type. 
  */
-class PhotoSearch extends OccurrenceSearch
+class PhotoQuery extends OccurrenceQuery
 {
     private $dateShotDay;
     private $dateShotMonth;
     private $dateShotYear;
     
-
     public function __construct($request)
     {
         parent::__construct($request);
@@ -46,6 +42,5 @@ class PhotoSearch extends OccurrenceSearch
 	public function setDateShotDay($dateShotDay){
 		$this->dateShotDay = $dateShotDay;
 	} 
-
 
 }

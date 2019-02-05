@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Elastica\Repository;
+
+use App\Elastica\Query\Query;
+use App\Elastica\Query\BaseQueryBuilder;
+use App\Elastica\Query\OccurrenceQuery;
+use App\Elastica\Query\OccurrenceQueryBuilder;
+
+//@todo rename to OccElasticRepo
+class OccurrenceRepository extends AbstractElasticRepository {
+
+    /**
+     * Returns a
+     */
+    protected function requestToFindQuery($request): Query {
+        return new OccurrenceQuery($request);
+    }
+
+    protected function getBuilder(): BaseQueryBuilder {
+        return new OccurrenceQueryBuilder();
+    }
+
+
+    /**
+     * Returns true if an Occurrence with same
+     * locality/geometry/userId/observedDate/serSciName already exists.
+     * Else returns false.
+     *
+     * @return bool Returns true if an Occurrence with the same
+     * locality/geometry/userId/observedDate/userSciName already exists.
+     */
+    public function hasDuplicate($occ) : bool
+    {
+        if ($occ->getSignature() == null) {
+            $occ->generateSignature();
+        } 
+
+        $result = $this->createQueryBuilder('p')
+            ->andWhere('p.signature = :val')
+            ->setParameter('val', $occ->getSignature())
+            ->orderBy('p.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+
+        return ( sizeof($result) > 0 );
+    }
+}

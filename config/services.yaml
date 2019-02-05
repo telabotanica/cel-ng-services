@@ -67,11 +67,11 @@ services:
  
     # Occurrence resource type.
     app.search.occurrence_to_elastica_transformer :
-        class: App\Search\OccurrenceToElasticaTransformer
+        class: App\Elastica\Transformer\OccurrenceToElasticaTransformer
 
     # Photo resource type.
     app.search.photo_to_elastica_transformer :
-        class: App\Search\PhotoToElasticaTransformer
+        class: App\Elastica\Transformer\PhotoToElasticaTransformer
 
     # ########################################################################
     # SECURITY VOTERS (ACL)
@@ -162,19 +162,19 @@ services:
     # RESPONSE EVENT LISTENERS
     # ########################################################################
 
-    # app.event.listener.xcount.response.listener:
-    #    class:      App\EventListener\XcountResponseListener
-    #    tags:
-    #       - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+    app.event.listener.xcount.response.listener:
+        class: App\EventListener\XcountResponseListener
+        tags:
+           - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
     # ########################################################################
     # CUSTOM ELASTICA FINER
     # ########################################################################
 
-    #app.elastica.finder.altruist.transformed.finder:
-    #    class:      App\Search\AltruistTransformedFinder
-    #    tags:
-    #       - { name: fos_elastica.finder.class }
+#    app.elastica.finder.altruist.transformed.finder:
+#        class:      App\Search\AltruistTransformedFinder
+#        tags:
+#           - { name: fos_elastica.finder.class }
 
     # ########################################################################
     # VALIDATORS
