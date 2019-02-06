@@ -3,21 +3,24 @@
 namespace App\Elastica\Query;
 
 use App\Security\User\TelaBotanicaUser;
-use App\Entity\Occurrence;
 
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataoryManagerInterface;
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
 use Elastica\Query\Match;
 
-// @todo swich to instance not static 
-// holds the ACL business rules with voters.
+/*
+ * Builds elastica <code>Query</code>s from provided 
+ * CEL <code>Query</code> and enhanced with the access control
+ * filters for current <code>TelaBotanicaUser</code>.
+ */
 class BaseQueryBuilder implements QueryBuilderInteface {
 
-    // The names of the filterable fields:
+    // the default sort direction:
+    const DEFAULT_SORT_DIRECTION = 'DESC';
+    // the default sort property:
+    const DEFAULT_SORT_BY        = 'dateCreated';   
+
+    // The names of the filterable fields (atomic value):
     protected $allowedFilterFields = array();
     // The names of of the filterable fields (arrays):
     protected $allowedFilterArrayFields = array();
@@ -25,6 +28,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
     protected $freeTextSearchFields = array();
 
     /**
+     * Returns a new <code>BaseQueryBuilder</code> instance.
      */
     public function __construct(array $allowedFilterFields, array $freeTextSearchFields, array $allowedFilterArrayFields) {
         $this->allowedFilterFields = $allowedFilterFields;
@@ -45,9 +49,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         return $fFilter;
     }
 
-
     protected function addMustArrayQueryIfNeeded($fFilter, $occSearch, $fieldName) {
-
         $getttterName = 'get' . ucfirst($fieldName);
 
         if (null !== $occSearch->$getttterName()) {
@@ -59,7 +61,6 @@ class BaseQueryBuilder implements QueryBuilderInteface {
                     $orBoolQuery = $this->addShouldQuery($orBoolQuery, intval($value), $fieldName);
                 }           
                 $fFilter = $fFilter->addMust($orBoolQuery);
-
             }
         }
 
@@ -74,6 +75,11 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         return $fFilter;
     }
 
+    /**
+     * Returns the elastica <code>Query</code> built from provided 
+     * CEL <code>Query</code> and enhanced with the access control
+     * filters for given <code>TelaBotanicaUser</code>.
+     */
     public function build(TelaBotanicaUser $user, QueryInterface $occSearch) : Query {
         $esQuery = new Query();
         $globalQuery = new BoolQuery();
@@ -105,8 +111,8 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         // @refactor: put these in conf
         // No sort parameters provided, add default ones:
         if ( ! $occSearch->isSorted() ) {
-            $occSearch->setSortDirection('DESC');
-            $occSearch->setSortBy('dateCreated');
+            $occSearch->setSortDirection(BaseQueryBuilder::DEFAULT_SORT_DIRECTION);
+            $occSearch->setSortBy(BaseQueryBuilder::DEFAULT_SORT_BY);
         }
 
         $esQuery = $this->customizeWithSortParameters($esQuery, $occSearch);
@@ -175,8 +181,6 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         return $acQuery;
     }
 
-    /**
-     */
     protected function customizeWithSortParameters($esQuery, $occSearch) {
         // We use the keyword typed version of the property for sorting:
         $esQuery->addSort(

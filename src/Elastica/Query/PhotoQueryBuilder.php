@@ -2,19 +2,14 @@
 
 namespace App\Elastica\Query;
 
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataoryManagerInterface;
-use Elastica\Query;
-use Elastica\Query\BoolQuery;
-use Elastica\Query\Match;
-
-// @todo swich to instance not static 
-class PhotoQueryBuilder extends BaseQueryBuilder
-{
+/**
+ * <code>BaseQueryBuilder</code> class for <code>Photo</code> entities.
+ */
+// @refactor: make construct arrays contant class members
+final class PhotoQueryBuilder extends BaseQueryBuilder {
 
     /**
+     * Returns a new <code>PhotoQueryBuilder</code> instance.
      */
     public function __construct()
     {

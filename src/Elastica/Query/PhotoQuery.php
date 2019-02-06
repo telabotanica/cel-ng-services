@@ -3,7 +3,8 @@
 namespace App\Elastica\Query;
 
 /**
- * Represents a search query for Photo resource type. 
+ * Represents a search query for CEL Photo resource type. 
+ *
  */
 class PhotoQuery extends OccurrenceQuery
 {

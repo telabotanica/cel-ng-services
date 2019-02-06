@@ -125,7 +125,6 @@ return true;
 		$this->country = $country;
 	}
 
-
 	public function getIsPublic(){
 		return $this->isPublic;
 	}
@@ -199,4 +198,5 @@ return true;
 	public function setProjectId($projectId){
 		$this->projectId = $projectId;
 	}
+
 }

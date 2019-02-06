@@ -2,24 +2,27 @@
 
 namespace App\Elastica\Query;
 
-use App\Entity\Occurrence;
 use App\Security\User\TelaBotanicaUser;
 
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataoryManagerInterface;
 use Elastica\Query;
-use Elastica\Query\BoolQuery;
-use Elastica\Query\Match;
 
 /**
- * Rename to ElasticaQueryBuilder
+ * Builds elastica <code>Query</code>s from CEL <code>Query</code>s and 
+ * currently logged in user's access rights.
  */
-
 interface QueryBuilderInteface {
 
-    public function build(TelaBotanicaUser $user, QueryInterface $occSearch): Query;
+    /**
+     * Returns an elastica <code>Query</code> from a CEL <code>Query</code>
+     * and currently logged in user's access rights.
+     *
+     * @param $user: the currently logged in <code>TelaBotanicaUser</code>.
+     * @param $query: the CEL <code>Query</code> to build the elastica 
+     *        <code>Query</code> from.
+     * @return an elastica query from a CEL <code>Query</code> and currently 
+     *         logged in user's access rights.
+     */
+    public function build(TelaBotanicaUser $user, QueryInterface $query): Query;
 
 }
 

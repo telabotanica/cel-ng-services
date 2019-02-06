@@ -2,20 +2,14 @@
 
 namespace App\Elastica\Query;
 
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataoryManagerInterface;
-use Elastica\Query;
-use Elastica\Query\BoolQuery;
-use Elastica\Query\Match;
-use Psr\Log\LoggerInterface;
-
-// @todo swich to instance not static 
-class OccurrenceQueryBuilder extends BaseQueryBuilder
-{
+/**
+ * <code>BaseQueryBuilder</code> class for <code>Occurrence</code> entities.
+ */
+// @refactor: make construct arrays contant class members
+final class OccurrenceQueryBuilder extends BaseQueryBuilder {
 
     /**
+     * Returns a new <code>OccurrenceQueryBuilder</code> instance.
      */
     public function __construct()
     {
@@ -30,7 +24,6 @@ class OccurrenceQueryBuilder extends BaseQueryBuilder
                 'sublocality', 'environment', 'taxoRepo', 'certainty'), 
             array('id') );
     }
-
 
 }
 

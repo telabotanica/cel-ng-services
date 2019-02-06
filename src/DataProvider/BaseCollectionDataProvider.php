@@ -6,58 +6,72 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use FOS\ElasticaBundle\Manager\RepositoryManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
-use FOS\ElasticaBundle\Manager\RepositoryManagerInterface;
 
-abstract class BaseCollectionDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface
-{
-    /** @var RequestStack */
+/**
+ * A data provider for collections of entity instances using elastica to 
+ * retrieve data from an elasticsearch index.
+ */
+//@refactor: use generics instead of absreact/inheritance, this is 
+//           the perfect case *if usable in services.yaml*...
+abstract class BaseCollectionDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface {
+
+    // the <code>RequestStack</code> service to retrieve the current HTTP 
+    // request.
     protected $requestStack;
+    // the elastica <code>RepositoryManagerInterface</code> service to  
+    // retrieve elastica repositories.
     protected $repositoryManager;
+    // the <code>Security</code> service to retrieve the current user.
     protected $security;
 
     /**
-     * @param RepositoryManagerInterface $repositoryManager
-     * @param RequestStack $requestStack
+     * Returns a new <code>BaseCollectionDataProvider</code> instance 
+     * initialized with (injected) services passed as parameters.
+     *
+     * @param Security $security the injected <code>Security</code> service.
+     * @param RepositoryManagerInterface $repositoryManager the injected 
+     *        <code>RepositoryManagerInterface</code> service.
+     * @param RequestStack $requestStack the injected <code>RequestStack</code>
+     *        service.
      */
-    public function __construct(Security $security, RepositoryManagerInterface $repositoryManager, RequestStack $requestStack)
-    {
+    public function __construct(Security $security, RepositoryManagerInterface $repositoryManager, RequestStack $requestStack) {
         $this->security = $security;
         $this->repositoryManager = $repositoryManager;
         $this->requestStack = $requestStack;
     }
 
-    abstract public function getResourceClass(string $resourceClass, string $operationName = null, array $context = []): bool;
-    abstract public function supports(string $resourceClass, string $operationName = null, array $context = []): bool;
+    /**
+     * Returns the class of the resource of which collections are provided 
+     * by instances of this class. 
+     */
+    abstract public function getResourceClass(): string;
 
     /**
-     * Retrieves a collection of <code>Occurrence</code> instances.
-     * 
-     * @param string $resourceClass
-     * @param string|null $operationName
-     *
-     * @throws ResourceClassNotSupportedException
-     *
-     * @return array|\Traversable
+     * @inheritdoc
      */
-    public function getCollection(string $resourceClass, string $operationName = null)
-    {
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool {
+        return $this->getResourceClass() === $resourceClass;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCollection(string $resourceClass, string $operationName = null) {
         $request = $this->requestStack->getCurrentRequest();
         $filters = $request->query->all();
         $user = $this->security->getToken()->getUser();
+        $repository = $this->repositoryManager->getRepository($this->getResourceClass());
 
-        /** @var SearchRepository $repository */
-        $repository = $this->repositoryManager->getRepository($this->getResourceClass()->toString());
-
-        if (!in_array($resourceClass, [Occurrence::class])) {
+        if (!in_array($resourceClass, [$this->getResourceClass()])) {
             throw new ResourceClassNotSupportedException();
         }
 
         $results = $repository->findWithRequest($request, $user);
 
         return $results;
-
     }
 
 }
