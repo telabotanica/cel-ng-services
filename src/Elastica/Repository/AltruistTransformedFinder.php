@@ -9,19 +9,16 @@ use FOS\ElasticaBundle\Transformer\ElasticaToModelTransformerInterface;
 /**
  * TransformedFinder which doesn't keep the searchable for itself as the 
  * original selfish one does.
- */
-/*
- * @impl: having a reference to the searchable is the only way to be able to 
+ * 
+ * @internal: having a reference to the searchable is the only way to be able to 
  *        make count queries on elasticsearch indexes.
  */
-class AltruistTransformedFinder extends TransformedFinder
-{
+class AltruistTransformedFinder extends TransformedFinder {
 
     /**
      * @return \Elastica\SearchableInterface
      */
-    public function getSearch()
-    {
+    public function getSearch() {
         return $this->searchable;
     }
 

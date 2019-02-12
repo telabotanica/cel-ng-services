@@ -5,6 +5,7 @@ namespace App\Elastica\Repository;
 use App\Elastica\Query\Query;
 use App\Elastica\Query\BaseQueryBuilder;
 use App\Entity\Photo;
+use App\Utils\ElasticsearchClient;
 
 use FOS\ElasticaBundle\Repository;
 
@@ -65,10 +66,7 @@ abstract class AbstractElasticRepository extends Repository
     }
 
 
-    /*
-     * Returns 1... howmanyever the number of actual hits...
-     * elastica is buggy on this...
-     */
+
     /**
      * @inheritdoc
      */
@@ -77,14 +75,9 @@ abstract class AbstractElasticRepository extends Repository
         $query = $this->requestToFindQuery($request);
         $queryBuilder = $this->getBuilder();
         $esQuery = $queryBuilder->build($user, $query);
-        $results = $this->findPaginated($esQuery);
-        $results->setMaxPerPage(10);
-        $results->setCurrentPage(1);
-/*
-        echo "NB OF DOCS FOR THIS PAGE=" . sizeof($results->getCurrentPageResults()) ."\n";
-        echo "TOTAL NBR OF DOCS=" . $results->getNbResults()  ."\n";
-*/
-        return $results->getNbResults();
+
+        return ElasticsearchClient::count($esQuery, 'occurrence');
+
     }
 
 
