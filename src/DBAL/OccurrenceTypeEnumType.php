@@ -6,7 +6,11 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * ENUM type for occurrences types. 
+ * ENUM type for occurrences type values. 
+ *
+ * @package App\DBAL
+ * @refactor: DRY all DBAL types using a superclass, children will only have 
+ *            a constant associative array, a type_enum and an error msg.
  */
 class OccurrenceTypeEnumType extends Type
 {
@@ -15,31 +19,47 @@ class OccurrenceTypeEnumType extends Type
     const LITTERATURE = 'issue de la bibliographie';
     const HERBARIUM = 'donnée d\'herbier';
 
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) {
+ 
         return "ENUM('observation de terrain', 'issue de la bibliographie', 'donnée d\'herbier')";
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function convertToPHPValue($value, AbstractPlatform $platform) {
+ 
         return $value;
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function convertToDatabaseValue($value, AbstractPlatform $platform) {
+ 
         if (!in_array($value, array(null, self::FIELD, self::LITTERATURE, self::HERBARIUM))) {
             throw new \InvalidArgumentException("Invalid occurrence type");
         }
         return $value;
     }
 
-    public function getName()
-    {
+    /**
+     * @inheritdoc
+     */
+    public function getName() {
+ 
         return self::OCCURRENCE_TYPE_ENUM;
     }
 
-    public function requiresSQLCommentHint(AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function requiresSQLCommentHint(AbstractPlatform $platform) {
+ 
         return true;
     }
+
 }

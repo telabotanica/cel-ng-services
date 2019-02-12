@@ -5,8 +5,13 @@ namespace App\Security\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 
-class TelaBotanicaUser implements UserInterface, EquatableInterface
-{
+/**
+ * Represents a user logged in Tela Botanica SSO authentication system.  
+ *
+ * @package App\Security\User
+ */
+class TelaBotanicaUser implements UserInterface, EquatableInterface {
+
     private $id;
     private $email;
     private $pseudo;
@@ -17,8 +22,12 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface
     private $administeredProjectId;
     private $roles;
 
-    public function __construct($id, $email, $surname, $lastName, $pseudo, $usePseudo, $avatar, array $roles, $administeredProjectId)
-    {
+    const ADMIN_ROLE = "administrator";
+
+    public function __construct(
+        $id, $email, $surname, $lastName, $pseudo, $usePseudo, $avatar, 
+        array $roles, $administeredProjectId) {
+
         $this->id = $id;
         $this->email = $email;
         $this->surname = $surname;
@@ -32,84 +41,70 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface
 
 
 
-    public function getId()
-    {
+    public function getId() {
+
         return $this->id;
     }
 
-    // @todo put "Admin" in config
-    public function isTelaBotanicaAdmin()
-    {
-        return in_array("administrator", $this->roles);
+    public function isTelaBotanicaAdmin() {
+        return in_array(TelaBotanicaUser::ADMIN_ROLE, $this->roles);
     }
 
-    public function isProjectAdmin()
-    {
+    public function isProjectAdmin() {
         return (!is_null($this->administeredProjectId));
     }
 
-// @todo put "Admin" in config
-    public function isLuser()
-    {
-        return true;
+    public function isLuser() {
+        return ( 
+            !( $this->isTelaBotanicaAdmin() ) || 
+            ( $this->isProjectAdmin() ) );
     }
 
-    public function getRoles()
-    {
+    public function getRoles() {
         return $this->roles;
     }
 
-    public function getSurname()
-    {
+    public function getSurname() {
         return $this->surname;
     }
 
-    public function getLastName()
-    {
+    public function getLastName() {
         return $this->lastName;
     }
 
-    public function getAvatar()
-    {
+    public function getAvatar() {
         return $this->avatar;
     }
 
-    public function getAdministeredProjectId()
-    {
+    public function getAdministeredProjectId() {
         return $this->administeredProjectId;
     }
 
-    public function getPassword()
-    {
+    public function getPassword() {
+
         return null;
     }
 
-    public function getSalt()
-    {
+    public function getSalt() {
         return null;
     }
 
-    public function getEmail()
-    {
+    public function getEmail() {
         return $this->email;
     }
 
-    public function getUsername()
-    {
+    public function getUsername() {
         return $this->usePseudo ? $this->pseudo : ($this->surname + ' ' + $this->lastName);
     }
 
-    public function getPseudo()
-    {
+    public function getPseudo() {
         return $this->pseudo;
     }
 
-    public function eraseCredentials()
-    {
+    public function eraseCredentials() {
     }
 
-    public function isEqualTo(UserInterface $user)
-    {
+    public function isEqualTo(UserInterface $user) {
         if (!$user instanceof TelaBotanicaUser) {
             return false;
         }

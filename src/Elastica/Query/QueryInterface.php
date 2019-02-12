@@ -3,10 +3,13 @@
 namespace App\Elastica\Query;
 
 /**
- * Interface for queries on CEL resources. The resultset can be sorted 
+ * Interface for queries on CEL resources/entities. The resultset can be sorted
  * and/or paginated.
+ * 
  * A query is a set of predifined filters on a given CEL resource properties 
  * AND a set of pagination/sort parameters.
+ *
+ * @package App\Elastica\Query
  */
 // @refactor type parameters/return values
 interface QueryInterface {

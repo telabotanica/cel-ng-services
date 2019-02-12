@@ -9,21 +9,19 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\GenericSerializationVisitor;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\PreSerializeEvent;
-use Symfony\Component\Routing\RequestContext;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
+use Symfony\Component\Routing\RequestContext;
 
-class AddPhotoUrlSubscriber implements EventSubscriberInterface
-{
+class AddPhotoUrlSubscriber implements EventSubscriberInterface {
+
 	private $uploaderHelper;
 
-	public function __construct(UploaderHelper $uploaderHelper, RequestContext $requestContext)
-	{
+	public function __construct(UploaderHelper $uploaderHelper, RequestContext $requestContext) {
 		$this->uploaderHelper = $uploaderHelper;
 		$this->requestContext = $requestContext;
 	}
 
-	public function onPreSerialize(PreSerializeEvent $event)
-	{
+	public function onPreSerialize(PreSerializeEvent $event) {
 
 		$object = $event->getObject();
 		$visitor = $event->getVisitor();
@@ -32,8 +30,7 @@ class AddPhotoUrlSubscriber implements EventSubscriberInterface
 		$visitor->setData('absoluteUrl', $url);
 	}
 
-    public static function getSubscribedEvents(): array
-    {
+    public static function getSubscribedEvents(): array {
         return [
             ['event' => Events::PRE_SERIALIZE, 'method' => 'onPreSerialize', 'class' => Photo::class],
         ];
@@ -44,8 +41,7 @@ class AddPhotoUrlSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    private function getHostUrl(): string
-    {
+    private function getHostUrl(): string {
         $scheme = $this->requestContext->getScheme();
         $url = $scheme.'://'.$this->requestContext->getHost();
         $httpPort = $this->requestContext->getHttpPort();

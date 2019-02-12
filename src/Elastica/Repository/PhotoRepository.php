@@ -8,13 +8,25 @@ use App\Elastica\Query\PhotoQuery;
 use App\Elastica\Query\PhotoQueryBuilder;
 
 
+/**
+ * Implementation of <code>AbstractElasticRepository</code> dedicated to 
+ * <code>Photo</code> entities/resources.
+ *
+ * @package App\Elastica\Repository
+ */
 class PhotoRepository extends AbstractElasticRepository
 {
 
+    /**
+     * @inheritdoc
+     */
     protected function requestToFindQuery($request): Query {
         return new PhotoQuery($request);
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getBuilder(): BaseQueryBuilder {
         return new PhotoQueryBuilder();
     }

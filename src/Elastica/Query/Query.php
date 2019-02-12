@@ -3,7 +3,10 @@
 namespace App\Elastica\Query;
 
 /**
- * Base set of . A  can be
+ * Base implementation of <code>QueryInterface</code>. Handles sort/pagination
+ * and free text queries.
+ *
+ * @package App\Elastica\Query
  */
 
 // @todo make enum for sortDirection : DESC ASC

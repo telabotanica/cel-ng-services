@@ -20,15 +20,15 @@ use App\Controller\AbstractBulkAction;
  * Occurrence resource endpoint for bulk operations. Currently, only 
  * 'remove', 'replace' and 'copy' (clone) atomic operations are allowed. 
  *
+ * @package App\Controller
  */
-class OccurrenceBulkAction extends AbstractBulkAction
-{
+class OccurrenceBulkAction extends AbstractBulkAction {
 
     /**
      * @inheritdoc
      */
     protected function initForm($entity) {
-        $this->form = $this->factory->create(Occurrence::class, $entity);
+        $this->form = $this->formFactory->create(Occurrence::class, $entity);
     }
 
     /**

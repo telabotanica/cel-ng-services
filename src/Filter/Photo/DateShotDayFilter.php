@@ -2,40 +2,37 @@
 
 namespace App\Filter\Photo;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
 
 /** 
- * Filters <code>Occurrence</code> resources on the value of the day 
- * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ * Filters <code>Photo</code> resources on the value of the day 
+ * it was shot in.
+ *
+ * @package App\Filter\Photo
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class DateShotDayFilter implements FilterInterface {
+class DateShotDayFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the value of the day the photo was shot in.';
+    const PROPERTY = 'dateShotDay';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            DateShotDayFilter::PROPERTY, 
+            DateShotDayFilter::TYPE, 
+            DateShotDayFilter::DESC, 
+            DateShotDayFilter::REQUIRED);
 
-            $description['dateShotDay'] = [
-                'property' => 'dateShotDay',
-                'required' => false,
-                'type' => 'int',
-                'swagger' => [
-                    'description' => 'Filter on the value of the day the photo was shot.',
-                    'name' => 'dateShotDay',
-                    'required' => false,
-                    'type' => "int"
-                ],
-            ];
-
-
-        return $description;
     }
 
-
 }
+

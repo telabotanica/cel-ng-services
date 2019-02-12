@@ -2,42 +2,40 @@
 
 namespace App\Filter\Photo;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
+use App\Filter\BaseEnumFilter;
 use App\DBAL\CertaintyEnumType;
 
-// @todo use PHP enum for the enum part 
+use ApiPlatform\Core\Api\FilterInterface;
+
 /** 
- * Filters <code>Occurrence</code> resources on the value of their "certainty" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ * Filters <code>Photo</code> resources on the value of the "certainty" status 
+ * of associated </code>Occurrence</code>.
+ *
+ * @package App\Filter\Photo
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class CertaintyFilter implements FilterInterface {
+class CertaintyFilter extends  BaseEnumFilter implements FilterInterface {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+    const CERTAINTY_ENUM = [
+        CertaintyEnumType::CERTAIN, 
+        CertaintyEnumType::DOUBTFUL, 
+        CertaintyEnumType::TO_BE_DETERMINED];
+    const DESC     = 'Filter on the value of the "certainty" status of ' .
+        'associated occurrence';
+    const PROPERTY = 'certainty';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
-            $description['certainty'] = [
-                'property' => 'certainty',
-                'required' => false,
-                'type' => 'list',
-                'swagger' => [
-                    'description' => 'Filter on the "certainty" associated with this photo.',
-                    'name' => 'certainty',
-                    'required' => false,
-                    'type' => "list",
-                    'enum' => [CertaintyEnumType::CERTAIN, CertaintyEnumType::DOUBTFUL, CertaintyEnumType::TO_BE_DETERMINED]
-                ],
-            ];
+    function __construct() {
 
+        parent::__construct(
+            CertaintyFilter::PROPERTY, 
+            CertaintyFilter::TYPE, 
+            CertaintyFilter::DESC, 
+            CertaintyFilter::REQUIRED, 
+            CertaintyFilter::CERTAINTY_ENUM);
 
-        return $description;
     }
-
 
 }

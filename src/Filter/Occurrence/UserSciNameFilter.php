@@ -2,43 +2,38 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
-
 
 /** 
- * Filters <code>Occurrence</code> resources on the value of the day 
- * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ * Filters <code>Occurrence</code> resources on the value of the scientific
+ * name the observer attributed.
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra)
  */
-class UserSciNameFilter implements FilterInterface {
+class UserSciNameFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the value of the scientific name the observer'. 
+        'attributed.';
+    const PROPERTY = 'userSciName';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            UserSciNameFilter::PROPERTY, 
+            UserSciNameFilter::TYPE, 
+            UserSciNameFilter::DESC, 
+            UserSciNameFilter::REQUIRED);
 
-            $description['userSciName'] = [
-                'property' => 'userSciName',
-                'required' => false,
-                'type' => 'string',
-                'swagger' => [
-                    'description' => 'Filter on the value of the scientific name the observer attributed.',
-                    'name' => 'userSciName',
-                    'required' => false,
-                    'type' => "string"
-                ],
-            ];
-
-
-        return $description;
     }
 
-
 }
+

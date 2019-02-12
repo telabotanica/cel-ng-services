@@ -7,16 +7,24 @@ use App\Elastica\Query\BaseQueryBuilder;
 use App\Elastica\Query\OccurrenceQuery;
 use App\Elastica\Query\OccurrenceQueryBuilder;
 
-//@todo rename to OccElasticRepo
+/**
+ * Implementation of <code>AbstractElasticRepository</code> dedicated to 
+ * <code>Occurrence</code> entities/resources.
+ *
+ * @package App\Elastica\Repository
+ */
 class OccurrenceRepository extends AbstractElasticRepository {
 
     /**
-     * Returns a
+     * @inheritdoc
      */
     protected function requestToFindQuery($request): Query {
         return new OccurrenceQuery($request);
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getBuilder(): BaseQueryBuilder {
         return new OccurrenceQueryBuilder();
     }
@@ -30,8 +38,8 @@ class OccurrenceRepository extends AbstractElasticRepository {
      * @return bool Returns true if an Occurrence with the same
      * locality/geometry/userId/observedDate/userSciName already exists.
      */
-    public function hasDuplicate($occ) : bool
-    {
+    public function hasDuplicate($occ) : bool {
+
         if ($occ->getSignature() == null) {
             $occ->generateSignature();
         } 
@@ -46,4 +54,5 @@ class OccurrenceRepository extends AbstractElasticRepository {
 
         return ( sizeof($result) > 0 );
     }
+
 }

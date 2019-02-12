@@ -2,43 +2,36 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
-
 
 /** 
  * Filters <code>Occurrence</code> resources on the value of the day 
  * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra)
  */
-class LocalityFilter implements FilterInterface {
+class LocalityFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the locality the observation took place in.';
+    const PROPERTY = 'locality';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            LocalityFilter::PROPERTY, 
+            LocalityFilter::TYPE, 
+            LocalityFilter::DESC, 
+            LocalityFilter::REQUIRED);
 
-            $description['locality'] = [
-                'property' => 'locality',
-                'required' => false,
-                'type' => 'string',
-                'swagger' => [
-                    'description' => 'Filter on the locality the observation took place in.',
-                    'name' => 'locality',
-                    'required' => false,
-                    'type' => "string"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

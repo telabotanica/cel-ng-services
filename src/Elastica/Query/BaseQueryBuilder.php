@@ -12,6 +12,8 @@ use Elastica\Query\Match;
  * Builds elastica <code>Query</code>s from provided 
  * CEL <code>Query</code> and enhanced with the access control
  * filters for current <code>TelaBotanicaUser</code>.
+ *
+ * @package App\Elastica\Query
  */
 class BaseQueryBuilder implements QueryBuilderInteface {
 

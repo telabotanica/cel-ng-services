@@ -1,11 +1,6 @@
 <?php
 
-
 namespace App\Entity;
-
-use App\Exception\InvalidImageException;
-use App\Utils\ExifExtractionUtils;
-use App\Controller\CreatePhotoAction;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -18,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * An entity representing a taxonomic repository (référentiel taxonomique).
  *
- * The associated API is read-only. Changes and deletions in the underlying 
+ * The associated Web API is read-only. Changes and deletions in the underlying 
  * database are "manually" made by tela devs using CLI or directly in DB.
  *
  * @ApiResource(

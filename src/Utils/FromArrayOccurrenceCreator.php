@@ -14,7 +14,9 @@ use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * Worst class name in OO software dev history to date.
+ * Instanciates <code>Occurrence</code> objects from a data array.
+ *
+ * @package App\Utils
  */
 class FromArrayOccurrenceCreator
 {
@@ -22,6 +24,29 @@ class FromArrayOccurrenceCreator
     private $doctrine;
     private $lineCount = 0;
     private $headerIndexArray = array();
+
+    // Map between CSV file headers (keys) and Occurrence members (values)
+    const CSV_HEADER_OCC_PROP_MAP = array(
+            'Transmis'      => 'isPublic',
+            'Spontanéité'   => 'isWild',
+            'Observateur' => 'observer',
+            "Structure de l'observateur" => 'observerInstitution',
+            'Espèce' => 'userSciName',
+            'Numéro nomenclatural' => 'userSciNameId',
+            'Abondance' => 'coef',
+            "Type d'observation" => 'observationType',
+            "Floutage" => 'publishedLocation',
+            "Phénologie" => 'phenology',
+            "Echantillon d'herbier" => 'sampleHerbarium',
+            "Certitude" => 'certainty',
+            "Altitude" => 'elevation',
+            'Référentiel Géographique' => 'geodatum',
+            "Milieu" => 'environment',
+            "Lieu-dit" => 'sublocality',
+            "Station" => 'station',
+            "Commune" => 'locality',
+            "Pays" => 'osmCountry'
+        );
 
     public function __construct(RegistryInterface $doctrine)
     {
@@ -40,9 +65,14 @@ class FromArrayOccurrenceCreator
      * Instanciate and persist an Occurrence instance populated with the 
      * data in the array provided. 
      *
-	 */
-	public function transform(array $csvLine, TelaBotanicaUser $user)
-	{
+     * @param array $csvLine An array containing the data of a CSV line
+     * @param TelaBotanicaUser $user The current user..
+     *
+     * @return array The ancestor descriptions for the taxon with ID = $taxonId
+     *         in the $taxoRepo repository. Returns null if it cannot be 
+     *         retrieved.
+     */
+	public function transform(array $csvLine, TelaBotanicaUser $user) {
 		$resultMsgs = array();
 		$em = $this->doctrine->getManager();     
 
@@ -89,7 +119,8 @@ class FromArrayOccurrenceCreator
         $photoRepo = $em->getRepository('App\Entity\Photo');
 
         foreach($photoOriginalNames as $imageName) {
-            $photos = $photoRepo->findByOriginalNameAndUserId($imageName, $user->getId());
+            $photos = $photoRepo->findByOriginalNameAndUserId(
+                $imageName, $user->getId());
             if ( sizeof($photos)>0 ) {
                 $occ->addPhoto($photo[0]);
             }
@@ -103,14 +134,17 @@ class FromArrayOccurrenceCreator
     private function populateWithUserTags($occ, $user, $tagNames) {
 
         $em = $this->doctrine->getManager();
-        $userOccurrenceTagRepo = $em->getRepository('App\Entity\UserOccurrenceTag');
+        $userOccurrenceTagRepo = $em->getRepository(
+            'App\Entity\UserOccurrenceTag');
 
         foreach($tagNames as $tagName) {
 
-            $tags = $userOccurrenceTagRepo->findByNameAndUserId($tagName, $user->getId());
+            $tags = $userOccurrenceTagRepo->findByNameAndUserId(
+                $tagName, $user->getId());
 
             if ( sizeof($tags)>0 ) {
-                // creates and persists a new OccurrenceUserOccurrenceTag relation with 
+                // creates and persists a new OccurrenceUserOccurrenceTag 
+                // relation with 
 		        $rel = new OccurrenceUserOccurrenceTagRelation(); 
                 $rel->setUserOccurrenceTag($tags[0]);
                 $rel->setOccurrence($occ);
@@ -171,45 +205,31 @@ class FromArrayOccurrenceCreator
 
     private function populate($occ, $user, $csvLine) {
 
-	    $occ->setGeometry('{"type" : "point","coordinates" : [' . $csvLine[$this->headerIndexArray['Latitude']] . ',' . $csvLine[$this->headerIndexArray['Longitude']] . ']}');
+        $lat  = $csvLine[$this->headerIndexArray['Latitude']];
+        $long = $csvLine[$this->headerIndexArray['Longitude']];
+        
+        if ( ( null !== $lat ) && ( null !== $long ) ) {
+    	    $occ->setGeometry('{"type" : "Point","coordinates" : [' . $csvLine[$this->headerIndexArray['Latitude']] . ',' . $csvLine[$this->headerIndexArray['Longitude']] . ']}');
+        }
 
-        $csvHeaderOccPropertyMap = array(
-            'Transmis'      => 'isPublic',
-            'Spontanéité'   => 'isWild',
-            'Observateur' => 'observer',
-            "Structure de l'observateur" => 'observerInstitution',
-            'Espèce' => 'userSciName',
-            'Numéro nomenclatural' => 'userSciNameId',
-            'Abondance' => 'coef',
-            "Type d'observation" => 'observationType',
-            "Floutage" => 'publishedLocation',
-            "Phénologie" => 'phenology',
-            "Echantillon d'herbier" => 'sampleHerbarium',
-            "Certitude" => 'certainty',
-            "Altitude" => 'elevation',
-            'Référentiel Géographique' => 'geodatum',
-            "Milieu" => 'environment',
-            "Lieu-dit" => 'sublocality',
-            "Station" => 'station',
-            "Commune" => 'locality',
-            "Pays" => 'osmCountry'
-        );
-
-        foreach ($csvHeaderOccPropertyMap as $svHeader => $propertyName) {
+        foreach (FromArrayOccurrenceCreator::CSV_HEADER_OCC_PROP_MAP as $svHeader => $propertyName) {
 	        if ( null !== $csvLine[$this->headerIndexArray[$svHeader]] ) {
                 $setterMethodName = 'set' . ucfirst($propertyName);
 		        $occ->$setterMethodName($csvLine[$this->headerIndexArray[$svHeader]]);
 	        }         
         }
 
-	    if ( null !== $csvLine[$this->headerIndexArray["Date"]] ) {
-		    $occ->setDateObserved(DateTime::createFromFormat('d/m/Y', $csvLine[$this->headerIndexArray['Date']]));
+        $obsDate = $csvLine[$this->headerIndexArray["Date"]];
+	    if ( null !== $obsDate ) {
+		    $occ->setDateObserved(
+                DateTime::createFromFormat('d/m/Y', $obsDate));
 	    }
 
 	    return $occ;	
 	
     }
-    // @todo create a normalizer interface and a BooleanNormalizer
+
+    // @refactor create a normalizer interface and a BooleanNormalizer
 	private function booleanishToBool($booleanish) {
 
 		if ($booleanish == 'oui') {

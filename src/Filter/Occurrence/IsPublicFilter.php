@@ -2,46 +2,37 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
-
 
 /** 
  * Filters <code>Occurrence</code> resources on the value of their "isPublic" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class IsPublicFilter implements FilterInterface {
+class IsPublicFilter extends BaseFilter implements FilterInterface {
 
-    private $requestStack;
+    const DESC     = 'Filter only public occurrence';
+    const PROPERTY = 'isPublic';
+    const TYPE     = 'boolean';
+    const REQUIRED = false;
 
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
+
+        parent::__construct(
+            IsPublicFilter::PROPERTY, 
+            IsPublicFilter::TYPE, 
+            IsPublicFilter::DESC, 
+            IsPublicFilter::REQUIRED);
+
     }
-
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
-
-            $description['isPublic'] = [
-                "property" => 'isPublic',
-                "required" => false,
-                'type' => 'boolean',
-                'swagger' => [
-                    'description' => 'Filter only public occurrence',
-                    'name' => 'isPublic',
-                    'type' => 'boolean',
-                ],
-            ];
-
-
-        return $description;
-    }
-
 
 }
+
+

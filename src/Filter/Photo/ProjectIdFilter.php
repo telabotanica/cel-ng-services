@@ -2,40 +2,37 @@
 
 namespace App\Filter\Photo;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
 
 /** 
- * Filters <code>Occurrence</code> resources on the value of the day 
- * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ * Filters <code>Photo</code> resources on the id of the project the associated
+ * <code>Occurrence</code> belongs to.
+ *
+ * @package App\Filter\Photo
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class ProjectIdFilter implements FilterInterface {
+class ProjectIdFilter  extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the id of the project the associated ' .
+        'occurrence belongs to.';
+    const PROPERTY = 'project.id';
+    const TYPE     = 'int';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            ProjectIdFilter::PROPERTY, 
+            ProjectIdFilter::TYPE, 
+            ProjectIdFilter::DESC, 
+            ProjectIdFilter::REQUIRED);
 
-            $description['project.id'] = [
-                'property' => 'project.id',
-                'required' => false,
-                'type' => 'int',
-                'swagger' => [
-                    'description' => 'Filter on the id of the project the observation is associated with.',
-                    'name' => 'project.id',
-                    'required' => false,
-                    'type' => "int"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

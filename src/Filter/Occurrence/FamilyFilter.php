@@ -2,43 +2,37 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
+use App\Filter\BaseFilter;
 
-use App\Service\OccurrenceSearcherService;
+use ApiPlatform\Core\Api\FilterInterface;
 
 
 /** 
  * Filters <code>Occurrence</code> resources on the value of the botanic 
  * family.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class FamilyFilter implements FilterInterface {
+class FamilyFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the name of the botanic family.';
+    const PROPERTY = 'family';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            FamilyFilter::PROPERTY, 
+            FamilyFilter::TYPE, 
+            FamilyFilter::DESC, 
+            FamilyFilter::REQUIRED);
 
-            $description['county'] = [
-                'property' => 'family',
-                'required' => false,
-                'type' => 'int',
-                'swagger' => [
-                    'description' => 'The name of the botanic family of the occurrence. ',
-                    'name' => 'family',
-                    'required' => false,
-                    'type' => "int"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

@@ -2,42 +2,36 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
-
 
 /** 
  * Filters <code>Occurrence</code> resources on the value of the botanic 
  * family.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class IsIdentiplanteValidatedFilter implements FilterInterface {
+class IsIdentiplanteValidatedFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the validation status on IdentiPlante.';
+    const PROPERTY = 'isIdentiplanteValidated';
+    const TYPE     = 'boolean';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            IsIdentiplanteValidatedFilter::PROPERTY, 
+            IsIdentiplanteValidatedFilter::TYPE, 
+            IsIdentiplanteValidatedFilter::DESC, 
+            IsIdentiplanteValidatedFilter::REQUIRED);
 
-            $description['county'] = [
-                'property' => 'isIdentiplanteValidated',
-                'required' => false,
-                'type' => 'boolean',
-                'swagger' => [
-                    'description' => 'The score obtained on IdentiPlante. ',
-                    'name' => 'isIdentiplanteValidated',
-                    'type' => "boolean"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

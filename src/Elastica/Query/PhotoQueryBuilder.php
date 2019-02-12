@@ -4,6 +4,8 @@ namespace App\Elastica\Query;
 
 /**
  * <code>BaseQueryBuilder</code> class for <code>Photo</code> entities.
+ *
+ * @package App\Elastica\Query
  */
 // @refactor: make construct arrays contant class members
 final class PhotoQueryBuilder extends BaseQueryBuilder {

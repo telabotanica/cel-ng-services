@@ -1,46 +1,43 @@
 <?php
 
-
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Exception\InvalidImageException;
-use App\Utils\ExifExtractionUtils;
-use App\Controller\CreatePhotoAction;
 
 /**
- * An entity representing a Photo.
+ * An entity representing a notification that the DEL DB was updated. Used to  
+ * keep DEL related data (score and/or validation status) in sync in 
+ * <code>Occurrence</code> entities.
  *
- * @ORM\HasLifecycleCallbacks
+ * @package App\Entity
+ *
  * @ORM\Entity
  * @ORM\Table(name="del_update_notfications")
  */
-class DelUpdateNotification
-{
+class DelUpdateNotification {
 
-   /**
-    * @ORM\Id
-    * @ORM\GeneratedValue(strategy="IDENTITY")
-    * @ORM\Column(type="integer")
-    */
-   private $id = null;
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(type="integer")
+     */
+    private $id = null;
 
+    /**
+     * IdentiPlante (DEL) score for the Occurrence.
+     *
+     * @ORM\Column(name="identiplante_score", type="integer", nullable=true, options={"comment":"Nouveau score de l'observation sur identiplante"})
+     */
+    private $identiplanteScore = null;
 
-   /**
-    * IdentiPlante (DEL) score for the Occurrence.
-    *
-    * @ORM\Column(name="identiplante_score", type="integer", nullable=true, options={"comment":"Nouveau score de l'observation sur identiplante"})
-    */
-   private $identiplanteScore = null;
-
-   /**
-    * IdentiPlante (DEL) validation status for the Occurrence.
-    *
-    * @ORM\Column(name="is_identiplante_validated", type="boolean", nullable=false, options={"comment":"Statut validé (ou non) de l'observation sur identiplante"})
-    */
-   private $isIdentiplanteValidated = null;
+    /**
+     * IdentiPlante (DEL) validation status for the Occurrence.
+     *
+     * @ORM\Column(name="is_identiplante_validated", type="boolean", nullable=false, options={"comment":"Statut validé (ou non) de l'observation sur identiplante"})
+     */
+    private $isIdentiplanteValidated = null;
 
 
    /**
@@ -49,9 +46,7 @@ class DelUpdateNotification
     * @ORM\Column(name="date_updated", type="datetime", nullable=true, options={"comment":"Date de dernière modification"})
     */
    private $dateUpdated = null;
-
-
-
+    
    /**
      * A Photo can belong to a single Occurrence.
      *
@@ -60,59 +55,57 @@ class DelUpdateNotification
      */
     private $occurrence;
 
+    public function getId(): ?int {
+ 
+        return $this->id;
+    }
+
+    public function getIdentiplanteScore(): ?int {
+ 
+        return $this->identiplanteScore;
+    }
+
+    public function setIdentiplanteScore(?int $identiplanteScore): self {
+ 
+        $this->identiplanteScore = $identiplanteScore;
+
+        return $this;
+    }
+
+    public function getIsIdentiplanteValidated() {
+ 
+        return $this->isIdentiplanteValidated;
+    }
+
+    public function setIsIdentiplanteValidated( $isIdentiplanteValidated): self {
+ 
+        $this->isIdentiplanteValidated = $isIdentiplanteValidated;
+
+        return $this;
+    }
 
 
-   public function getId(): ?int
-   {
-       return $this->id;
-   }
+    public function getDateUpdated(): ?\DateTimeInterface {
+ 
+        return $this->dateUpdated;
+    }
 
-   public function getIdentiplanteScore(): ?int
-   {
-       return $this->identiplanteScore;
-   }
+    public function setDateUpdated(?\DateTimeInterface $dateUpdated): self {
+ 
+        $this->dateUpdated = $dateUpdated;
 
-   public function setIdentiplanteScore(?int $identiplanteScore): self
-   {
-       $this->identiplanteScore = $identiplanteScore;
+        return $this;
+    }
+    public function getOccurrence(): ?Occurrence {
+ 
+        return $this->occurrence;
+    }
 
-       return $this;
-   }
+    public function setOccurrence(?Occurrence $occurrence): self {
+ 
+        $this->occurrence = $occurrence;
 
-   public function getIsIdentiplanteValidated()
-   {
-       return $this->isIdentiplanteValidated;
-   }
-
-   public function setIsIdentiplanteValidated( $isIdentiplanteValidated): self
-   {
-       $this->isIdentiplanteValidated = $isIdentiplanteValidated;
-
-       return $this;
-   }
-   
-
-   public function getDateUpdated(): ?\DateTimeInterface
-   {
-       return $this->dateUpdated;
-   }
-
-   public function setDateUpdated(?\DateTimeInterface $dateUpdated): self
-   {
-       $this->dateUpdated = $dateUpdated;
-
-       return $this;
-   }
-   public function getOccurrence(): ?Occurrence
-   {
-       return $this->occurrence;
-   }
-
-   public function setOccurrence(?Occurrence $occurrence): self
-   {
-       $this->occurrence = $occurrence;
-
-       return $this;
-   }
+        return $this;
+    }
 
 }

@@ -6,10 +6,14 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * ENUM type for allowed phenology. 
+ * ENUM type for allowed phenology values. 
+ *
+ * @package App\DBAL
+ * @refactor: DRY all DBAL types using a superclass, children will only have 
+ *            a constant associative array, a type_enum and an error msg.
  */
-class PhenologyEnumType extends Type
-{
+class PhenologyEnumType extends Type {
+
     const PHENOLOGY_ENUM = 'phenologyenum';
     const ZERO_NINE = '00-09: germination, développement des bourgeons';
     const TEN_NINETEEN = '10-19: développement des feuilles';
@@ -29,8 +33,11 @@ class PhenologyEnumType extends Type
     const NINETYONE = '91: par ex, environ 10% des feuilles jaunes';
     const NINETYFIVE = '95: par ex, environ 50% des feuilles jaunes';
 
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) {
+ 
         return "ENUM('00-09: germination, développement des bourgeons', " .
                "'10-19: développement des feuilles', " .
                "'11: par ex, environ 10% des feuilles épanouies', " .
@@ -49,26 +56,39 @@ class PhenologyEnumType extends Type
                "'95: par ex, environ 50% des feuilles jaunes')";
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function convertToPHPValue($value, AbstractPlatform $platform) {
+ 
         return $value;
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function convertToDatabaseValue($value, AbstractPlatform $platform) {
+ 
         if (!in_array($value, array(null, self::ZERO_NINE, self::TEN_NINETEEN, self::ELEVEN, self::FIFTEEN, self::TWENTY_TWENTYNINE , self::THIRTY_THIRTY_NINE, self::FORTY_FORTYNINE, self::FIFTY_FIFTYNINE, self::SIXTY_SIXTYNINE, self::SIXTYONE, self::SIXTYFIVE, self::SEVENTY_SEVENTYNINE, self::HEIGHTY_HEIGHTYNINE, self::HEIGHTYFIVE, self::NINETY_NINETYNINE, self::NINETYONE, self::NINETYFIVE, ))) {
             throw new \InvalidArgumentException("Invalid phenology value");
         }
         return $value;
     }
 
-    public function getName()
-    {
+    /**
+     * @inheritdoc
+     */
+    public function getName() {
+ 
         return self::PHENOLOGY_ENUM;
     }
 
-    public function requiresSQLCommentHint(AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function requiresSQLCommentHint(AbstractPlatform $platform) {
+ 
         return true;
     }
+
 }

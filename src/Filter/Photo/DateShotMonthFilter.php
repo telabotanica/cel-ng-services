@@ -2,38 +2,36 @@
 
 namespace App\Filter\Photo;
 
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
 
 /** 
- * Filters <code>Occurrence</code> resources on the value of the month 
- * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ * Filters <code>Photo</code> resources on the value of the month
+ * of their shooting.
+ *
+ * @package App\Filter\Photo
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class DateShotMonthFilter implements FilterInterface {
+class DateShotMonthFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the value of the month the photo was shot in.';
+    const PROPERTY = 'dateShotMonth';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            DateShotMonthFilter::PROPERTY, 
+            DateShotMonthFilter::TYPE, 
+            DateShotMonthFilter::DESC, 
+            DateShotMonthFilter::REQUIRED);
 
-            $description['dateShotMonth'] = [
-                'property' => 'dateShotMonth',
-                'required' => false,
-                'type' => 'int',
-                'swagger' => [
-                    'description' => 'Filter on the value of the month of their "dateObserved" property the photo was shot.',
-                    'name' => 'dateShotMonth',
-                    'required' => false,
-                    'type' => "int"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

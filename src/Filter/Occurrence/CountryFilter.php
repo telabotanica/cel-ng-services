@@ -2,43 +2,35 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
-
 
 /** 
- * Filters <code>Occurrence</code> resources on the value of the day 
- * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ * Filters <code>Occurrence</code> resources on the country it took place in.
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class CountryFilter implements FilterInterface {
+class CountryFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the country the occurrence was observed in.';
+    const PROPERTY = 'country';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            CountryFilter::PROPERTY, 
+            CountryFilter::TYPE, 
+            CountryFilter::DESC, 
+            CountryFilter::REQUIRED);
 
-            $description['country'] = [
-                'property' => 'country',
-                'required' => false,
-                'type' => 'string',
-                'swagger' => [
-                    'description' => 'Filter on the value of the country the observation took place in.',
-                    'name' => 'country',
-                    'required' => false,
-                    'type' => "string"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

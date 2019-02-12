@@ -2,33 +2,29 @@
 
 namespace App\Elastica\Transformer;    
 
+use App\Entity\Photo;
+
 use DateTime;
 use Elastica\Document;
 use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
-
-use App\Entity\Photo;
  
-// @refactor move to a Elastica/Transformer package
 /**
- * Transforms Photo entities ot elastica documents.
+ * Transforms <code>Photo</code> entity instances into elastica 
+ * <code>Document</code> instances.
+ *
+ * @package App\Elastica\Transformer
  */
-class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface
-{
+class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface {
  
-	/**
-	 * @param Occurrence  $post
-	 * @param array $occ
-	 *
-	 * @return Document
-	 */
-	public function transform($occ, array $fields)
-	{
+    /**
+     * @inheritdoc
+     */
+	public function transform($occ, array $fields) {
 		return new Document($occ->getId(), $this->buildData($occ));
 	}
 
-    // @todo DRY this using meta prog black magicgetFormattedDateUpdated
-	protected function buildData($photo)
-	{
+    // @refactor DRY this using meta prog black magic + an abstract class
+	protected function buildData($photo) {
 		$data = [];
         $tags = [];
         $occ = $photo->getOccurrence();
@@ -90,7 +86,6 @@ class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface
             }
 
         }
-	
                    
 		return $data;
 	}

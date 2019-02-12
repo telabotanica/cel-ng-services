@@ -2,7 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Photo;
+use App\Form\PhotoType;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -11,46 +15,70 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
-use App\Entity\Photo;
-use App\Form\PhotoType;
+/**
+ * Action/controller for POST (CREATE) HTTP requests on <code>Photo</code> 
+ * resources.
+ *
+ * @package App\Controller
+ */
+final class CreatePhotoAction {
 
-final class CreatePhotoAction
-{
+    // Symfony services
     private $validator;
     private $doctrine;
-    private $factory;
+    private $formFactory;
 
-    public function __construct(RegistryInterface $doctrine, FormFactoryInterface $factory, ValidatorInterface $validator)
-    {
+    const DUPLICATE_NAME_MSG = "A photo with the same name is already present "
+        . "in the user gallery. This is not allowed.";
+
+    /**
+     * Returns a new <code>CreatePhotoAction</code> instance 
+     * initialized with (injected) services passed as parameters.
+     *
+     * @param RegistryInterface $doctrine The injected 
+     *        <code>RegistryInterface</code> service.
+     * @param FormFactoryInterface $formFactory The injected 
+     *        <code>FormFactoryInterface</code> service.
+     * @param ValidatorInterface $validator The injected 
+     *        <code>ValidatorInterface</code> service.
+     * @return CreatePhotoAction Returns a new  
+     *         <code>CreatePhotoAction</code> instance initialized 
+     *         with (injected) services passed as parameters.
+     */
+    public function __construct(
+        RegistryInterface $doctrine, 
+        FormFactoryInterface $formFactory, 
+        ValidatorInterface $validator) {
+
         $this->validator = $validator;
         $this->doctrine = $doctrine;
-        $this->factory = $factory;
+        $this->factory = $formFactory;
     }
 
     /**
-     * //@IsGranted("ROLE_USER")
+     * Invokes the controller/action.
+     *
+     * @param Request $request The HTTP <code>Request</code> issued 
+     *        by the client.
+     * 
+     * @return Response Returns an HTTP <code>Response</code> reflecting
+     *         the action result.
      */
-    public function __invoke(Request $request): Photo
-    {
+    public function __invoke(Request $request): Photo {
+
         $photo = new Photo();
         $photoRepo = $this->doctrine->getRepository(Photo::class);
-
         $form = $this->factory->create(PhotoType::class, $photo);
         $form->handleRequest($request);
-/*
-        if ($form->isSubmitted() && $form->isValid()) {
-*/
-
-
-        $originalName = $request->files->get('file')->getClientOriginalName();
-        $photoWithSameName = $photoRepo->findBy(array('originalName' => $originalName));
+        $file = $request->files->get('file');
+        $originalName = $file->getClientOriginalName();
+        $findByArray = array('originalName' => $originalName);
+        $photoWithSameName = $photoRepo->findBy($findByArray);
 
 
         if ( (sizeof($photoWithSameName)==0) ) {
 
             $em = $this->doctrine->getManager();
-
             $em->persist($photo);
             $em->flush();
 
@@ -60,9 +88,11 @@ final class CreatePhotoAction
             return $photo;
         }
 
-        // This will be handled by API Platform and returns a validation error.
-        throw new \Exception("A photo with the same name is already present in the user gallery. This is not allowed.");
+        // This will be handled by API Platform which will return a 
+        // validation error:
+        throw new \Exception(CreatePhotoAction::DUPLICATE_NAME_MSG);
     }
+
 }
 
 

@@ -2,43 +2,37 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
-
 
 /** 
  * Filters <code>Occurrence</code> resources on the value of the year 
  * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class DateObservedYearFilter implements FilterInterface {
+class DateObservedYearFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the value of the year of their '
+        .'"dateObserved" property.';
+    const PROPERTY = 'dateObservedYear';
+    const TYPE     = 'int';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            DateObservedYearFilter::PROPERTY, 
+            DateObservedYearFilter::TYPE, 
+            DateObservedYearFilter::DESC, 
+            DateObservedYearFilter::REQUIRED);
 
-            $description['dateObservedYear'] = [
-                'property' => 'dateObservedYear',
-                'required' => false,
-                'type' => 'int',
-                'swagger' => [
-                    'description' => 'Filter on the value of the year of their "dateObserved" property ',
-                    'name' => 'dateObservedYear',
-                    'required' => false,
-                    'type' => "int"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

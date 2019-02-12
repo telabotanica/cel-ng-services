@@ -1,18 +1,29 @@
 <?php
 
-// src/App/EventListener/OccurrenceEventListener.php
 namespace App\EventListener;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use App\Entity\Occurrence;
 use App\TelaBotanica\Eflore\Api\EfloreApiClient;
 
-class OccurrenceEventListener
-{
-    public function prePersist(LifecycleEventArgs $args)
-    {
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 
+/**
+ * Populates various properties of <code>Occurrence</code> instances 
+ * based on CEL business rules before they are persisted/updated.
+ * The properties can be "family", "datePublished" and "isPublic".
+ *
+ * @package App\EventListener
+ */
+class OccurrenceEventListener {
+
+    /**
+     * Populates various properties of <code>Occurrence</code> instances 
+     * based on CEL business rules before they are persisted.
+     *
+     * @param LifecycleEventArgs $args The Lifecycle Event emitted.
+     */
+    public function prePersist(LifecycleEventArgs $args) { 
         $entity = $args->getEntity();
 
         // only act on "Occurrence" entities
@@ -29,17 +40,24 @@ class OccurrenceEventListener
         }
 
         if ( null !== $entity->getTaxoRepo() ){
-            $efloreClient = new EfloreApiClient();
-            $familyName = $efloreClient->getFamilyName($entity->getUserSciNameId(), $entity->getTaxoRepo()->getName());
+            $efClient = new EfloreApiClient();
+            $userSciNameId = $entity->getUserSciNameId();
+            $taxoRepoName = $entity->getTaxoRepo()->getName();
+            $familyName = $efClient->getFamilyName(
+                $userSciNameId, $taxoRepoName);
             if ( null !== $familyName ) {
                 $entity->setFamily($familyName);
             }
         }
     }
 
-    public function preUpdate(LifecycleEventArgs $args)
-    {
-
+    /**
+     * Populates various properties of <code>Occurrence</code> instances 
+     * based on CEL business rules before they are updated.
+     *
+     * @param LifecycleEventArgs $args The Lifecycle Event emitted.
+     */
+    public function preUpdate(LifecycleEventArgs $args) {
         $entity = $args->getEntity();
 
         // only act on "Occurrence" entities
@@ -48,8 +66,10 @@ class OccurrenceEventListener
         }
 
         // If isPublic status has been changed to true, set the occurrence 
-        // datePublished to now:
-        if ($args->hasChangedField('isPublic') && $args->getNewValue('isPublic') == true) {
+        // datePublished to "now":
+        if ( $args->hasChangedField('isPublic') && 
+            $args->getNewValue('isPublic') == true) {
+
             $entity->setDatePublished(new \DateTime());
         }
 
@@ -58,9 +78,7 @@ class OccurrenceEventListener
 
     }
 
-    public function doCommon(Occurrence $occ)
-    {
-
+    private function doCommon(Occurrence $occ) {
         // If the occurrence cannot be published:
         if ( ! ($occ->isPublishable()) ) {
             // Force it to be private:
@@ -73,8 +91,8 @@ class OccurrenceEventListener
 
 /*
 
-    public function persistRelatedPhotos(LifecycleEventArgs $args)
-    {
+    public function persistRelatedPhotos(LifecycleEventArgs $args) {
+ 
         $entity = $args->getEntity();
 
         // only act on some "GenericEntity" entity

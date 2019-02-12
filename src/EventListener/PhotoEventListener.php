@@ -11,27 +11,36 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\Routing\RequestContext;
 
-class PhotoEventListener
-{
+/**
+ * Populates various properties of <code>Photo</code> instances before they 
+ * are persisted. The properties are 'url' and exif data. Also updates 
+ * other properties based on the values passed in the uploaded JSON file if 
+ * any.
+ *
+ * @package App\EventListener
+ */
+class PhotoEventListener {
 
-  /** @var UploaderHelper */
-  private $uploaderHelper;
+    private $uploaderHelper;
+    private $requestContext;
 
-  private $requestContext;
-
-    public function __construct(UploaderHelper $uploaderHelper, RequestContext $requestContext)
-    {
-      $this->uploaderHelper = $uploaderHelper;
+    public function __construct(UploaderHelper $uploaderHelper, RequestContext $requestContext) {
+        $this->uploaderHelper = $uploaderHelper;
 		$this->requestContext = $requestContext;
     }
 
-
-    public function prePersist(LifecycleEventArgs $args)
-    {
+    /**
+     * Populates 'url' and exif related properties of <code>Photo</code>
+     * instances  before they are persisted. Also updates other properties 
+     * based on values passed in the uploaded JSON file if any.
+     *
+     * @param LifecycleEventArgs $args The Lifecycle Event emitted.
+     */
+    public function prePersist(LifecycleEventArgs $args) {
 
         $entity = $args->getEntity();
 
-        // only act on some "GenericEntity" entity
+        // only act on some "Photo" entity
         if (!$entity instanceof Photo) {
             return;
         }
@@ -40,8 +49,8 @@ class PhotoEventListener
       // So we purge the associative array of all entries with keys belonging
       // to the set of property names which are not overwritten right after 
       // and that can cause issues. This is a bit bit paranoid cos there is no
-      // interest for an evil user to fuck his own records up and cos it should
-      // have no nasty side effect but hey! let's do it anyway!
+      // interest for an evil user to fuck his own records up plus it should
+      // have no nasty side effects but hey! let's do it anyway!
       $forbiddenKeys = array(
          "occurrence",
          "photoTags",
@@ -57,30 +66,14 @@ class PhotoEventListener
       $entity->fillPropertiesWithImageExif();
       $imgUrl = $this->getHostUrl() . $this->uploaderHelper->asset($entity, 'file');
       $entity->setUrl($imgUrl);
-      
     }
-
-    public function preUpdate(LifecycleEventArgs $args)
-    {
-        $entity = $args->getEntity();
-
-        // only acts on "Photo" entities
-        if (!$entity instanceof Photo) {
-            return;
-        }
-
-        //$entity->fillPropertiesWithImageExif();
-
-    }
-
 
     /**
-     * Get host url (scheme://host:port).
+     * Returns the host URL (<scheme>://<host>:<port>).
      *
-     * @return string
+     * @return string the host URL.
      */
-    private function getHostUrl(): string
-    {
+    private function getHostUrl(): string {
         $scheme = $this->requestContext->getScheme();
         $url = $scheme.'://'.$this->requestContext->getHost();
         $httpPort = $this->requestContext->getHttpPort();

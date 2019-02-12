@@ -2,43 +2,37 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
-
 
 /** 
  * Filters <code>Occurrence</code> resources on the value of the day 
  * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class DateObservedDayFilter implements FilterInterface {
+class DateObservedDayFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the value of the day of their '
+        .'"dateObserved" property.';
+    const PROPERTY = 'dateObservedDay';
+    const TYPE     = 'int';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            DateObservedDayFilter::PROPERTY, 
+            DateObservedDayFilter::TYPE, 
+            DateObservedDayFilter::DESC, 
+            DateObservedDayFilter::REQUIRED);
 
-            $description['dateObservedDay'] = [
-                'property' => 'dateObservedDay',
-                'required' => false,
-                'type' => 'int',
-                'swagger' => [
-                    'description' => 'Filter on the value of the day of the observation date.',
-                    'name' => 'dateObservedDay',
-                    'required' => false,
-                    'type' => "int"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

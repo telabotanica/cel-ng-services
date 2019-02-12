@@ -2,44 +2,39 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
+use App\Filter\BaseEnumFilter;
 use App\DBAL\CertaintyEnumType;
 
+use ApiPlatform\Core\Api\FilterInterface;
 
 /** 
- * Filters <code>Occurrence</code> resources on the value of their "certainty" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ * Filters <code>Occurrence</code> resources on the value of their "certainty"
+ * status. 
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class CertaintyFilter implements FilterInterface {
+class CertaintyFilter extends  BaseEnumFilter implements FilterInterface {
 
+    const CERTAINTY_ENUM = [
+        CertaintyEnumType::CERTAIN, 
+        CertaintyEnumType::DOUBTFUL, 
+        CertaintyEnumType::TO_BE_DETERMINED];
+    const DESC     = 'Filter on the "certainty" status';
+    const PROPERTY = 'certainty';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            CertaintyFilter::PROPERTY, 
+            CertaintyFilter::TYPE, 
+            CertaintyFilter::DESC, 
+            CertaintyFilter::REQUIRED, 
+            CertaintyFilter::CERTAINTY_ENUM);
 
-            $description['certainty'] = [
-                'property' => 'certainty',
-                'required' => false,
-                'type' => 'boolean',
-                'swagger' => [
-                    'description' => 'Filter on the "certainty" property values',
-                    'name' => 'certainty',
-                    'required' => false,
-                    'type' => "list",
-                    'enum' => [CertaintyEnumType::CERTAIN, CertaintyEnumType::DOUBTFUL, CertaintyEnumType::TO_BE_DETERMINED]
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

@@ -7,6 +7,8 @@ use App\Entity\Occurrence;
 /**
  * <code>BaseCollectionDataProvider</code> class for <code>Occurrence</code> 
  * entities.
+ *
+ * @package App\DataProvider
  */
 final class OccurrenceCollectionDataProvider extends BaseCollectionDataProvider {
 

@@ -23,7 +23,6 @@ doctrine:
             phenologyenum: App\DBAL\PhenologyEnumType
             certaintyenum: App\DBAL\CertaintyEnumType
             publishedlocationenum: App\DBAL\PublishedLocationEnumType
-            environmentenum: App\DBAL\EnvironmentEnumType
             locationtypeenum: App\DBAL\LocationTypeEnumType
             taxorestrictiontypeenum: App\DBAL\TaxoRestrictionTypeEnumType
             fielddatatypeenum: App\DBAL\FieldDataTypeEnumType

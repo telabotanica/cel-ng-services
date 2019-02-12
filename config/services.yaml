@@ -79,47 +79,46 @@ services:
 
     # Security: voter (ACL) for occurrence entities/resources 
     security.acccess.occurrence_voter :
-        class:  App\Security\OccurrenceVoter
+        class:  App\Security\Authorization\OccurrenceVoter
         public: false
         tags:
             - { name: security.voter }
 
-    # Security: voter (ACL) for photo resources 
+    # Security: voter (ACL) for photo entities/resources 
     security.acccess.photo_voter :
-        class:  App\Security\PhotoVoter
+        class:  App\Security\Authorization\PhotoVoter
         public: false
         tags:
             - { name: security.voter }
 
-    # Security: voter (ACL) for user profile resources 
-    security.access.user_profile_cel_voter :
-        class:  App\Security\UserProfileCelVoter
+    # Security: voter (ACL) for ExtendedFieldOccurrence entities/resources 
+    security.acccess.extended_field_occurrence_voter :
+        class:  App\Security\Authorization\ExtendedFieldOccurrenceVoter
         public: false
         tags:
             - { name: security.voter }
 
-    # Security: voter (ACL) for user profile resources 
-    security.access.user_occurrence_tag_voter :
-        class:  App\Security\UserOccurrenceTagVoter
+    # Security: voter (ACL) for OccurrenceUserOccurrenceTagRelation entities/resources 
+    security.acccess.occurrence_user_occurrence_tag_relation_voter :
+        class:  App\Security\Authorization\OccurrenceUserOccurrenceTagRelationVoter
         public: false
         tags:
             - { name: security.voter }
 
-    # Security: voter (ACL) for user custom fields resources 
-    security.access.user_custom_field_voter :
-        class:  App\Security\UserCustomFieldVoter
+    # Security: voter (ACL) for PhotoPhotoTagRelation entities/resources 
+    security.acccess.photo_photo_tag_relation_voter :
+        class:  App\Security\Authorization\PhotoPhotoTagRelationVoter
         public: false
         tags:
             - { name: security.voter }
 
-    # Security: voter (ACL) for user custom fields resources 
-    security.access.user_custom_field_occurrence_voter :
-        class:  App\Security\UserCustomFieldOccurrenceVoter
+    # Security: voter (ACL) for UserProfileCel/UserCustomField/PhotoTag/UserOccurrenceTag/
+    # UserCustomFieldOccurrence entities/resources 
+    security.access.base_voter :
+        class:  App\Security\Authorization\BaseVoter
         public: false
         tags:
             - { name: security.voter }
-
-
 
 
     # ########################################################################
@@ -137,7 +136,6 @@ services:
         class: App\EventListener\PhotoEventListener
         tags:
             - { name: doctrine.event_listener, event: prePersist }
-            - { name: doctrine.event_listener, event: preUpdate }
 
     app.event.listener.owned.entity.event.listener:
         class: App\EventListener\OwnedEntityEventListener

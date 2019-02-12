@@ -14,21 +14,26 @@ use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * Extracts latitude and longitude from a GeoJSON 'geometry' element.
+ * Extracts latitude and longitude from/validates the GeoJSON 'geometry' 
+ * element it has been iniated with.
+ *
+ * @package App\Utils
  */
 class LatLongGeoJsonExtractor
 {
-
+    
     private $geoJson;
 
-    public function __construct(string $strGeoJson)
-    {
+    public function __construct(string $strGeoJson) {
         $this->geoJson = json_decode($strGeoJson, true);
-     }
+    }
 
     /** 
      * Returns true if the geoJson geometry fulfills basic format structural
      * requirements. Else returns false.
+     *
+     * @return bool Returns true if the geoJson geometry fulfills basic format 
+     *         structural requirements. Else returns false.
      */
     public function isValidGeometry() {
         return (
@@ -39,6 +44,9 @@ class LatLongGeoJsonExtractor
     /** 
      * Returns true if the type of the geoJson geometry is 'Point'.
      * Else returns false.
+     *
+     * @return bool Returns true if the type of the geoJson geometry is 
+     *        'Point'. Else returns false.
      */
     public function isPoint() {
         if ( $this->isValidGeometry() ) {
@@ -49,6 +57,8 @@ class LatLongGeoJsonExtractor
 
     /** 
      * Returns the latitude of the geoJson geometry.
+     *
+     * @return int Returns the latitude of the geoJson geometry.
      */
     public function extractLatitude() {
         if ( $this->isValidGeometry() && $this->isPoint() ) {
@@ -59,6 +69,8 @@ class LatLongGeoJsonExtractor
 
     /** 
      * Returns the longitude of the geoJson geometry.
+     *
+     * @return int the longitude of the geoJson geometry.
      */
     public function extractLongitude() {
         if ( $this->isValidGeometry() && $this->isPoint() ) {

@@ -7,40 +7,54 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * ENUM type for allowed WidgetConfiguration entity localisation type values. 
- * @refactor DRY this using a superclass, children will only have a constant associative array, a type_enum and an error msg
+ *
+ * @package App\DBAL
+ * @refactor: DRY all DBAL types using a superclass, children will only have 
+ *            a constant associative array, a type_enum and an error msg.
  */
-class LanguageEnumType extends Type
-{
+class LanguageEnumType extends Type {
+
     const ENV_TYPE_ENUM = 'languageenum';
     const INVALID_ARGUMENT_MESSAGE = 'Invalid language';
     const EN = 'EN';
     const FR = 'FR';
 
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) {
         return "ENUM('EN', 'FR')";
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function convertToPHPValue($value, AbstractPlatform $platform) {
         return $value;
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function convertToDatabaseValue($value, AbstractPlatform $platform) {
         if (!in_array($value, array(null, self::EN, self::FR))) {
             throw new \InvalidArgumentException(self::INVALID_ARGUMENT_MESSAGE);
         }
+
         return $value;
     }
 
-    public function getName()
-    {
+    /**
+     * @inheritdoc
+     */
+    public function getName() {
         return self::ENV_TYPE_ENUM;
     }
 
-    public function requiresSQLCommentHint(AbstractPlatform $platform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function requiresSQLCommentHint(AbstractPlatform $platform) {
         return true;
     }
 

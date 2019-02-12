@@ -2,29 +2,29 @@
 
 namespace App\Elastica\Transformer;  
 
+use App\Entity\Occurrence;
+
 use DateTime;
 use Elastica\Document;
 use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
-
-use App\Entity\Occurrence;
  
-class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInterface
-{
+/**
+ * Transforms <code>Occurrence</code> entity instances into elastica 
+ * <code>Document</code> instances.
+ *
+ * @package App\Elastica\Transformer
+ */
+class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInterface {
  
-	/**
-	 * @param Occurrence  $occ
-	 * @param array $occ
-	 *
-	 * @return Document
-	 */
-	public function transform($occ, array $fields)
-	{
+    /**
+     * @inheritdoc
+     */
+	public function transform($occ, array $fields) {
 		return new Document($occ->getId(), $this->buildData($occ));
 	}
  
-    // @todo DRY this using meta prog black magic
-	protected function buildData($occ)
-	{
+    // @refactor DRY this using meta prog black magic + an abstract class
+	protected function buildData($occ) {
 		$data = [];
         $tags = [];
 

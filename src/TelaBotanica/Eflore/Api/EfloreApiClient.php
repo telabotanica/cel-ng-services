@@ -10,29 +10,39 @@ use Symfony\Component\HttpFoundation\Request;
  * Client service for eflore Web service API. Currently, only offers methods 
  * to retrieve ancestor name for a given taxon.
  *
- * Service client de l'API eflore (Web services). Pour le moment, seules des 
- * méthodes d'accès aux parents d'un taxon sont disponibles.
- *
- * @todo config these
+ * @package App\TelaBotanica\Eflore\Api
  */
-//@docStatus OK
-class EfloreApiClient
-{
+class EfloreApiClient {
 
     // The base URL for eflore Web service API:
-    private $baseUrl = 'http://api.tela-botanica.org/service:eflore:0.1/';
-    private $resourceName = 'taxons';
+    const BASE_URL = 'http://api.tela-botanica.org/service:eflore:0.1/';
+    const RESOURCE_NAME = 'taxons';
+    const SERVICE_URL_POSTFIX = '/relations/superieurs';
     // The allowed repository names (also called 'projets' but it can be 
     // misleading):
-    private $allowedRepoNames = array('bdtfxr', 'aublet', 'florical', 'bdtre', 'commun', 'sophy', 'apd', 'sptba', 'nvps', 'bdnt', 'bdtfx', 'bdtxa', 'chorodep', 'coste', 'eflore', 'fournier', 'insee-d', 'iso-3166-1', 'iso-639-1', 'nvjfl', 'cel', 'lion1906', 'liste-rouge', 'wikipedia', 'osm', 'prometheus', 'bibliobota', 'photoflora', 'baseflor', 'baseveg', 'sptb', 'isfan', 'nva', 'moissonnage', 'nasa-srtm', 'coord-transfo', 'lbf');
-
+    const ALLOWED_REPO_NAMES = array(
+        'bdtfxr', 'aublet', 'florical', 'bdtre', 'commun', 'sophy', 'apd', 
+        'sptba', 'nvps', 'bdnt', 'bdtfx', 'bdtxa', 'chorodep', 'coste', 
+        'eflore', 'fournier', 'insee-d', 'iso-3166-1', 'iso-639-1', 'nvjfl', 
+        'cel', 'lion1906', 'liste-rouge', 'wikipedia', 'osm', 'prometheus', 
+        'bibliobota', 'photoflora', 'baseflor', 'baseveg', 'sptb', 'isfan', 
+        'nva', 'moissonnage', 'nasa-srtm', 'coord-transfo', 'lbf');
     // Constants for rank names as used in the Web services:
     const RANK_FAMILY = 'Famille';
     const RANK_ORDER  = 'Ordre';
 
+    private function buildGetUpperTaxaHierarchyUrl(
+        int $taxonId, string $taxoRepo): string {
 
-    private function buildGetUpperTaxaHierarchyUrl(int $taxonId, string $taxoRepo) {
-        return $this->baseUrl  . $taxoRepo . '/' .  $this->resourceName . '/' . $taxonId . '/relations/superieurs';
+        $url = EfloreApiClient::BASE_URL;
+        $url .= $taxoRepo;
+        $url .= '/';
+        $url .= EfloreApiClient::RESOURCE_NAME;
+        $url .= '/';
+        $url .= $taxonId;
+        $url .= EfloreApiClient::SERVICE_URL_POSTFIX;
+
+        return $url;
     }
 
     /**
@@ -44,14 +54,14 @@ class EfloreApiClient
      * @param string $taxoRepo The name of the taxonomic repository to retrieve
      *        the taxon ancestor names from.
      *
-     * @return array the ancestor descriptions for the taxon with ID = $taxonId
+     * @return array The ancestor descriptions for the taxon with ID = $taxonId
      *         in the $taxoRepo repository. Returns null if it cannot be 
      *         retrieved.
      */
     protected function getUpperTaxaHierarchy(int $taxonId, string $taxoRepo) {
 
 
-        if ( in_array($taxoRepo, $this->allowedRepoNames) ) {
+        if ( in_array($taxoRepo, EfloreApiClient::ALLOWED_REPO_NAMES) ) {
 
             $url = $this->buildGetUpperTaxaHierarchyUrl($taxonId, $taxoRepo);
 
@@ -90,7 +100,8 @@ class EfloreApiClient
      */
     public function getFamilyName(int $taxonId, string $taxoRepo) {
 
-        return $this->getAncestorName($taxonId, $taxoRepo, EfloreApiClient::RANK_FAMILY);
+        return $this->getAncestorName(
+            $taxonId, $taxoRepo, EfloreApiClient::RANK_FAMILY);
     }
 
     /**
@@ -107,7 +118,8 @@ class EfloreApiClient
      */
     public function getOrderName(int $taxonId, string $taxoRepo) {
 
-        return $this->getAncestorName($taxonId, $taxoRepo, EfloreApiClient::RANK_ORDER);
+        return $this->getAncestorName(
+            $taxonId, $taxoRepo, EfloreApiClient::RANK_ORDER);
     }
 
     /**
@@ -121,14 +133,13 @@ class EfloreApiClient
      *        the taxon ancestor name from.
      * @param string $taxoRank The name of the taxonomic rank to retrieve.
      *
-     * @return string the name of the ancestor with rank named $taxoRank for
-     *         the taxon with ID = $taxonId in the $taxoRepo repository.  
-     *         Returns null if it cannot be found.
+     * @return string Returns the name of the ancestor with rank named 
+     *         $taxoRank for the taxon with ID = $taxonId in the $taxoRepo  
+     *         repository. Returns null if it cannot be found.
      *
      */
-    protected function getAncestorName(int $taxonId, string $taxoRepo, string $taxoRank) : ?string {
-
-
+    protected function getAncestorName(
+        int $taxonId, string $taxoRepo, string $taxoRank) : ?string {
 
         if ( null !== $taxoRank ) {    
             $data = $this->getUpperTaxaHierarchy($taxonId, $taxoRepo);
@@ -136,13 +147,9 @@ class EfloreApiClient
             if ( null !== $data ) {   
 
                 $ancestorArray = (array)$data->$taxonId;
-//echo var_dump($ancestorArray);
-    //die('+++++++++++++++++++'.var_dump($ancestorArray) .'***********');
+
                 if ( null !== $ancestorArray ) {
                     foreach ($ancestorArray as $ancestor) {
-    //die('+++++++++++++++++++'.var_dump($ancestor->nom_sci) .'***********');
-
-
                         if ( $ancestor->{'rang.libelle'} == $taxoRank) {
                             return $ancestor->nom_sci;
                         }
@@ -150,6 +157,7 @@ class EfloreApiClient
                 }
             }
         }
+
         return null;
     }
 

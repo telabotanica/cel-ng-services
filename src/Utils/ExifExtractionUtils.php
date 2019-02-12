@@ -3,7 +3,9 @@
 namespace App\Utils;
 
 /**
- * Helper class to extract exif information from images.
+ * Helper class to extract exif information from an image.
+ *
+ * @package App\Utils
  */
 class ExifExtractionUtils {
 
@@ -25,18 +27,33 @@ class ExifExtractionUtils {
       return ($ref == 'S' || $ref == 'W') ? $d *= -1 : $d;
    }
 
+	/**
+     * Returns the latitude extracted from image exif data.
+     *
+     * @return float The latitude extracted from image exif data.
+     */
    public function getLatitude() {
 
       return (isset($this->exif['GPSLatitude'])) ? 
          floatval(sprintf('%.6f', $this->toDecimal($this->exif['GPSLatitude'][0], $this->exif['GPSLatitude'][1], $this->exif['GPSLatitude'][2], $this->exif['GPSLatitudeRef']))) : null;
    }
 
+	/**
+     * Returns the longitude extracted from image exif data.
+     *
+     * @return float The longitude extracted from image exif data.
+     */
    public function getLongitude() {
 
       return (isset($this->exif['GPSLatitude'])) ? 
          floatval(sprintf('%.6f', $this->toDecimal($this->exif['GPSLongitude'][0], $this->exif['GPSLongitude'][1], $this->exif['GPSLongitude'][2], $this->exif['GPSLongitudeRef']))) : null;
    }
 
+	/**
+     * Returns the longitude extracted from image exif data.
+     *
+     * @return float The longitude extracted from image exif data.
+     */
    public function getCoordinateArray()  {
 
       return (isset($exif['GPSLatitude'], $exif['GPSLongitude'])) ? implode(',', array(
@@ -46,6 +63,12 @@ class ExifExtractionUtils {
 
    }
 
+	/**
+     * Returns the image shooting date as extracted from image exif data.
+     *
+     * @return DateTime The image shooting date as extracted from image exif 
+     *         data.
+     */
    public function getShootingDate() {
       return new \DateTime($this->exifIfdzero['DateTime']);
    }

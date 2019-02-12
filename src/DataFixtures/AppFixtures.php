@@ -19,7 +19,7 @@ use App\DBAL\InputSourceEnumType;
 
 /**
  * Creates and persists three user (profile) instances (one tela-botanica
- * admin, one project admin and one luser) along ith their Occurrenceand one and their associated  + )two intances of the follo UserProfileCel
+ * admin, one project admin and one luser) along with some Occurrence and one and their associated  + )two intances of the follo UserProfileCel
  *
  * @impl populates the database with 
  */
@@ -90,9 +90,9 @@ class AppFixtures extends Fixture
         return $occTag;
     }
 
-
-
-
+    /**
+     * @inheritdoc
+     */
     public function load(ObjectManager $manager)
     {
         $user22Id = 22;
@@ -184,6 +184,13 @@ echo $occ->getGeometry();
         }
 
         $manager->flush();
+        // The event listener sets the user info in Occurrence to current user
+        // i.e. -1 (as security service is not available when the fixture is 
+        // loaded). So we set the user_id again with pure SQL as a workaround
+        $manager->getConnection()->exec("UPDATE occurrence SET user_id=22 WHERE observer='Lulu';");
+        $manager->getConnection()->exec("UPDATE occurrence SET user_id=23 WHERE observer='Gigi';");
+        $manager->flush();
+
     }
 
     private function generateRandomString($length = 10) {

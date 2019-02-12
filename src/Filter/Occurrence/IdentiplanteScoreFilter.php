@@ -2,42 +2,37 @@
 
 namespace App\Filter\Occurrence;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
+use App\Filter\BaseFilter;
 
-use App\Service\OccurrenceSearcherService;
+use ApiPlatform\Core\Api\FilterInterface;
 
 
 /** 
  * Filters <code>Occurrence</code> resources on the value of the botanic 
  * family.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ *
+ * @package App\Filter\Occurrence
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class IdentiplanteScoreFilter implements FilterInterface {
+class IdentiplanteScoreFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the score obtained on IdentiPlante.';
+    const PROPERTY = 'identiplanteScore';
+    const TYPE     = 'int';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            IdentiplanteScoreFilter::PROPERTY, 
+            IdentiplanteScoreFilter::TYPE, 
+            IdentiplanteScoreFilter::DESC, 
+            IdentiplanteScoreFilter::REQUIRED);
 
-            $description['county'] = [
-                'property' => 'identiplanteScore',
-                'required' => false,
-                'type' => 'int',
-                'swagger' => [
-                    'description' => 'The score obtained on IdentiPlante. ',
-                    'name' => 'identiplanteScore',
-                    'type' => "int"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }

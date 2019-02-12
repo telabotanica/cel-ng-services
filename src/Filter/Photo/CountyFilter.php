@@ -2,43 +2,37 @@
 
 namespace App\Filter\Photo;
 
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Filter\BaseFilter;
+
 use ApiPlatform\Core\Api\FilterInterface;
-use Elastica\Multi\Search;
-
-use App\Service\OccurrenceSearcherService;
-
 
 /** 
- * Filters <code>Occurrence</code> resources on the value of the year 
- * of their "dateObserved" property.
- * Only used to hook the filter/parameter in documentation generators 
- * (supported by Swagger and Hydra).
+ * Filters <code>Photo</code> resources on the county their associated  
+ * occurrence took place in.
+ *
+ * @package App\Filter\Photo
+ * @internal Only used to hook the filter/parameter in documentation generators 
+ *           (supported by Swagger and Hydra).
  */
-class CountyFilter implements FilterInterface {
+class CountyFilter extends BaseFilter implements FilterInterface {
 
+    const DESC     = 'Filter on the value of the country of the associated ' .
+        'occurrence.';
+    const PROPERTY = 'county';
+    const TYPE     = 'string';
+    const REQUIRED = false;
 
+    /**
+     * @inheritdoc
+     */
+    function __construct() {
 
-    public function getDescription(string $resourceClass) : array
-    {
-        // I override the description to add a buckets array key to put my aggregations
-        $description = [];
+        parent::__construct(
+            CountyFilter::PROPERTY, 
+            CountyFilter::TYPE, 
+            CountyFilter::DESC, 
+            CountyFilter::REQUIRED);
 
-            $description['county'] = [
-                'property' => 'county',
-                'required' => false,
-                'type' => 'string',
-                'swagger' => [
-                    'description' => 'Filter on the county the occurrence the photo is associated with was observed in.',
-                    'name' => 'county',
-                    'required' => false,
-                    'type' => "string"
-                ],
-            ];
-
-
-        return $description;
     }
-
 
 }
