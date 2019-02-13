@@ -14,18 +14,22 @@ use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * Instanciates <code>Occurrence</code> objects from a data array.
+ * Transforms (deserializes) data arrays into a <code>Occurrence</code> 
+ * objects. 
  *
+ * @internal Only used during spreadsheet file import.
  * @package App\Utils
  */
-class FromArrayOccurrenceCreator
+class ArrayToOccurrenceTransformer
 {
 
     private $doctrine;
     private $lineCount = 0;
+    // Map between CSV headers (keys) and corresponding index 
+    // values (int). Built dynamically.
     private $headerIndexArray = array();
 
-    // Map between CSV file headers (keys) and Occurrence members (values)
+    // Map between CSV headers (keys) and Occurrence members (values)
     const CSV_HEADER_OCC_PROP_MAP = array(
             'Transmis'      => 'isPublic',
             'Spontanéité'   => 'isWild',
@@ -45,7 +49,8 @@ class FromArrayOccurrenceCreator
             "Lieu-dit" => 'sublocality',
             "Station" => 'station',
             "Commune" => 'locality',
-            "Pays" => 'osmCountry'
+            "Pays" => 'osmCountry',
+            'Referentiel taxonomique' => 'taxoRepo'
         );
 
     public function __construct(RegistryInterface $doctrine)
@@ -72,7 +77,7 @@ class FromArrayOccurrenceCreator
      *         in the $taxoRepo repository. Returns null if it cannot be 
      *         retrieved.
      */
-	public function transform(array $csvLine, TelaBotanicaUser $user) {
+	public function transform(array $csvLine, TelaBotanicaUser $user): Occurrence {
 		$resultMsgs = array();
 		$em = $this->doctrine->getManager();     
 
@@ -89,7 +94,6 @@ class FromArrayOccurrenceCreator
 		    $occ = new Occurrence();
 		    $occ = $this->populateWithUserInfo($occ, $user);
 		    $occ = $this->populate($occ, $user, $csvLine);
-		    $occ = $this->populateTaxoRepo($occ, $user, $csvLine);
 
 		    // Handle the photos.
 		    // Attach the photos with original names (separated by commas) in 
@@ -174,34 +178,6 @@ class FromArrayOccurrenceCreator
 		$occ->setUserPseudo($user->getUsername());
         return $occ;
     }
-
-    private function populateTaxoRepo($occ, $user, $csvLine) {
-		if ( null !== $csvLine[$this->headerIndexArray['Referentiel taxonomique']] ) {
-            $em = $this->doctrine->getManager();
-            $taxoRepoRepo = $em->getRepository('App\Entity\TaxoRepo');
-
-            $taxoRepo = $taxoRepoRepo->findOneBy(
-                array('name' => $csvLine[$this->headerIndexArray['Referentiel taxonomique']])
-            );
-            if ( null !== $taxoRepo ) {
-    			$occ->setTaxoRepo($taxoRepo);
-            }
-            else {
-                // @todo: put this in conf
-                $taxoRepo = $taxoRepoRepo->findOneBy(
-                    array('name' => 'Autre/Inconnu')
-                );
-                if ( null !== $taxoRepo ) {
-        			$occ->setTaxoRepo($taxoRepo);
-                }
-                // @todo: create custom exception
-                else throw new \LogicException("The taxo repository 'Autre/Inconnu' cannot be found in DB.");
-            }
-		}
-
-        return $occ;
-    }
-
 
     private function populate($occ, $user, $csvLine) {
 

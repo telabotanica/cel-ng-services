@@ -9,8 +9,6 @@ use App\Entity\Occurrence;
 use App\Entity\UserProfileCel;
 use App\Entity\TelaBotanicaProject;
 use App\Entity\UserOccurrenceTag;
-use App\Entity\TaxoRepo;
-use App\DBAL\TaxoRepoEnumType;
 use App\DBAL\CertaintyEnumType;
 use App\DBAL\PublishedLocationEnumType;
 use App\DBAL\OccurrenceTypeEnumType;
@@ -18,17 +16,22 @@ use App\DBAL\LocationAccuracyEnumType;
 use App\DBAL\InputSourceEnumType;
 
 /**
- * Creates and persists three user (profile) instances (one tela-botanica
- * admin, one project admin and one luser) along with some Occurrence and one and their associated  + )two intances of the follo UserProfileCel
+ * Creates and persists 
  *
- * @impl populates the database with 
+ * <ul>
+ *  <li>One <code>TelabotanicaProject</code> instances</li> 
+ *  <li>Three code>UserProfileCel</code> instances (one tela-botanica
+ * admin, one project admin and one luser) </li>
+ *  <li>A hierarchy of four <code>UserOccurrenceTag</code> </li> 
+ *  <li>A bunch of 40 <code>Occurrence</code> instances linked to above</li> 
+ * </ul>
+ *
  */
-//@todo private $manager
-class AppFixtures extends Fixture
-{
 
-    private function loadDaUserProfile(ObjectManager $manager, int $userId)
-    {
+class AppFixtures extends Fixture {
+
+    private function loadDaUserProfile(ObjectManager $manager, int $userId) {
+
         $userProfile = new UserProfileCel();
         $userProfile->setLanguage('EN');
         $userProfile->setUserId($userId);
@@ -37,9 +40,8 @@ class AppFixtures extends Fixture
         return $userProfile;
     }
 
+    private function loadDaTelaBotanicaProject(ObjectManager $manager) {
 
-    private function loadDaTelaBotanicaProject(ObjectManager $manager)
-    {
         $tbProj = new TelaBotanicaProject();
         $tbProj->setLabel('TB_proj_' . $this->generateRandomString(5));
         $tbProj->setIsPrivate(false);
@@ -49,20 +51,9 @@ class AppFixtures extends Fixture
         return $tbProj;
     }
 
+    private function loadDaOccTagHierarchy(
+        ObjectManager $manager, int $userId) {
 
-    private function loadDaTaxoRepo(ObjectManager $manager)
-    {
-        $tr = new TaxoRepo();
-        $tr->setName('bdtfx');
-        
-        $manager->persist($tr);
-
-        return $tr;
-    }
-
-
-    private function loadDaOccTagHierarchy(ObjectManager $manager, int $userId)
-    {
         $occTag = new UserOccurrenceTag();
         $occTag->setUserId($userId);
         $occTag->setName('RootTag' . $userId);
@@ -93,8 +84,8 @@ class AppFixtures extends Fixture
     /**
      * @inheritdoc
      */
-    public function load(ObjectManager $manager)
-    {
+    public function load(ObjectManager $manager) {
+
         $user22Id = 22;
         $user23Id = 23;
         $tbProj = $this->loadDaTelaBotanicaProject($manager);
@@ -102,18 +93,13 @@ class AppFixtures extends Fixture
         $userProfile23 = $this->loadDaUserProfile($manager, $user23Id);
         $occTag22 = $this->loadDaOccTagHierarchy($manager, $user22Id);
         $occTag23 = $this->loadDaOccTagHierarchy($manager, $user23Id);
-        $taxoRepo = $this->loadDaTaxoRepo($manager);
+
             
         $occ = null;
 
-        // create 20 occurrences! Bam!
+        // create 40 occurrences! Bam!
         for ($i = 0; $i < 40; $i++) {
             $occ = new Occurrence();
-
-            $occ->setDateObserved(new \DateTime("now"));
-            $occ->setDatePublished(new \DateTime("now"));
-            
-
 
             if ( 0 == $i%5 ) {
                 $occ->setUserId($user22Id);
@@ -150,7 +136,8 @@ echo $occ->getGeometry();
                 $occ->setValidSciNameId(12806);
             }
 
-            $occ->setTaxoRepo($taxoRepo);
+            $occ->setDateObserved(new \DateTime("now"));
+            $occ->setDatePublished(new \DateTime("now"));
             $occ->setCertainty(CertaintyEnumType::CERTAIN);
             $occ->setAnnotation('annotation');
             $occ->setIsWild(true);
@@ -172,13 +159,12 @@ echo $occ->getGeometry();
             $occ->setOsmCountry('France');
             $occ->setOsmId(399);
             $occ->setOsmPlaceId(299);
+            $occ->setTaxoRepo('bdtfx');
             $occ->setOsmCountry('France');
             $occ->setOsmCountry('France');
             $occ->setProject($tbProj);
             $occ->setIsIdentiplanteValidated(false);
             $occ->setIdentiplanteScore(0);
-            // do tags
-
 
             $manager->persist($occ);
         }
@@ -187,10 +173,11 @@ echo $occ->getGeometry();
         // The event listener sets the user info in Occurrence to current user
         // i.e. -1 (as security service is not available when the fixture is 
         // loaded). So we set the user_id again with pure SQL as a workaround
-        $manager->getConnection()->exec("UPDATE occurrence SET user_id=22 WHERE observer='Lulu';");
-        $manager->getConnection()->exec("UPDATE occurrence SET user_id=23 WHERE observer='Gigi';");
+        $manager->getConnection()->exec(
+            "UPDATE occurrence SET user_id=22 WHERE observer='Lulu';");
+        $manager->getConnection()->exec(
+            "UPDATE occurrence SET user_id=23 WHERE observer='Gigi';");
         $manager->flush();
-
     }
 
     private function generateRandomString($length = 10) {
@@ -202,7 +189,5 @@ echo $occ->getGeometry();
          $afterZ = ( rand(0,100)/100 );
          return $beforeZ + $afterZ;   
     }
-
-
 
 }

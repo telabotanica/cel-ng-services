@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Form\OccurrenceType;
-use App\Utils\FromArrayOccurrenceCreator;
+use App\Utils\ArrayToOccurrenceTransformer;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * Imports Occurrence resources by uploading a spreadsheet file (CSV or excel).
  *
+ * @internal Wrapped into an SQL transaction.
  * @package App\Controller
  */
 final class ImportOccurrenceAction {
@@ -82,7 +83,9 @@ final class ImportOccurrenceAction {
      */
     public function extractArrayFromSpreadsheet($file): array {
 
-        if ( in_array($file->getMimeType(), ImportOccurrenceAction::FILE_MIME_TYPES) ) {
+        if ( in_array(
+                $file->getMimeType(), 
+                ImportOccurrenceAction::FILE_MIME_TYPES) ) {
 		        
             $extension = $file->getClientOriginalExtension();
          
@@ -133,8 +136,7 @@ final class ImportOccurrenceAction {
                 json_encode($jsonResp), Response::HTTP_UNPROCESSABLE_ENTITY, []);
         }
         else {
-		    // @todo ? inject $doctrine in the object
-            $fromArrayOccCreator = new FromArrayOccurrenceCreator($this->doctrine);
+            $occTransformer = new ArrayToOccurrenceTransformer($this->doctrine);
             // Isolate the import in a transaction to allow rollbacking the INSERTs
             // in case an Exception occurs so the DB isn't left in a messy state.
             $em->getConnection()->beginTransaction();
@@ -144,7 +146,7 @@ final class ImportOccurrenceAction {
             try {
                 foreach( $occArray as $occAsArray ) {
                     $occCount++;
-                    $occ = $fromArrayOccCreator->transform($occAsArray, $user);
+                    $occ = $occTransformer->transform($occAsArray, $user);
 
 		            if ( null !== $occ) {
                             

@@ -39,10 +39,12 @@ class OccurrenceEventListener {
             $entity->setDatePublished(new \DateTime());
         }
 
-        if ( null !== $entity->getTaxoRepo() ){
+        if ( null !== $entity->getTaxoRepo() && 
+            null !== $entity->getUserSciNameId()  ){
+
             $efClient = new EfloreApiClient();
             $userSciNameId = $entity->getUserSciNameId();
-            $taxoRepoName = $entity->getTaxoRepo()->getName();
+            $taxoRepoName = $entity->getTaxoRepo();
             $familyName = $efClient->getFamilyName(
                 $userSciNameId, $taxoRepoName);
             if ( null !== $familyName ) {
@@ -53,12 +55,14 @@ class OccurrenceEventListener {
 
     /**
      * Populates various properties of <code>Occurrence</code> instances 
-     * based on CEL business rules before they are updated.
+     * based on CEL business rules before they are updated (isPublic,
+     * datePublished, signature, dateUpdated.
      *
      * @param LifecycleEventArgs $args The Lifecycle Event emitted.
      */
     public function preUpdate(LifecycleEventArgs $args) {
         $entity = $args->getEntity();
+        $entity->setDateUpdated(new \DateTime());
 
         // only act on "Occurrence" entities
         if (!$entity instanceof Occurrence) {

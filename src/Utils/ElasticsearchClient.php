@@ -13,12 +13,15 @@ use Symfony\Component\Dotenv\Dotenv;
  * ES. Introduced because of an elastica bug (failing at counting 
  * total number of hits).
  *
+ * @internal the conf is in the .env file while it should be retrieved from 
+ *           foselastica yaml config... this housld not be duplicated but no
+ *           clean way has been found to access foselastica conf
  * @package App\Utils
  */
 /*
 Elastica bug:
 //
-// Returns 1... howmanyever the number of actual hits...
+// getNbResults() returns 1... howmanyever the number of actual hits...
 // elastica is buggy on this... 
 $results = $this->findPaginated($esQuery);
 $results->setMaxPerPage(10);
@@ -60,7 +63,6 @@ class ElasticsearchClient {
     }
 
     public static function buildUrl(string $resourceTypeName): string {
-
         $url = getenv('ELASTICSEARCH_INDEX_URL');
         $url .= $resourceTypeName;
         $url .= '/_count';

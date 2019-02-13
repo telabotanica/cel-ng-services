@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\DBAL\TaxoRepoEnumType;
 use App\DBAL\CertaintyEnumType;
 use App\DBAL\PublishedLocationEnumType;
 use App\DBAL\OccurrenceTypeEnumType;
@@ -10,7 +9,6 @@ use App\DBAL\InputSourceEnumType;
 use App\Controller\OccurrenceBulkAction;
 use App\Controller\ImportOccurrenceAction;
 use App\Entity\Photo;
-use App\Entity\TaxoRepo;
 use App\Filter\Occurrence\IsPublicFilter;
 use App\Filter\Occurrence\CertaintyFilter;
 use App\Filter\Occurrence\DateObservedYearFilter;
@@ -37,7 +35,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
 
 /**
  * Entity representing a botanic occurrence (observation).
@@ -530,9 +527,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      * Référentiel taxonomique
      * 
      * @Groups({"read", "write"})
-     * @ORM\ManyToOne(targetEntity=TaxoRepo::class)
-     * @ORM\JoinColumn(name="taxo_repo_id", referencedColumnName="id")
-     * @ApiSubresource(maxDepth=1)
+     * @ORM\Column(name="taxo_repo", type="string", nullable=true, options={"default": false, "comment":"Référentiel taxonomique"})
      */
     private $taxoRepo;
 
@@ -865,12 +860,12 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
 
 
 
-   public function getTaxoRepo() : ?TaxoRepo
+   public function getTaxoRepo() : ?string
    {
        return $this->taxoRepo;
    }
 
-   public function setTaxoRepo(?TaxoRepo $taxoRepo): self
+   public function setTaxoRepo(?string $taxoRepo): self
    {
        $this->taxoRepo = $taxoRepo;
 

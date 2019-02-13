@@ -68,12 +68,7 @@ fos_elastica:
                         plantnetId:
                             type: "long"
                         taxoRepo:
-                            type: "object"
-                            properties:
-                                id:
-                                    type: "long"
-                                name:
-                                    type: "text"
+                            type: "text"
                         # sortable property
                         certainty:
                             type: "text"

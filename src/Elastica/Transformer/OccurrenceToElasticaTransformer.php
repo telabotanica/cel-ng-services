@@ -101,6 +101,7 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
         $data['identiplanteScore'] = $occ->getIdentiplanteScore();
         $data['identiplanteScore_keyword'] = $occ->getIdentiplanteScore();
         $data['isIdentiplanteValidated'] = $occ->getIsIdentiplanteValidated();
+        $data['taxoRepo'] = $occ->getTaxoRepo();
 
         // Flatten associated Project resource if any:
         if ( null !== $occ->getProject()) {
@@ -110,15 +111,7 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
             ];
             $data['project'] = $project;
         }
-
-        if ( null !== $occ->getTaxoRepo() ) {
-            $taxoRepo = [
-                'id:' => $occ->getTaxoRepo()->getId(),
-                'name:' => $occ->getTaxoRepo()->getName(),
-            ];
-            $data['taxoRepo'] = $taxoRepo;
-        }  
-                   
+      
 		return $data;
 	}
  
