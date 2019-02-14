@@ -47,7 +47,7 @@ CREATE TABLE `extended_field` (
   `field_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `project` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `data_type` enum('Booléen','Texte','Date','Entier','Décimal') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Type de champ - Texte, Entier, Décimal, Date, Booléen(DC2Type:fielddatatypeenum)',
-  `is_visible` tinyint(1) NOT NULL COMMENT 'Champ invisible de l''utilisateur mais nécessaire au projet\n',
+  `is_visible` tinyint(1) NOT NULL COMMENT 'Champ invisible de l''utilisateur mais nécessaire au projet\n     ',
   `is_mandatory` tinyint(1) NOT NULL COMMENT 'Indique si le champ est obligatoire pour envoyer la donnée ou non',
   `min_value` decimal(10,0) DEFAULT NULL,
   `miax_value` decimal(10,0) DEFAULT NULL,
@@ -113,7 +113,6 @@ DROP TABLE IF EXISTS `occurrence`;
 CREATE TABLE `occurrence` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) DEFAULT NULL,
-  `taxo_repo_id` int(11) DEFAULT NULL,
   `user_profile_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'id de l''utilisateur ayant saisi l''obs (seulement identification de tela, si utilisateur non inscrit ce champ est vide)',
   `user_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Email de l''utilisateur ayant saisi l''obs',
@@ -164,15 +163,14 @@ CREATE TABLE `occurrence` (
   `identiplante_score` int(11) DEFAULT 0 COMMENT 'Score de l''observation sur identiplante',
   `is_identiplante_validated` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Statut validé (ou non) de l''observation sur identiplante',
   `identification_author` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Nom de la personne ayant identifié l''espèce observée (si différente de l''observateur)',
+  `taxo_repo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT 'Référentiel taxonomique',
   PRIMARY KEY (`id`),
   KEY `IDX_BEFD81F3166D1F9C` (`project_id`),
-  KEY `IDX_BEFD81F37D81B3C` (`taxo_repo_id`),
   KEY `IDX_BEFD81F36B9DD454` (`user_profile_id`),
   KEY `user_id_idx` (`user_id`),
-  CONSTRAINT `FK_BEFD81F3166D1F9C` FOREIGN KEY (`project_id`) REFERENCES `taxo_repos` (`id`),
-  CONSTRAINT `FK_BEFD81F36B9DD454` FOREIGN KEY (`user_profile_id`) REFERENCES `user_profile_cel` (`id`),
-  CONSTRAINT `FK_BEFD81F37D81B3C` FOREIGN KEY (`taxo_repo_id`) REFERENCES `tb_project` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `FK_BEFD81F3166D1F9C` FOREIGN KEY (`project_id`) REFERENCES `tb_project` (`id`),
+  CONSTRAINT `FK_BEFD81F36B9DD454` FOREIGN KEY (`user_profile_id`) REFERENCES `user_profile_cel` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -314,20 +312,6 @@ CREATE TABLE `project_settings` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `taxo_repos`
---
-
-DROP TABLE IF EXISTS `taxo_repos`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `taxo_repos` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nouveau score de l''observation sur identiplante',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `tb_project`
 --
 
@@ -342,7 +326,7 @@ CREATE TABLE `tb_project` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_50640A4C727ACA70` (`parent_id`),
   CONSTRAINT `FK_50640A4C727ACA70` FOREIGN KEY (`parent_id`) REFERENCES `tb_project` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -400,7 +384,7 @@ CREATE TABLE `user_occurrence_tag` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id__name` (`user_id`,`name`),
   KEY `user_id_idx` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur).';
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur).';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -421,7 +405,7 @@ CREATE TABLE `user_profile_cel` (
   PRIMARY KEY (`id`),
   KEY `IDX_EEE77E506C1DD863` (`administered_project_id`),
   CONSTRAINT `FK_EEE77E506C1DD863` FOREIGN KEY (`administered_project_id`) REFERENCES `tb_project` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des préférences utilisateurs';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des préférences utilisateurs';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -433,4 +417,4 @@ CREATE TABLE `user_profile_cel` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-01-27 17:27:20
+-- Dump completed on 2019-02-14  8:42:20
