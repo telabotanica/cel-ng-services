@@ -45,7 +45,6 @@ class OwnedEntityEventListener {
             ( $entity instanceof PhotoTag ) )) {
             return;
         }
-
         if ( null !== $currentUser = $this->getUser() ) {
 
             $entity->setUserId($currentUser->getId());

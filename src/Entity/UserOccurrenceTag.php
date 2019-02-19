@@ -42,7 +42,6 @@ class UserOccurrenceTag implements OwnedEntitySimpleInterface
     *
     * Idenfiant utilisateur de lu'tilisateur ayant publié l'observation (null si utilisateur anonyme).
     *
-    * @Assert\NotNull
     * @Groups({"read"})
     * @ORM\Column(name="user_id", type="integer", nullable=false, options={"comment":"ID de l'utilisateur"})
     */

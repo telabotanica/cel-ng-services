@@ -37,7 +37,6 @@ class PhotoTag
    /**
     * ID de l'utilisateur.
     *
-    * @Assert\NotNull
     * @Groups({"read"})
     * @ORM\Column(name="user_id", type="integer", nullable=false, options={"comment":"ID de l'utilisateur"})
     */

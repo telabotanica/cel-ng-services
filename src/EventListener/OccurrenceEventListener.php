@@ -38,6 +38,7 @@ class OccurrenceEventListener {
         if ( $entity->getIsPublic() ) {
             $entity->setDatePublished(new \DateTime());
         }
+        $entity->setIdentiplanteScore(0);
 
         if ( null !== $entity->getTaxoRepo() && 
             null !== $entity->getUserSciNameId()  ){

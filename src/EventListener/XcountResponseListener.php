@@ -1,8 +1,6 @@
 <?php
 
-// src/App/EventListener/OccurrenceEventListener.php
 namespace App\EventListener;
-
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\Security\Core\Security;
@@ -10,7 +8,7 @@ use FOS\ElasticaBundle\Manager\RepositoryManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * In case of collection GET request on occurrences and photos endpoint, 
+ * In case of collection GET request on occurrence and photo resource endpoint, 
  * adds an 'X-count' HTTP header to the response for pagination purpose.
  *
  * @internal Make sure the 'Access-Control-Allow-Headers' and 
@@ -31,8 +29,9 @@ class XcountResponseListener {
     }
 
     /**
-     * In case of collection GET request on occurrences endpoint, adds 
-     * an 'X-count' HTTP header to the response for pagination purpose.
+     * In case of collection GET request on occurrence or photo resource  
+     * endpoints, adds an 'X-count' HTTP header to the response for pagination 
+     * purpose.
      */
     public function onKernelResponse(FilterResponseEvent $event) {   
 

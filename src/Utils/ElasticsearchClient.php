@@ -6,7 +6,6 @@ use Elastica\Query;
 
 use Symfony\Component\Dotenv\Dotenv;
 
-
 /**
  * Elasticsearch HTTP API client. Only used to retrieve the total number 
  * of hits for given <code>Query</code> and index name of the resource in 
@@ -14,8 +13,8 @@ use Symfony\Component\Dotenv\Dotenv;
  * total number of hits).
  *
  * @internal the conf is in the .env file while it should be retrieved from 
- *           foselastica yaml config... this housld not be duplicated but no
- *           clean way has been found to access foselastica conf
+ *           foselastica yaml config. Unfortunately, no *clean* way has been 
+ *           found to access foselastica conf...
  * @package App\Utils
  */
 /*
@@ -35,7 +34,7 @@ return $results->getNbResults();
 class ElasticsearchClient {
     
     /**
-     * Returns the toal number of hits for given <code>Query</code> and type
+     * Returns the total number of hits for given <code>Query</code> and type
      * name of the resource/entity in ES.
      */
     public static function count(
