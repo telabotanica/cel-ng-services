@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
+ *     "formats"={"jsonld", "json"},
  *     "denormalization_context"={"groups"={"write"}}
  * })
  * @ORM\Entity(repositoryClass="App\Repository\UserOccurrenceTagRepository")

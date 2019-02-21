@@ -22,8 +22,9 @@ use ApiPlatform\Core\Annotation\ApiResource;
  * handled by tela devs using CLI or direct SQL not via the Web API.
  *
  * @ApiResource(attributes={
- *      "normalization_context"={"groups"={"read"}},
- *      "denormalization_context"={"groups"={"write"}}},
+ *     "normalization_context"={"groups"={"read"}},
+ *     "formats"={"jsonld", "json"},
+ *     "denormalization_context"={"groups"={"write"}}},
  *     collectionOperations={"get"},
  *     itemOperations={"get"}
  * )

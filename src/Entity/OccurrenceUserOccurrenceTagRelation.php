@@ -27,14 +27,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * })
  * @ORM\Table(name="occurrence_user_occurrence_tag", options={"comment":"Table de jointure entre occurrence et user_occurrence_tag."})
  */
-class OccurrenceUserOccurrenceTagRelation
-{
+class OccurrenceUserOccurrenceTagRelation {
 
    /**
     * @Groups({"read"})
     * @ORM\Id
     * @ORM\GeneratedValue(strategy="IDENTITY")
-    * @ORM\Column(type="integer")Occurrence
+    * @ORM\Column(type="integer")
     */
    private $id = null;
 
@@ -56,8 +55,14 @@ class OccurrenceUserOccurrenceTagRelation
 
 
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+
     /**
-     * @return PhotoTag
+     * @return UserOccurrenceTag
      */
     public function getUserOccurrenceTag(): UserOccurrenceTag
     {
@@ -73,7 +78,7 @@ class OccurrenceUserOccurrenceTagRelation
    }
 
     /**
-     * @return Photo
+     * @return Occurrence
      */
     public function getOccurrence(): Occurrence
     {

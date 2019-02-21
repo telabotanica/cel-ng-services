@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Entity;
 
 use App\Entity\Photo;
@@ -26,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * })
  * @ORM\Table(name="photo_tag_photo", options={"comment":"Table de jointure entre Photo et PhotoTag."})
  */
-class PhotoPhotoTagRelation
+class PhotoPhotoTagRelation 
 {
 
    /**
@@ -39,39 +38,53 @@ class PhotoPhotoTagRelation
 
     /**
      *
-     * @Assert\NotNull
+
      * @Groups({"read", "write"})
      * @ORM\ManyToOne(targetEntity=Photo::class, inversedBy="photoTagRelations")
      * @ApiSubresource(maxDepth=1)
      */
     protected $photo;
 
-
     /**
-     * @Assert\NotNull  
      * @Groups({"read", "write"})
      * @ORM\ManyToOne(targetEntity=PhotoTag::class, inversedBy="photoRelations")
      * @ApiSubresource(maxDepth=1)
      */
     protected $photoTag;
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
 
     /**
      * @return PhotoTag
      */
-    public function getPhotoTag(): PhotoTag
+    public function getPhotoTag()
     {
         return $this->photoTag;
     }
 
+   public function setPhotoTag($photoTag): self
+   {
+       $this->photoTag = $photoTag;
+
+       return $this;
+   }
 
     /**
      * @return Photo
      */
-    public function getPhoto(): Photo
+    public function getPhoto()
     {
         return $this->photo;
     }
 
+   public function setPhoto($photo): self
+   {
+       $this->photo = $photo;
+
+       return $this;
+   }
 
 }

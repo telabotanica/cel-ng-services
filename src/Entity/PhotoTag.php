@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
+ *     "formats"={"jsonld", "json"},
  *     "denormalization_context"={"groups"={"write"}}
  * })
  * @ORM\Table(name="photo_tag",indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Mot-clé photo"})
