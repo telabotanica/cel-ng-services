@@ -19,7 +19,6 @@
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.1",
         "symfony/http-foundation": "^4.1",
-        "symfony/lts": "^4@dev",
         "symfony/monolog-bundle": "^3.3",
         "symfony/web-server-bundle": "^4.1",
         "symfony/yaml": "^4.1",
