@@ -29,23 +29,11 @@ class UserProfileCel
 
    /**
     * @ORM\Id
-    * @ORM\GeneratedValue(strategy="IDENTITY")
     * @ORM\Column(type="integer")
     * @Groups({"read"})    
     */
    private $id = null;
 
-
-   /**
-    * Publisher user ID (null if user is anonymous).
-    *
-    * Idenfiant utilisateur de lu'tilisateur ayant publié l'observation (null si utilisateur anonyme).
-    *
-    * @Assert\NotNull
-    * @ORM\Column(type="integer", nullable=false)
-    * @Groups({"read"})    
-    */
-   private $userId = null;
 
    /**
     * Anonymisation des données d'observation.
@@ -86,15 +74,6 @@ class UserProfileCel
    private $language = LanguageEnumType::FR;
 
     /**
-     * One UserProfileCel has Many Occurrences.
-     * @ORM\OneToMany(targetEntity="Occurrence", mappedBy="userProfile")
-     * @Groups({"read", "write"})  
-     */
-    private $occurrences;
-
-
-
-    /**
      * A user can be the admin of a single TelaBotanicaProject.
      *
      * @ORM\ManyToOne(targetEntity="TelaBotanicaProject", inversedBy="administratorProfiles", cascade={"persist"})
@@ -102,15 +81,6 @@ class UserProfileCel
      * @Groups({"read", "write"})  
      */
     private $administeredProject;
-
-    /**
-     * The references to CustomUserField this user has created.
-     *
-     * @ORM\OneToMany(targetEntity="UserCustomField", mappedBy="userProfileCel", cascade={"remove"})
-     * @Groups({"read", "write"})  
-     */
-    private $userCustomFields;
-
 
     public function __construct()
     {
@@ -191,37 +161,6 @@ class UserProfileCel
     public function setIsEndUserLicenceAccepted(bool $isEndUserLicenceAccepted): self
     {
         $this->isEndUserLicenceAccepted = $isEndUserLicenceAccepted;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Occurrence[]
-     */
-    public function getOccurrences(): Collection
-    {
-        return $this->occurrences;
-    }
-
-    public function addOccurrence(Occurrence $occurrence): self
-    {
-        if (!$this->occurrences->contains($occurrence)) {
-            $this->occurrences[] = $occurrence;
-            $occurrence->setUserProfile($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOccurrence(Occurrence $occurrence): self
-    {
-        if ($this->occurrences->contains($occurrence)) {
-            $this->occurrences->removeElement($occurrence);
-            // set the owning side to null (unless already changed)
-            if ($occurrence->getUserProfile() === $this) {
-                $occurrence->setUserProfile(null);
-            }
-        }
 
         return $this;
     }

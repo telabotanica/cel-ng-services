@@ -1,8 +1,8 @@
--- MySQL dump 10.16  Distrib 10.2.21-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.16  Distrib 10.2.22-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: cel_dev
 -- ------------------------------------------------------
--- Server version	10.2.21-MariaDB-10.2.21+maria~stretch-log
+-- Server version	10.2.22-MariaDB-10.2.22+maria~stretch-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,6 +14,8 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+SET FOREIGN_KEY_CHECKS=0
 
 --
 -- Table structure for table `del_update_notfications`
@@ -113,7 +115,6 @@ DROP TABLE IF EXISTS `occurrence`;
 CREATE TABLE `occurrence` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) DEFAULT NULL,
-  `user_profile_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'id de l''utilisateur ayant saisi l''obs (seulement identification de tela, si utilisateur non inscrit ce champ est vide)',
   `user_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Email de l''utilisateur ayant saisi l''obs',
   `user_pseudo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Pseudo de l''utilisateur ayant saisi l''obs. Nom/Prénom si non renseigné.',
@@ -166,11 +167,9 @@ CREATE TABLE `occurrence` (
   `taxo_repo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT 'Référentiel taxonomique',
   PRIMARY KEY (`id`),
   KEY `IDX_BEFD81F3166D1F9C` (`project_id`),
-  KEY `IDX_BEFD81F36B9DD454` (`user_profile_id`),
   KEY `user_id_idx` (`user_id`),
-  CONSTRAINT `FK_BEFD81F3166D1F9C` FOREIGN KEY (`project_id`) REFERENCES `tb_project` (`id`),
-  CONSTRAINT `FK_BEFD81F36B9DD454` FOREIGN KEY (`user_profile_id`) REFERENCES `user_profile_cel` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `FK_BEFD81F3166D1F9C` FOREIGN KEY (`project_id`) REFERENCES `tb_project` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -182,8 +181,8 @@ DROP TABLE IF EXISTS `occurrence_user_occurrence_tag`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `occurrence_user_occurrence_tag` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `occurrence_id` int(11) DEFAULT NULL,
-  `user_occurrence_tag_id` int(11) DEFAULT NULL,
+  `occurrence_id` int(11) NOT NULL,
+  `user_occurrence_tag_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `IDX_B06FBA5830572FAC` (`occurrence_id`),
   KEY `IDX_B06FBA58768D75C5` (`user_occurrence_tag_id`),
@@ -266,8 +265,8 @@ DROP TABLE IF EXISTS `photo_tag_photo`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `photo_tag_photo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `photo_id` int(11) DEFAULT NULL,
-  `photo_tag_id` int(11) DEFAULT NULL,
+  `photo_id` int(11) NOT NULL,
+  `photo_tag_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `IDX_3BA5CB3F7E9E4C8C` (`photo_id`),
   KEY `IDX_3BA5CB3FEF6D1439` (`photo_tag_id`),
@@ -326,7 +325,7 @@ CREATE TABLE `tb_project` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_50640A4C727ACA70` (`parent_id`),
   CONSTRAINT `FK_50640A4C727ACA70` FOREIGN KEY (`parent_id`) REFERENCES `tb_project` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -384,7 +383,7 @@ CREATE TABLE `user_occurrence_tag` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id__name` (`user_id`,`name`),
   KEY `user_id_idx` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur).';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur).';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -395,9 +394,8 @@ DROP TABLE IF EXISTS `user_profile_cel`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_profile_cel` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `administered_project_id` int(11) DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
   `anonymize_data` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Anonymisation des données d''observation',
   `is_end_user_licence_accepted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Validation des conditions d''utilisation',
   `always_display_advanced_fields` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Validation des conditions d''utilisation',
@@ -405,7 +403,7 @@ CREATE TABLE `user_profile_cel` (
   PRIMARY KEY (`id`),
   KEY `IDX_EEE77E506C1DD863` (`administered_project_id`),
   CONSTRAINT `FK_EEE77E506C1DD863` FOREIGN KEY (`administered_project_id`) REFERENCES `tb_project` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des préférences utilisateurs';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des préférences utilisateurs';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -417,4 +415,6 @@ CREATE TABLE `user_profile_cel` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-02-14  8:42:20
+SET FOREIGN_KEY_CHECKS=1
+
+-- Dump completed on 2019-02-26 16:30:47

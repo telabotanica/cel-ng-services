@@ -41,6 +41,7 @@ class PhotoPhotoTagRelation
 
      * @Groups({"read", "write"})
      * @ORM\ManyToOne(targetEntity=Photo::class, inversedBy="photoTagRelations")
+     * @ORM\JoinColumn(name="photo_id", referencedColumnName="id", nullable=false)
      * @ApiSubresource(maxDepth=1)
      */
     protected $photo;
@@ -48,6 +49,7 @@ class PhotoPhotoTagRelation
     /**
      * @Groups({"read", "write"})
      * @ORM\ManyToOne(targetEntity=PhotoTag::class, inversedBy="photoRelations")
+     * @ORM\JoinColumn(name="photo_tag_id", referencedColumnName="id", nullable=false)
      * @ApiSubresource(maxDepth=1)
      */
     protected $photoTag;

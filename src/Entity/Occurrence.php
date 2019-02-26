@@ -540,13 +540,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      */
     private $project;
 
-   /**
-     * Many Occurrences have One UserProfileCel.
-     * @ORM\ManyToOne(targetEntity="UserProfileCel", inversedBy="occurrences")
-     * @ORM\JoinColumn(name="user_profile_id", referencedColumnName="id")
-     */
-    private $userProfile;
-
     /**
      * One Occurrence can have many attached photos.
      * @ORM\OneToMany(targetEntity="Photo", mappedBy="occurrence", cascade={"persist"})
@@ -1284,15 +1277,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
        return $this;
    }
 
-   public function getUserProfile(): ?UserProfileCel
-   {
-       return $this->userProfile;
-   }
-   public function setUserProfile(?UserProfileCel $userProfile): self
-   {
-       $this->userProfile = $userProfile;
-       return $this;
-   }
    /**
     * @return Collection|Photo[]
     */
