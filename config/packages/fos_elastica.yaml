@@ -77,7 +77,7 @@ fos_elastica:
                         occurrenceType: ~
                         isWild: 
                             type: "boolean"
-                        coef: ~
+                        coef: "text"
                         phenology: ~
                         sampleHerbarium: 
                             type: "boolean"

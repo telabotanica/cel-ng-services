@@ -273,7 +273,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
 
    /**
     * @Groups({"read", "write"})
-    * @ORM\Column(type="integer", nullable=true)
+    * @ORM\Column(type="string", length=50, nullable=true)
     */
    private $coef = null;
 
@@ -803,12 +803,12 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
        return $this->validSciName;
    }
 
-   public function getCoef(): ?int
+   public function getCoef(): ?string
    {
        return $this->coef;
    }
 
-   public function setCoef(?int $coef): self
+   public function setCoef(?string $coef): self
    {
        $this->coef = $coef;
 

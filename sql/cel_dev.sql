@@ -134,7 +134,7 @@ CREATE TABLE `occurrence` (
   `annotation` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Commentaires concernant l''obs',
   `occurrence_type` enum('observation de terrain','issue de la bibliographie','donnée d''herbier') COLLATE utf8mb4_unicode_ci DEFAULT 'observation de terrain' COMMENT 'Type de donnée - observation de terrain, issue de la bibliographie, donnée d''herbier(DC2Type:occurrencetypeenum)',
   `is_wild` tinyint(1) DEFAULT 1 COMMENT 'Indique si l''individu observé était sauvage ou cultivé',
-  `coef` int(11) DEFAULT NULL,
+  `coef` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `phenology` enum('00-09: germination, développement des bourgeons','10-19: développement des feuilles','11: par ex, environ 10% des feuilles épanouies','15: par ex, environ 50% des feuilles épanouies','20-29: formation de pousses latérales, tallage','30-39: développement des tiges, croissance des rosettes','40-49: développement des organes de propagation végétative','floraison','61: par ex, environ 10% des fleurs épanouies','65: par ex, environ 50% des fleurs épanouies','70-79: fructification','80-89: maturité des fruits et des graines','85: par ex, 50% des fruits matures','90-99: sénescence et dormance','91: par ex, environ 10% des feuilles jaunes','95: par ex, environ 50% des feuilles jaunes') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Stade phénologique observé - échelle BBCH, stades regroupés par 10 (sauf certains stades remarquables)(DC2Type:phenologyenum)',
   `sample_herbarium` tinyint(1) DEFAULT 0 COMMENT 'Indique la présence / l''absence d''une part d''herbier associée à l''obs',
   `bibliography_source` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Source bibliographique',
@@ -417,4 +417,4 @@ CREATE TABLE `user_profile_cel` (
 
 SET FOREIGN_KEY_CHECKS=1
 
--- Dump completed on 2019-02-26 16:30:47
+-- Dump completed on 2019-02-26 16:47:49
