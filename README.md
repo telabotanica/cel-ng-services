@@ -10,8 +10,14 @@ git clone https://gitlab.com/slack_lpm/cel2-services.git
 
 In the project root folder, launch the composer install with the following options:
 
+For dev:
 ```
-composer install --no-dev --optimize-autoloader
+composer install
+```
+
+For prod:
+```
+APP_ENV=prod composer install --no-dev --optimize-autoloader
 ```
 
 ## Editing configuration
@@ -20,18 +26,22 @@ The default configuration are located in the .env file at root folder of the pro
 
 ### Editing elasticsearch instance URL
 
-The communication with elasticsearch is managed by the elastica bundle. You can change the ES instance URL in the config/packages/fos_elastica.yaml file.
+The communication with elasticsearch is managed by [FOSElasticaBundle](https://github.com/FriendsOfSymfony/FOSElasticaBundle). 
+
+You can change the ES instance URL in the config/packages/fos_elastica.yaml file.
 
 ### Editing database credentials and mysql instance 
 
-Configure rour database connections:
+Configure your database connection:
 
 ```
 DATABASE_URL=mysql://db_username:db_paswword@db_server_host:db_server_port/db_name
 ```
 ### Editing the CORS policy
 
-CORS feature is managed by nelmio CORS bundle (https://github.com/nelmio/NelmioCorsBundle). The configuration file is config/packages/nelmio_cors.yaml. You may want to edit the settings for the '^/api/' path.
+CORS feature is managed by [NelmioCorsBundle](https://github.com/nelmio/NelmioCorsBundle). 
+
+The configuration file is config/packages/nelmio_cors.yaml. You may want to edit the settings for the '^/api/' path.
 
 ## Creating the database
 
