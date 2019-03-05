@@ -16,6 +16,7 @@
         "symfony/cache": "^4.1",
         "symfony/console": "^4.1",
         "symfony/debug": "^4.1",
+        "symfony/dotenv": "^4.1",
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.1",
         "symfony/http-foundation": "^4.1",
@@ -29,7 +30,6 @@
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "easycorp/easy-deploy-bundle": "^1.0",
         "symfony/debug-pack": "^1.0",
-        "symfony/dotenv": "^4.1",
         "symfony/maker-bundle": "^1.5"
     },
     "config": {
