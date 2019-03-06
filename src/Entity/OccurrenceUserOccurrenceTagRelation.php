@@ -14,11 +14,10 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 /**
  * Represents a relation between an Occurrence and a UserOccurrenceTag.
  *
- * Modélise la relation entre une occurrence et un tag utilisateur.
+ * @package App\Entity  
  *
  * @ORM\Entity
  * @ApiResource(attributes={
@@ -29,14 +28,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OccurrenceUserOccurrenceTagRelation {
 
-   /**
-    * @Groups({"read"})
-    * @ORM\Id
-    * @ORM\GeneratedValue(strategy="IDENTITY")
-    * @ORM\Column(type="integer")
-    */
-   private $id = null;
-
+    /**
+     * @Groups({"read"})
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(type="integer")
+     */
+    private $id = null;
+            
     /**
      *
      * @Groups({"read", "write"})
@@ -46,53 +45,42 @@ class OccurrenceUserOccurrenceTagRelation {
      */
     protected $occurrence;
 
-
-    /**
-     * @Groups({"read", "write"})
-     * @ORM\ManyToOne(targetEntity=UserOccurrenceTag::class, inversedBy="photoRelations")
-     * @ORM\JoinColumn(name="user_occurrence_tag_id", referencedColumnName="id", nullable=false)
-     * @ApiSubresource(maxDepth=1)
-     */
+     /**
+      * @Groups({"read", "write"})
+      * @ORM\ManyToOne(targetEntity=UserOccurrenceTag::class, inversedBy="photoRelations")
+      * @ORM\JoinColumn(name="user_occurrence_tag_id", referencedColumnName="id", nullable=false)
+      * @ApiSubresource(maxDepth=1)
+      */
     protected $userOccurrenceTag;
-
-
-
-    public function getId(): int
-    {
+    
+    public function getId(): int {
         return $this->id;
     }
-
-
+        
     /**
      * @return UserOccurrenceTag
      */
-    public function getUserOccurrenceTag(): UserOccurrenceTag
-    {
+    public function getUserOccurrenceTag(): UserOccurrenceTag {
         return $this->userOccurrenceTag;
     }
-
-
-   public function setUserOccurrenceTag($userOccurrenceTag): self
-   {
-       $this->userOccurrenceTag = $userOccurrenceTag;
-
-       return $this;
-   }
-
+           
+    public function setUserOccurrenceTag($userOccurrenceTag): self {
+        $this->userOccurrenceTag = $userOccurrenceTag;
+               
+        return $this;
+    }
+    
     /**
      * @return Occurrence
      */
-    public function getOccurrence(): Occurrence
-    {
+    public function getOccurrence(): Occurrence {        
         return $this->occurrence;
     }
-
-   public function setOccurrence($occurrence): self
-   {
-       $this->occurrence = $occurrence;
-
-       return $this;
-   }
-
-
+                           
+    public function setOccurrence($occurrence): self {
+        $this->occurrence = $occurrence;
+                 
+        return $this;
+    }
+    
 }

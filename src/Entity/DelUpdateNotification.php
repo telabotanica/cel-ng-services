@@ -39,29 +39,27 @@ class DelUpdateNotification {
      */
     private $isIdentiplanteValidated = null;
 
-
-   /**
-    * Date de dernière modification.
-    *
-    * @ORM\Column(name="date_updated", type="datetime", nullable=true, options={"comment":"Date de dernière modification"})
-    */
-   private $dateUpdated = null;
     
-   /**
+    /**
+     * Date de dernière modification.
+     *
+     * @ORM\Column(name="date_updated", type="datetime", nullable=true, options={"comment":"Date de dernière modification"})
+     */
+    private $dateUpdated = null;
+            
+    /**
      * A Photo can belong to a single Occurrence.
      *
      * @ORM\ManyToOne(targetEntity="Occurrence", inversedBy="photos")
      * @ORM\JoinColumn(name="occurrence_id", referencedColumnName="id")
      */
     private $occurrence;
-
+    
     public function getId(): ?int {
- 
         return $this->id;
     }
 
     public function getIdentiplanteScore(): ?int {
- 
         return $this->identiplanteScore;
     }
 
@@ -73,12 +71,10 @@ class DelUpdateNotification {
     }
 
     public function getIsIdentiplanteValidated() {
- 
         return $this->isIdentiplanteValidated;
     }
 
     public function setIsIdentiplanteValidated( $isIdentiplanteValidated): self {
- 
         $this->isIdentiplanteValidated = $isIdentiplanteValidated;
 
         return $this;
@@ -86,12 +82,10 @@ class DelUpdateNotification {
 
 
     public function getDateUpdated(): ?\DateTimeInterface {
- 
         return $this->dateUpdated;
     }
 
     public function setDateUpdated(?\DateTimeInterface $dateUpdated): self {
- 
         $this->dateUpdated = $dateUpdated;
 
         return $this;
@@ -102,7 +96,6 @@ class DelUpdateNotification {
     }
 
     public function setOccurrence(?Occurrence $occurrence): self {
- 
         $this->occurrence = $occurrence;
 
         return $this;

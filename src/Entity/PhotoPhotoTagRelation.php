@@ -15,8 +15,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Represents a photo tag.
- * Mot-clé photo.
+ * Represents a link between a <code>photoTag</code> and a <code>Photo</code>.
+ *
+ * @package App\Entity  
  *
  * @ORM\Entity
  * @ApiResource(attributes={
@@ -25,8 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * })
  * @ORM\Table(name="photo_tag_photo", options={"comment":"Table de jointure entre Photo et PhotoTag."})
  */
-class PhotoPhotoTagRelation 
-{
+class PhotoPhotoTagRelation {
 
    /**
     * @Groups({"read"})
@@ -54,21 +54,18 @@ class PhotoPhotoTagRelation
      */
     protected $photoTag;
 
-    public function getId(): int
-    {
+    public function getId(): int {
         return $this->id;
     }
 
     /**
      * @return PhotoTag
      */
-    public function getPhotoTag()
-    {
+    public function getPhotoTag() {
         return $this->photoTag;
     }
 
-   public function setPhotoTag($photoTag): self
-   {
+   public function setPhotoTag($photoTag): self {
        $this->photoTag = $photoTag;
 
        return $this;
@@ -77,13 +74,11 @@ class PhotoPhotoTagRelation
     /**
      * @return Photo
      */
-    public function getPhoto()
-    {
+    public function getPhoto() {
         return $this->photo;
     }
 
-   public function setPhoto($photo): self
-   {
+   public function setPhoto($photo): self {
        $this->photo = $photo;
 
        return $this;

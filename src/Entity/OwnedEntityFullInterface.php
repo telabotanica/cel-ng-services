@@ -2,8 +2,14 @@
 
 namespace App\Entity;
 
-interface OwnedEntityFullInterface extends OwnedEntitySimpleInterface
-{
+/**
+ * Represents an entity belonging to a CEL user which holds her/his email and
+ * pseudo as attributes.
+ *
+ * @package App\Entity  
+ *
+ */
+interface OwnedEntityFullInterface extends OwnedEntitySimpleInterface {
 
     public function getUserEmail(): ?string;
     public function setUserEmail(?string $userEmail): OwnedEntityFullInterface;
