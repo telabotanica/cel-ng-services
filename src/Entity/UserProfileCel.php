@@ -32,6 +32,7 @@ class UserProfileCel {
     * Unique identifier for the profile. Equals the user ID in the SSO system.
     *
     * @ORM\Id
+    * @ORM\GeneratedValue(strategy="IDENTITY")
     * @ORM\Column(type="integer")
     * @Groups({"read"})    
     */
