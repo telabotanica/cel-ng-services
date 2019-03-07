@@ -47,6 +47,20 @@ The configuration file is config/packages/nelmio_cors.yaml. You may want to edit
 
 Run the sql script located in the 'sql' folder of the project.
 
+## Dev: populating the DB and elasticsearch index with dev/test data
+
+Run the data fixture to populate the DB:
+
+```
+php bin/console doctrine:fixtures:load -v
+```
+
+To populate the index by scanning the whole DB, run the following:
+
+```
+php bin/console fos:elastica:populate -v
+```
+
 ## Dev: launching the app on the test server
 
 You can do so by issuing the following command:
