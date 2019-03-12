@@ -29,9 +29,11 @@ class PhotoVoter extends OccurrenceVoter {
             return true;
         }
         if ( $photo->getOccurrence() !== null ) {
-            $prjId = $photo->getOccurrence()->getProject()->getId();
-            if ( $user->getAdministeredProjectId() == $prjId ) {
-                return $photo->getIsPublic();
+            if ( $photo->getOccurrence()->getProject() !== null ) {
+                $prjId = $photo->getOccurrence()->getProject()->getId();
+                if ( $user->getAdministeredProjectId() == $prjId ) {
+                    return $photo->getIsPublic();
+                }
             }
         }        
         switch ($attribute) {

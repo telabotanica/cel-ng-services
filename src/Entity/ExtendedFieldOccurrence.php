@@ -11,14 +11,15 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Relation entre une observation et un champ étendu. Stocke la valeur de ce 
- * dernier pour l'obs en question.
+ * Represents the value of an <code>ExtendedField</code> for a given 
+ * <code>Occurrence</code>.
+ *
+ * @package App\Entity  
  *
  * @ORM\Entity
  * @ORM\Table(name="extended_field_occurrence")
  */
-class ExtendedFieldOccurrence
-{
+class ExtendedFieldOccurrence {
 
     /**
      * @ORM\Id
@@ -50,48 +51,48 @@ class ExtendedFieldOccurrence
    private $value = null;
 
 
-   public function getId(): ?int
-   {
+   public function getId(): ?int {
+
        return $this->id;
    }
 
 
-   public function getValue(): ?string
-   {
+   public function getValue(): ?string {
+
        return $this->value;
    }
 
 
-   public function setValue(string $value): self
-   {
+   public function setValue(string $value): self {
+
        $this->value = $value;
 
        return $this;
    }
 
 
-   public function getOccurrence(): ?Occurrence
-   {
+   public function getOccurrence(): ?Occurrence {
+
        return $this->occurrence;
    }
 
 
-   public function setOccurrence(?Occurrence $occurrence): self
-   {
+   public function setOccurrence(?Occurrence $occurrence): self {
+
        $this->occurrence = $occurrence;
 
        return $this;
    }
 
 
-   public function getExtendedField(): ?ExtendedField
-   {
+   public function getExtendedField(): ?ExtendedField {
+
        return $this->extendedField;
    }
 
 
-   public function setExtendedField(?ExtendedField $extendedField): self
-   {
+   public function setExtendedField(?ExtendedField $extendedField): self {
+
        $this->extendedField = $extendedField;
 
 

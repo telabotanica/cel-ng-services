@@ -14,8 +14,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * An entity representing an extended field of a 
  * <code>TelaBotanicaProject</code>.
  *
- * Champs étendus des projets.
- *
  * @package App\Entity
  *
  * @ORM\Entity
@@ -120,7 +118,6 @@ class ExtendedField {
     private $extendedFieldTranslations;
 
     public function __construct() {
- 
         $this->extendedFieldValues = new ArrayCollection();
     }
 
@@ -130,43 +127,36 @@ class ExtendedField {
     }
 
     public function getDataType(): ?string {
- 
         return $this->dataType;
     }
     
     public function setDataType(string $dataType): self {
- 
         $this->dataType = $dataType;
 
         return $this;
     }
 
     public function getIsVisible(): ?bool {
- 
         return $this->isVisible;
     }
 
     public function setIsVisible(bool $isVisible): self {
- 
         $this->isVisible = $isVisible;
 
         return $this;
     }
 
     public function getIsMandatory(): ?bool {
- 
         return $this->isMandatory;
     }
 
     public function setIsMandatory(bool $isMandatory): self {
- 
         $this->isMandatory = $isMandatory;
 
         return $this;
     }
 
     public function getRegexp(): ?string {
- 
         return $this->regexp;
     }
 
@@ -178,48 +168,40 @@ class ExtendedField {
     }
 
     public function getUnit(): ?string {
- 
         return $this->unit;
     }
 
     public function setUnit(string $unit): self {
- 
         $this->unit = $unit;
 
         return $this;
     }
 
     public function getProject(): ?TelaBotanicaProject {
- 
         return $this->project;
     }
 
     public function setProject(?TelaBotanicaProject $project): self {
- 
         $this->project = $project;
 
         return $this;
     }
 
     public function getFieldId(): ?string {
- 
         return $this->fieldId;
     }
 
     public function setFieldId(?string $fieldId): self {
- 
         $this->project = $fieldId;
 
         return $this;
     }
 
     public function getProjectName(): ?string {
- 
         return $this->projectName;
     }
 
     public function setProjectName(?string $project): self {
- 
         $this->projectName = $projectName;
 
         return $this;

@@ -15,8 +15,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * CEL user profile. 
- * Gestion des préférences utilisateurs.
+ * Represents a CEL user profile (which corresponds to a given SSO user) . 
+ *
+ * @package App\Entity
  *
  * @ORM\Entity
  * @ORM\Table(name="user_profile_cel", options={"comment":"Gestion des préférences utilisateurs"})
@@ -24,28 +25,18 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "normalization_context"={"groups"={"read"}},
  *     "denormalization_context"={"groups"={"write"}}})
  */
-class UserProfileCel
-{
+class UserProfileCel {
+
 
    /**
+    * Unique identifier for the profile. Equals the user ID in the SSO system.
+    *
     * @ORM\Id
-    * @ORM\GeneratedValue(strategy="IDENTITY")
     * @ORM\Column(type="integer")
     * @Groups({"read"})    
     */
    private $id = null;
 
-
-   /**
-    * Publisher user ID (null if user is anonymous).
-    *
-    * Idenfiant utilisateur de lu'tilisateur ayant publié l'observation (null si utilisateur anonyme).
-    *
-    * @Assert\NotNull
-    * @ORM\Column(type="integer", nullable=false)
-    * @Groups({"read"})    
-    */
-   private $userId = null;
 
    /**
     * Anonymisation des données d'observation.
@@ -86,15 +77,6 @@ class UserProfileCel
    private $language = LanguageEnumType::FR;
 
     /**
-     * One UserProfileCel has Many Occurrences.
-     * @ORM\OneToMany(targetEntity="Occurrence", mappedBy="userProfile")
-     * @Groups({"read", "write"})  
-     */
-    private $occurrences;
-
-
-
-    /**
      * A user can be the admin of a single TelaBotanicaProject.
      *
      * @ORM\ManyToOne(targetEntity="TelaBotanicaProject", inversedBy="administratorProfiles", cascade={"persist"})
@@ -103,136 +85,90 @@ class UserProfileCel
      */
     private $administeredProject;
 
-    /**
-     * The references to CustomUserField this user has created.
-     *
-     * @ORM\OneToMany(targetEntity="UserCustomField", mappedBy="userProfileCel", cascade={"remove"})
-     * @Groups({"read", "write"})  
-     */
-    private $userCustomFields;
+    public function __construct() {
 
-
-    public function __construct()
-    {
         $this->occurrences = new ArrayCollection();
 //        $this->administeredProjects = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
+
         return $this->id;
     }
-
-   public function getUserId(): ?int
-   {
-       return $this->userId;
-   }
-
-   public function setUserId(?int $userId): self
-   {
-       $this->userId = $userId;
+    
+    public function setId(?int $id): self {
+       $this->id = $id;
 
        return $this;
-   }
+    }
+    
+    public function getAnonymousData(): ?bool {
 
-    public function getAnonymousData(): ?bool
-    {
         return $this->anonymousData;
     }
 
-    public function setAnonymousData(bool $anonymousData): self
-    {
+    public function setAnonymousData(bool $anonymousData): self {
+
         $this->anonymousData = $anonymousData;
 
         return $this;
     }
 
-    public function getProfileVisibility(): ?bool
-    {
+    public function getProfileVisibility(): ?bool {
+
         return $this->profileVisibility;
     }
 
-    public function setProfileVisibility(bool $profileVisibility): self
-    {
+    public function setProfileVisibility(bool $profileVisibility): self {
+
         $this->profileVisibility = $profileVisibility;
 
         return $this;
     }
 
-    public function getLanguage(): ?string
-    {
+    public function getLanguage(): ?string {
+
         return $this->language;
     }
 
-    public function setLanguage(string $language): self
-    {
+    public function setLanguage(string $language): self {
+
         $this->language = $language;
 
         return $this;
     }
 
-    public function getAlwaysDisplayAdvancedFields(): ?bool
-    {
+    public function getAlwaysDisplayAdvancedFields(): ?bool {
+
         return $this->alwaysDisplayAdvancedFields;
     }
 
-    public function setAlwaysDisplayAdvancedFields(bool $alwaysDisplayAdvancedFields): self
-    {
+    public function setAlwaysDisplayAdvancedFields(bool $alwaysDisplayAdvancedFields): self {
+
         $this->alwaysDisplayAdvancedFields = $alwaysDisplayAdvancedFields;
 
         return $this;
     }
 
-    public function getIsEndUserLicenceAccepted(): ?bool
-    {
+    public function getIsEndUserLicenceAccepted(): ?bool {
+
         return $this->isEndUserLicenceAccepted;
     }
 
-    public function setIsEndUserLicenceAccepted(bool $isEndUserLicenceAccepted): self
-    {
+    public function setIsEndUserLicenceAccepted(bool $isEndUserLicenceAccepted): self {
+
         $this->isEndUserLicenceAccepted = $isEndUserLicenceAccepted;
 
         return $this;
     }
 
-    /**
-     * @return Collection|Occurrence[]
-     */
-    public function getOccurrences(): Collection
-    {
-        return $this->occurrences;
-    }
+    public function getAdministeredProject(): ?TelaBotanicaProject {
 
-    public function addOccurrence(Occurrence $occurrence): self
-    {
-        if (!$this->occurrences->contains($occurrence)) {
-            $this->occurrences[] = $occurrence;
-            $occurrence->setUserProfile($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOccurrence(Occurrence $occurrence): self
-    {
-        if ($this->occurrences->contains($occurrence)) {
-            $this->occurrences->removeElement($occurrence);
-            // set the owning side to null (unless already changed)
-            if ($occurrence->getUserProfile() === $this) {
-                $occurrence->setUserProfile(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getAdministeredProject(): ?TelaBotanicaProject
-    {
         return $this->administeredProject;
     }
 
-    public function setAdministeredProject(?TelaBotanicaProject $administeredProject): self
-    {
+    public function setAdministeredProject(?TelaBotanicaProject $administeredProject): self {
+
         $this->administeredProject = $administeredProject;
 
         return $this;

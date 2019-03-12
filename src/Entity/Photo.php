@@ -35,10 +35,10 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-
-
 /**
- * An entity representing a CEL photo.
+ * Represents a photo in CEL2 user galleries.
+ *
+ * @package App\Entity  
  *
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
@@ -100,186 +100,185 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @Vich\Uploadable
  *
  */
-class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface
-{
+class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
    /**
-    * @Groups({"read"})
-    * @ORM\Id
-    * @ORM\GeneratedValue(strategy="IDENTITY")
-    * @ORM\Column(type="integer")
-    */
-   private $id = null;
-
-   /**
-    * Publisher user ID (null if user is anonymous).
-    *
-    * Idenfiant utilisateur de lu'tilisateur ayant publié l'observation (null si utilisateur anonyme).
-    *
-    * @Groups({"read"})
-    * @ORM\Column(name="user_id", type="integer", nullable=true, options={"comment":"ID de l'utilisateur"})
-    */
-   private $userId = null;
-
-   /**
-    * Email de l'utilisateur.
-    *
-    * @Assert\NotNull
-    * @Groups({"read", "write"})
-    * @ORM\Column(name="user_email", type="string", nullable=false, options={"comment":"Email de l'utilisateur"})
-    */
-   private $userEmail = null;
-
-   /**
-    * Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné.
-    *
-    * @Assert\NotNull
-    * @Groups({"read"})
-    * @ORM\Column(name="user_pseudo", type="string", nullable=true, options={"comment":"Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné."})
-    */
-   private $userPseudo = null;
-
-   /**
-    * Nom du fichier image.
-    *
-    * @Groups({"read"})
-    * @ORM\Column(name="original_name", type="string", nullable=false,  length=190, options={"comment":"Nom du fichier image"})
-    */
-   private $originalName = null;
-
-   /**
-    * Date de la prise de vue.
-    * 
-    * @Groups({"read", "write"})
-    * @ORM\Column(name="date_shot", type="datetime", nullable=true, options={"comment":"Date de la prise de vue"})
-    */
-   private $dateShot = null;
-
-
-   /**
-    * Latitude de la photo.
-    * 
-    * @Groups({"read", "write"})
-    * @ORM\Column(type="float", nullable=true, options={"comment":"Latitude de la photo"})
-    */
-   private $latitude = null;
-
-   /**
-    * Longitude de la photo.
-    * 
-    * @Groups({"read", "write"})
-    * @ORM\Column(type="float", nullable=true, options={"comment":"Longitude de la photo"})
-    */
-   private $longitude = null;
-
-   /**
-    * Date de l'import de la photo.
-    *
-    * @Assert\NotNull
-    * @Groups({"read"})
-    * @ORM\Column(name="date_created", type="datetime", nullable=false, options={"comment":"Date de l'import du fichier"})
-    */
-   private $dateCreated = null;
-
-   /**
-    * Date de dernière modification.
-    *
-    * @Groups({"read"})
-    * @ORM\Column(name="date_updated", type="datetime", nullable=true, options={"comment":"Date de dernière modification"})
-    */
-   private $dateUpdated = null;
-
-   /**
-    * Date à laquelle la photo a été liée à une obs.
-    *
-    * @Groups({"read"})
-    * @ORM\Column(name="date_linked_to_occurrence", type="datetime", nullable=true, options={"comment":"Date à laquelle la photo a été liée à une obs"})
-    */
-   private $dateLinkedToOccurrence = null;
-
-
-    /**
-     * @var File|null
-     * @Vich\UploadableField(mapping="media_object", fileNameProperty="contentUrl", size="size", mimeType="mimeType", originalName="originalName")
-     */
-    public $file;
-
-
-    /**
-     * The uploaded JSON metadata file containing the user email in case the
-     * user is not logged but uploads a photo anyway. Just parsed to fill the
-     * userEmail property, nothing is stored.
-     *
-     * @var File|null
-     * @Vich\UploadableField(mapping="media_object", fileNameProperty="jsonData")
-     */
-    public $json;  
-
-    /**
-     * Won't be persisted. Just a temporary holder for the JSON metadata file 
-     * containing the user email in case the user is not logged but uploads a
-     * photo anyway.
-     *
-     * @var string|null
-     */
-    public $jsonData;
-
-
-    /**
-     * @var string|null
      * @Groups({"read"})
-     * @ORM\Column(name="content_url", type="string", nullable=false)
-     * @ApiProperty(iri="http://schema.org/contentUrl")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(type="integer")
      */
-    public $contentUrl;
+    private $id = null;
 
-
-    /**
-     * @var integer|null
+   /**
+     * Publisher user ID (null if user is anonymous).
+     *
+     * Idenfiant utilisateur de lu'tilisateur ayant publié l'observation (null si utilisateur anonyme).
+     *
      * @Groups({"read"})
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(name="user_id", type="integer", nullable=true, options={"comment":"ID de l'utilisateur"})
      */
-    public $size;
+    private $userId = null;
 
+   /**
+     * Email de l'utilisateur.
+     *
+     * @Assert\NotNull
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="user_email", type="string", nullable=false, options={"comment":"Email de l'utilisateur"})
+     */
+    private $userEmail = null;
 
-    /**
-     * @var string|null
+   /**
+     * Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné.
+     *
      * @Assert\NotNull
      * @Groups({"read"})
-     * @ORM\Column(name="mime_type", type="string", nullable=false)
+     * @ORM\Column(name="user_pseudo", type="string", nullable=true, options={"comment":"Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné."})
      */
-    public $mimeType;
+    private $userPseudo = null;
 
-
-    /**
-     * Relative URL of the file.
+   /**
+     * Nom du fichier image.
      *
-     * @var string|null
      * @Groups({"read"})
-     * @ORM\Column(name="url", type="string", nullable=false)
+     * @ORM\Column(name="original_name", type="string", nullable=false,  length=190, options={"comment":"Nom du fichier image"})
      */
-    public $url;
+    private $originalName = null;
 
-
-    /**
-     * @ORM\OneToMany(targetEntity=PhotoPhotoTagRelation::class, cascade={"persist", "remove"}, mappedBy="photo")
-     * @ApiSubresource(maxDepth=1)
+   /**
+     * Date de la prise de vue.
+     * 
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="date_shot", type="datetime", nullable=true, options={"comment":"Date de la prise de vue"})
      */
-    protected $photoTagRelations;
+    private $dateShot = null;
 
 
    /**
-     * A Photo can belong to a single Occurrence.
-     *
-     * @ORM\ManyToOne(targetEntity="Occurrence", inversedBy="photos")
-     * @ORM\JoinColumn(name="occurrence_id", referencedColumnName="id")
-     * @ApiSubresource(maxDepth=1)
-     * @Groups({"read", "write"}) 
+     * Latitude de la photo.
+     * 
+     * @Groups({"read", "write"})
+     * @ORM\Column(type="float", nullable=true, options={"comment":"Latitude de la photo"})
      */
-    private $occurrence;
+    private $latitude = null;
+
+   /**
+     * Longitude de la photo.
+     * 
+     * @Groups({"read", "write"})
+     * @ORM\Column(type="float", nullable=true, options={"comment":"Longitude de la photo"})
+     */
+    private $longitude = null;
+
+   /**
+     * Date de l'import de la photo.
+     *
+     * @Assert\NotNull
+     * @Groups({"read"})
+     * @ORM\Column(name="date_created", type="datetime", nullable=false, options={"comment":"Date de l'import du fichier"})
+     */
+    private $dateCreated = null;
+
+   /**
+     * Date de dernière modification.
+     *
+     * @Groups({"read"})
+     * @ORM\Column(name="date_updated", type="datetime", nullable=true, options={"comment":"Date de dernière modification"})
+     */
+    private $dateUpdated = null;
+
+   /**
+     * Date à laquelle la photo a été liée à une obs.
+     *
+     * @Groups({"read"})
+     * @ORM\Column(name="date_linked_to_occurrence", type="datetime", nullable=true, options={"comment":"Date à laquelle la photo a été liée à une obs"})
+     */
+    private $dateLinkedToOccurrence = null;
 
 
-   public function fillPropertiesWithImageExif() {
+     /**
+      * @var File|null
+      * @Vich\UploadableField(mapping="media_object", fileNameProperty="contentUrl", size="size", mimeType="mimeType", originalName="originalName")
+      */
+     public $file;
+
+
+     /**
+      * The uploaded JSON metadata file containing the user email in case the
+      * user is not logged but uploads a photo anyway. Just parsed to fill the
+      * userEmail property, nothing is stored.
+      *
+      * @var File|null
+      * @Vich\UploadableField(mapping="media_object", fileNameProperty="jsonData")
+      */
+     public $json;  
+
+     /**
+      * Won't be persisted. Just a temporary holder for the JSON metadata file 
+      * containing the user email in case the user is not logged but uploads a
+      * photo anyway.
+      *
+      * @var string|null
+      */
+     public $jsonData;
+
+
+     /**
+      * @var string|null
+      * @Groups({"read"})
+      * @ORM\Column(name="content_url", type="string", nullable=false)
+      * @ApiProperty(iri="http://schema.org/contentUrl")
+      */
+     public $contentUrl;
+
+
+     /**
+      * @var integer|null
+      * @Groups({"read"})
+      * @ORM\Column(type="integer", nullable=false)
+      */
+     public $size;
+
+
+     /**
+      * @var string|null
+      * @Assert\NotNull
+      * @Groups({"read"})
+      * @ORM\Column(name="mime_type", type="string", nullable=false)
+      */
+     public $mimeType;
+
+
+     /**
+      * Relative URL of the file.
+      *
+      * @var string|null
+      * @Groups({"read"})
+      * @ORM\Column(name="url", type="string", nullable=false)
+      */
+     public $url;
+
+
+     /**
+      * @ORM\OneToMany(targetEntity=PhotoPhotoTagRelation::class, cascade={"persist", "remove"}, mappedBy="photo")
+      * @ApiSubresource(maxDepth=1)
+      */
+     protected $photoTagRelations;
+
+
+   /**
+      * A Photo can belong to a single Occurrence.
+      *
+      * @ORM\ManyToOne(targetEntity="Occurrence", inversedBy="photos")
+      * @ORM\JoinColumn(name="occurrence_id", referencedColumnName="id")
+      * @ApiSubresource(maxDepth=1)
+      * @Groups({"read", "write"}) 
+      */
+     private $occurrence;
+
+
+    public function fillPropertiesWithImageExif() {
       if  ( !exif_imagetype( $this->file->getRealPath() ) ) {
           throw new InvalidImageException('The file you tried to associate to this Photo is not a valid image.');
       }
@@ -291,7 +290,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface
       }
    }
 
-   public function fillPropertiesFromJsonFile($jsonPath, $forbiddenKeys) {
+    public function fillPropertiesFromJsonFile($jsonPath, $forbiddenKeys) {
       if  ( isset($jsonPath) ) {
          $jsonAsString = file_get_contents($jsonPath);
          $json = json_decode($jsonAsString, true);
@@ -308,85 +307,85 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface
    }
 
    /**
-    * Triggered on update
-    * @ORM\PreUpdate
-    */
-   public function onPreUpdate()
-   {
+     * Triggered on update
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate() {
+
       $this->dateUpdated = new \DateTime();
       $this->fillPropertiesWithImageExif();
    }
 
-   public function getId(): ?int
-   {
+    public function getId(): ?int {
+
        return $this->id;
    }
 
-   public function getUserId(): ?int
-   {
+    public function getUserId(): ?int {
+
        return $this->userId;
    }
 
-   public function setUserId(?int $userId): OwnedEntitySimpleInterface
-   {
+    public function setUserId(?int $userId): OwnedEntitySimpleInterface {
+
        $this->userId = $userId;
 
        return $this;
    }
 
-   public function getUserEmail(): ?string
-   {
+    public function getUserEmail(): ?string {
+
        return $this->userEmail;
    }
 
-   public function setUserEmail(?string $userEmail): OwnedEntityFullInterface
-   {
+    public function setUserEmail(?string $userEmail): OwnedEntityFullInterface {
+
        $this->userEmail = $userEmail;
 
        return $this;
    }
 
-   public function getUserPseudo(): ?string
-   {
+    public function getUserPseudo(): ?string {
+
        return $this->userPseudo;
    }
 
-   public function setUserPseudo(?string $userPseudo): OwnedEntityFullInterface
-   {
+    public function setUserPseudo(?string $userPseudo): OwnedEntityFullInterface {
+
        $this->userPseudo = $userPseudo;
 
        return $this;
    }
 
-   public function getOriginalName(): ?string
-   {
+    public function getOriginalName(): ?string {
+
        return $this->originalName;
    }
 
-   public function getLatitude(): ?float
-   {
+    public function getLatitude(): ?float {
+
        return $this->latitude;
    }
 
-   public function getLongitude(): ?float
-   {
+    public function getLongitude(): ?float {
+
        return $this->longitude;
    }
 
-   public function setOriginalName(?string $originalName): self
-   {
+    public function setOriginalName(?string $originalName): self {
+
        $this->originalName = $originalName;
 
        return $this;
    }
 
-   public function getDateShot(): ?\DateTimeInterface
-   {
+    public function getDateShot(): ?\DateTimeInterface {
+
        return $this->dateShot;
    }
 
-   public function setDateShot(?\DateTimeInterface $dateShot): self
-   {
+    public function setDateShot(?\DateTimeInterface $dateShot): self {
+
        $this->dateShot = $dateShot;
 
        return $this;
@@ -394,88 +393,88 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface
 
 
 
-   public function getFormattedDateShot(): ?string
-   {
+    public function getFormattedDateShot(): ?string {
+
        return (null !== $this->dateShot) ? $this->dateShot->format('Y-m-d H:i:s') : null;
    }
 
-   public function getDateShotMonth(): ?float
-   {
+    public function getDateShotMonth(): ?float {
+
        return $this->dateShot->format('m');
    }
 
-   public function getDateShotYear(): ?float
-   {
+    public function getDateShotYear(): ?float {
+
        return $this->dateShot->format('y');
    }
 
-   public function getDateShotDay(): ?float
-   {
+    public function getDateShotDay(): ?float {
+
        return $this->dateShot->format('d');
    }
 
 
 
 
-   public function getDateCreated(): ?\DateTimeInterface
-   {
+    public function getDateCreated(): ?\DateTimeInterface {
+
        return $this->dateCreated;
    }
 
-   public function setDateCreated(?\DateTimeInterface $dateCreated): TimestampedEntityInterface
-   {
+    public function setDateCreated(?\DateTimeInterface $dateCreated): TimestampedEntityInterface {
+
        $this->dateCreated = $dateCreated;
 
        return $this;
    }
 
-   public function getDateUpdated(): ?\DateTimeInterface
-   {
+    public function getDateUpdated(): ?\DateTimeInterface {
+
        return $this->dateUpdated;
    }
 
-   public function setDateUpdated(?\DateTimeInterface $dateUpdated): TimestampedEntityInterface
-   {
+    public function setDateUpdated(?\DateTimeInterface $dateUpdated): TimestampedEntityInterface {
+
        $this->dateUpdated = $dateUpdated;
 
        return $this;
    }
 
-   public function getDateLinkedToOccurrence(): ?\DateTimeInterface
-   {
+    public function getDateLinkedToOccurrence(): ?\DateTimeInterface {
+
        return $this->dateLinkedToOccurrence;
    }
 
-   public function __construct()
-   {
+    public function __construct() {
+
        $this->photoRelations = new ArrayCollection();
        $this->photoTagRelations = new ArrayCollection();
    }
 
-   public function setDateLinkedToOccurrence(?\DateTimeInterface $dateLinkedToOccurrence): self
-   {
+    public function setDateLinkedToOccurrence(?\DateTimeInterface $dateLinkedToOccurrence): self {
+
        $this->dateLinkedToOccurrence = $dateLinkedToOccurrence;
 
        return $this;
    }
 
-   public function getFormattedDateCreated(): ?string
-   {
+    public function getFormattedDateCreated(): ?string {
+
        return (null !== $this->dateCreated) ? $this->dateCreated->format('Y-m-d H:i:s') : null;
    }
 
-   public function getFormattedDateUpdated(): ?string
-   {
+    public function getFormattedDateUpdated(): ?string {
+
        return (null !== $this->dateUpdated) ? $this->dateUpdated->format('Y-m-d H:i:s') : null;
    }
 
 
 
 
-    /**
-     * @return PhotoTags[]
-     */
-    public function getPhotoTags()
+     /**
+      * @return PhotoTags[]
+      */
+     public function getPhotoTags()
     {
         $photoTags = array();
         foreach($this->photoTagRelations as $rel) {
@@ -485,7 +484,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface
     }
 
 
-    public function addPhotoTag(PhotoTag $photoTag): self
+     public function addPhotoTag(PhotoTag $photoTag): self
     {
         $pptRelation = new PhotoPhotoTagRelation();
         $pptRelation->setPhotoTag($photoTag);
@@ -494,8 +493,8 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface
         $this->photoTagRelations[] = $pptRelation;
     }
 
-   public function removePhotoTag(PhotoTag $photoTag): self
-   {
+    public function removePhotoTag(PhotoTag $photoTag): self {
+
         $em = $this->getDoctrine()->getEntityManager();
         foreach($this->photoTagRelations as $rel) {
             if ( $rel->getPhotoTag() ==  $photoTag) {
@@ -505,91 +504,91 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface
         }
    }
 
-   public function getOccurrence(): ?Occurrence
-   {
+    public function getOccurrence(): ?Occurrence {
+
        return $this->occurrence;
    }
 
-   public function setOccurrence(?Occurrence $occurrence): self
-   {
+    public function setOccurrence(?Occurrence $occurrence): self {
+
        $this->occurrence = $occurrence;
 
        return $this;
    }
 
-   public function getContentUrl(): ?string
-   {
+    public function getContentUrl(): ?string {
+
        return $this->contentUrl;
    }
 
-   public function getMimeType(): ?string
-   {
+    public function getMimeType(): ?string {
+
        return $this->mimeType;
    }
 
 
-   public function setMimeType(?string $mimeType): self
-   {
+    public function setMimeType(?string $mimeType): self {
+
        $this->mimeType = $mimeType;
 
        return $this;
    }
 
-   public function getSize(): ?int
-   {
+    public function getSize(): ?int {
+
        return $this->size;
    }
 
-   public function setSize(?int $size): self
-   {
+    public function setSize(?int $size): self {
+
        $this->size = $size;
 
        return $this;
    }
 
-   public function setLatitude(?float $latitude): self
-   {
+    public function setLatitude(?float $latitude): self {
+
        $this->latitude = $latitude;
 
        return $this;
    }
 
-   public function setLongitude(?float $longitude): self
-   {
+    public function setLongitude(?float $longitude): self {
+
        $this->longitude = $longitude;
 
        return $this;
    }
 
-   public function setContentUrl(?string $contentUrl): self
-   {
+    public function setContentUrl(?string $contentUrl): self {
+
        $this->contentUrl = $contentUrl;
 
        return $this;
    }
 
-   public function getUrl(): ?string
-   {
+    public function getUrl(): ?string {
+
        return $this->url;
    }
 
-   public function setUrl(?string $url): self
-   {
+    public function setUrl(?string $url): self {
+
        $this->url = $url;
 
        return $this;
    }
 
    /**
-    * @return Collection|PhotoPhotoTagRelation[]
-    */
-   public function getPhotoTagRelations(): Collection
-   {
+     * @return Collection|PhotoPhotoTagRelation[]
+     */
+    public function getPhotoTagRelations(): Collection {
+
        return $this->photoTagRelations;
    }
 
-   public function addPhotoTagRelation(PhotoPhotoTagRelation $photoTagRelation): self
-   {
+    public function addPhotoTagRelation(PhotoPhotoTagRelation $photoTagRelation): self {
+
        if (!$this->photoTagRelations->contains($photoTagRelation)) {
            $this->photoTagRelations[] = $photoTagRelation;
            $photoTagRelation->setPhoto($this);
@@ -598,8 +597,8 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface
        return $this;
    }
 
-   public function removePhotoTagRelation(PhotoPhotoTagRelation $photoTagRelation): self
-   {
+    public function removePhotoTagRelation(PhotoPhotoTagRelation $photoTagRelation): self {
+
        if ($this->photoTagRelations->contains($photoTagRelation)) {
            $this->photoTagRelations->removeElement($photoTagRelation);
            // set the owning side to null (unless already changed)

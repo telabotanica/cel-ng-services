@@ -37,7 +37,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * Entity representing a botanic occurrence (observation).
+ * Entity representing a botanic occurrence (French: observation).
+ *
+ * @package App\Entity
  *
  * @ApiResource(attributes={
  *      "normalization_context"={"groups"={"read"}},
@@ -98,8 +100,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @todo use JSON type for geometry if possible to have MariaDB 10.2.7.+ in prod
  * @todo elevation string -> float
  */
-class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
-{
+class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
    /**
     * @Groups({"read"})
@@ -133,7 +134,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * @ORM\Column(name="user_pseudo", type="string", nullable=true, options={"comment":"Pseudo de l'utilisateur ayant saisi l'obs. Nom/Prénom si non renseigné."})
     */
    private $userPseudo = null;
-
 
    /**
     * Observateur.
@@ -273,7 +273,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
 
    /**
     * @Groups({"read", "write"})
-    * @ORM\Column(type="integer", nullable=true)
+    * @ORM\Column(type="string", length=50, nullable=true)
     */
    private $coef = null;
 
@@ -293,7 +293,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * @ORM\Column(name="sample_herbarium", type="boolean", nullable=true, options={"comment":"Indique la présence / l'absence d'une part d'herbier associée à l'obs", "default": false})
     */
    private $sampleHerbarium = false;
-
 
    /**
     * Source bibliographique.
@@ -347,7 +346,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     */
    private $signature = null;
 
-
    /**
     * Localisation précise de l'obs.
     * GeoJSON geometry fo this occurrence.
@@ -356,7 +354,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * @ORM\Column(type="text", nullable=true, options={"comment":"Localisation précise de l'obs"})
     */
    private $geometry = null;
-
 
    /**
     * Altitude.
@@ -390,7 +387,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     */
    private $localityInseeCode = null;
 
-
    /**
     * Lieu-dit.
     *
@@ -407,7 +403,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     */
    private $environment = null;
 
-
    /**
     * Cohérence entre les coordonnées et la localité.
     *
@@ -415,7 +410,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * @ORM\Column(name="locality_consistency", type="boolean", nullable=true, options={"comment":"Cohérence entre les coordonnées et la localité"})
     */
    private $localityConsistency = null;
-
 
    /**
     * @Groups({"read", "write"})
@@ -513,7 +507,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     */
    private $isIdentiplanteValidated = false;
 
-
    /**
     * Champ complété automatiquement par osm - code pays.
     *
@@ -521,7 +514,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * @ORM\Column(name="identification_author", type="string", nullable=true, options={"comment":"Nom de la personne ayant identifié l'espèce observée (si différente de l'observateur)"})
     */
    private $identificationAuthor = null;
-
 
     /**
      * Référentiel taxonomique
@@ -539,13 +531,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
      */
     private $project;
-
-   /**
-     * Many Occurrences have One UserProfileCel.
-     * @ORM\ManyToOne(targetEntity="UserProfileCel", inversedBy="occurrences")
-     * @ORM\JoinColumn(name="user_profile_id", referencedColumnName="id")
-     */
-    private $userProfile;
 
     /**
      * One Occurrence can have many attached photos.
@@ -584,732 +569,598 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      */
     private $userCustomFieldOccurrences;
 
-
     /**
      * @ORM\OneToMany(targetEntity=OccurrenceUserOccurrenceTagRelation::class, cascade={"persist", "remove"}, mappedBy="occurrence")
      * @ApiSubresource(maxDepth=1)
      */
     protected $userTagRelations;
-
-
-   public function isPublishable(): ?bool
-   {
+    
+    public function isPublishable(): ?bool {
         return ( 
             ( null !== $this->geometry) &&            
             ( null !== $this->dateObserved) &&
             ( null !== $this->certainty) );
-   }
+    }
 
+    public function setId(?int $id): self {
+        $this->id = $id;
 
-   public function setId(?int $id): self
-   {
-       $this->id = $id;
-
-       return $this;
-   }
-
-   public function getId(): ?int
-   {
-       return $this->id;
-   }
-
-   public function getUserId(): ?int
-   {
-       return $this->userId;
-   }
-
-   public function setUserId(?int $userId): OwnedEntitySimpleInterface
-   {
-       $this->userId = $userId;
-
-       return $this;
-   }
-
-   public function getUserEmail(): ?string
-   {
-       return $this->userEmail;
-   }
-
-   public function setUserEmail(?string $userEmail): OwnedEntityFullInterface
-   {
-       $this->userEmail = $userEmail;
-
-       return $this;
-   }
-
-   public function getUserPseudo(): ?string
-   {
-       return $this->userPseudo;
-   }
-
-   public function setUserPseudo(?string $userPseudo): OwnedEntityFullInterface
-   {
-       $this->userPseudo = $userPseudo;
-
-       return $this;
-   }
-
- 
-   public function getObserver(): ?string
-   {
-       return $this->observer;
-   }
-
-   public function setObserver(string $observer): self
-   {
-       $this->observer = $observer;
-
-       return $this;
-   }
-
-   public function getObserverInstitution(): ?string
-   {
-       return $this->observerInstitution;
-   }
-
-   public function setObserverInstitution(string $observerInstitution): self
-   {
-       $this->observerInstitution = $observerInstitution;
-
-       return $this;
-   }
-
-   public function getDateObserved(): ?\DateTimeInterface
-   {
-       return $this->dateObserved;
-   }
-
-   public function getFormattedDateObserved(): ?string
-   {
-       return (null !== $this->dateObserved) ? $this->dateObserved->format('Y-m-d H:i:s') : null;
-   }
-
-
-   public function getFormattedDateCreated(): ?string
-   {
-       return (null !== $this->dateCreated) ? $this->dateCreated->format('Y-m-d H:i:s') : null;
-   }
-
-   public function getFormattedDateUpdated(): ?string
-   {
-       return (null !== $this->dateUpdated) ? $this->dateUpdated->format('Y-m-d H:i:s') : null;
-   }
-
-   public function getFormattedDatePublished(): ?string
-   {
-       return (null !== $this->datePublished) ? $this->datePublished->format('Y-m-d H:i:s') : null;
-   }
-
-   public function getDateObservedMonth(): ?float
-   {
-	if ( null !== $this->dateObserved ) {
-		return $this->dateObserved->format('m');
-	}
-	return null;
-   }
-
-   public function getDateObservedDay(): ?float
-   {
-	if ( null !== $this->dateObserved ) {
-		return $this->dateObserved->format('d');
-	}
-	return null;
-   }
-
-   public function getDateObservedYear(): ?float
-   {
-	if ( null !== $this->dateObserved ) {
-		return $this->dateObserved->format('Y');
-	}
-	return null;
-   }
-
-
-   public function setDateObserved(\DateTimeInterface $dateObserved): self
-   {
-       $this->dateObserved = $dateObserved;
-
-       return $this;
-   }
-
-   public function setDateCreated(?\DateTimeInterface $dateCreated): TimestampedEntityInterface
-   {
-       $this->dateCreated = $dateCreated;
-
-       return $this;
-   }
-
-   public function getDateCreated(): ?\DateTimeInterface
-   {
-       return $this->dateCreated;
-   }
-
-   public function setDateUpdated(?\DateTimeInterface $dateUpdated): TimestampedEntityInterface
-   {
-       $this->dateUpdated = $dateUpdated;
-
-       return $this;
-   }
-
-   public function getDateUpdated(): ?\DateTimeInterface
-   {
-       return $this->dateUpdated;
-   }
-
-   public function getDatePublished(): ?\DateTimeInterface
-   {
-       return $this->datePublished;
-   }
-
-   public function setDatePublished(\DateTimeInterface $datePublished): self
-   {
-       $this->datePublished = $datePublished;
-
-       return $this;
-   }
-
-   public function getUserSciName(): ?string
-   {
-       return $this->userSciName;
-   }
-
-   public function setUserSciName(string $userSciName): self
-   {
-       $this->userSciName = $userSciName;
-
-       return $this;
-   }
-
-   public function getUserSciNameId(): ?int
-   {
-       return $this->userSciNameId;
-   }
-
-   public function setUserSciNameId(?int $userSciNameId): self
-   {
-       $this->userSciNameId = $userSciNameId;
-
-       return $this;
-   }
-
-
-
-   public function getAcceptedSciName(): ?string
-   {
-       return $this->acceptedSciName;
-   }
-
-
-   public function getAcceptedSciNameId(): ?int
-   {
-       return $this->acceptedSciNameId;
-   }
-
-   public function getValidSciName(): ?string
-   {
-       return $this->validSciName;
-   }
-
-   public function getCoef(): ?int
-   {
-       return $this->coef;
-   }
-
-   public function setCoef(?int $coef): self
-   {
-       $this->coef = $coef;
-
-       return $this;
-   }
-
-   public function setValidSciName(string $validSciName): self
-   {
-       $this->validSciName = $validSciName;
-
-       return $this;
-   }
-
-   public function getValidSciNameId(): ?int
-   {
-       return $this->validSciNameId;
-   }
-
-   public function setValidSciNameId(int $validSciNameId): self
-   {
-       $this->validSciNameId = $validSciNameId;
-
-       return $this;
-   }
-
-   public function getPlantnetId(): ?int
-   {
-       return $this->plantnetId;
-   }
-
-   public function setFamily(string $family): self
-   {
-       $this->family = $family;
-
-       return $this;
-   }
-
-   public function getFamily(): ?string
-   {
-       return $this->family;
-   }
-
-
-
-   public function getTaxoRepo() : ?string
-   {
-       return $this->taxoRepo;
-   }
-
-   public function setTaxoRepo(?string $taxoRepo): self
-   {
-       $this->taxoRepo = $taxoRepo;
-
-       return $this;
-   }
-
-   public function getPhenology(): ?string
-   {
-       return $this->phenology;
-   }
-
-   public function setPhenology($phenology): self
-   {
-       $this->phenology = $phenology;
-
-       return $this;
-   }
-
-   public function getCertainty(): ?string
-   {
-       return $this->certainty;
-   }
-
-   public function setCertainty(string $certainty): self
-   {
-       $this->certainty = $certainty;
-
-       return $this;
-   }
-
-   public function getAnnotation(): ?string
-   {
-       return $this->annotation;
-   }
-
-   public function setAnnotation(string $annotation): self
-   {
-       $this->annotation = $annotation;
-
-       return $this;
-   }
-
-   public function getOccurrenceType()
-   {
-       return $this->occurrenceType;
-   }
-
-   public function setOccurrenceType($occurrenceType): self
-   {
-       $this->occurrenceType = $occurrenceType;
-
-       return $this;
-   }
-
-   public function getIsWild(): ?bool
-   {
-       return $this->isWild;
-   }
-
-   public function setIsWild(bool $isWild): self
-   {
-       $this->isWild = $isWild;
-
-       return $this;
-   }
-
-   public function getIndividualCount(): ?int
-   {
-       return $this->individualCount;
-   }
-
-   public function setIndividualCount(int $individualCount): self
-   {
-       $this->individualCount = $individualCount;
-
-       return $this;
-   }
-
-   public function getSampleHerbarium(): ?bool
-   {
-       return $this->sampleHerbarium;
-   }
-
-   public function setSampleHerbarium(bool $sampleHerbarium): self
-   {
-       $this->sampleHerbarium = $sampleHerbarium;
-
-       return $this;
-   }
-
-   public function getBibliographySource()
-   {
-       return $this->bibliographySource;
-   }
-
-   public function getInputSource()
-   {
-       return $this->inputSource;
-   }
-
-   public function setInputSource($inputSource): self
-   {
-       $this->inputSource = $inputSource;
-
-       return $this;
-   }
-
-   public function getIsPublic(): ?bool
-   {
-       return $this->isPublic;
-   }
-
-   public function setIsPublic(bool $isPublic): self
-   {
-       $this->isPublic = $isPublic;
-
-       return $this;
-   }
-
-   public function getIsVisibleInCel(): ?bool
-   {
-       return $this->isVisibleInCel;
-   }
-
-   public function setIsVisibleInCel(bool $isVisibleInCel): self
-   {
-       $this->isVisibleInCel = $isVisibleInCel;
-
-       return $this;
-   }
-
-   public function getIsVisibleInVegLab(): ?bool
-   {
-       return $this->isVisibleInVegLab;
-   }
-
-   public function setIsVisibleInVegLab(bool $isVisibleInVegLab): self
-   {
-       $this->isVisibleInVegLab = $isVisibleInVegLab;
-
-       return $this;
-   }
-
-   public function getSignature(): ?string
-   {
-       return $this->signature;
-   }
-
-
-   public function getGeodatum(): ?string
-   {
-       return $this->geodatum;
-   }
-
-   public function setGeodatum(?string $geodatum): self
-   {
-       $this->geodatum = $geodatum;
-
-       return $this;
-   }
-
-   public function getLocalityConsistency(): ?bool
-   {
-       return $this->localityConsistency;
-   }
-
-
-   public function getLocality(): ?string
-   {
-       return $this->locality;
-   }
-
-   public function setLocality(?string $locality): self
-   {
-       $this->locality = $locality;
-
-       return $this;
-   }
-
-   public function getLocalityInseeCode(): ?string
-   {
-       return $this->localityInseeCode;
-   }
-
-   public function setLocalityInseeCode(?string $localityInseeCode): self
-   {
-       $this->localityInseeCode = $localityInseeCode;
-
-       return $this;
-   }
-
-   public function getSublocality(): ?string
-   {
-       return $this->sublocality;
-   }
-
-   public function setSublocality(?string $sublocality): self
-   {
-       $this->sublocality = $sublocality;
-
-       return $this;
-   }
-
-   public function getEnvironment(): ?string
-   {
-       return $this->environment;
-   }
-
-   public function setEnvironment(?string $environment): self
-   {
-       $this->environment = $environment;
-
-       return $this;
-   }
-
-   public function getStation(): ?string
-   {
-       return $this->station;
-   }
-
-   public function setStation(?string $station): self
-   {
-       $this->station = $station;
-
-       return $this;
-   }
-
-   public function getPublishedLocation()
-   {
-       return $this->publishedLocation;
-   }
-
-   public function setPublishedLocation($publishedLocation): self
-   {
-       $this->publishedLocation = $publishedLocation;
-
-       return $this;
-   }
-
-   public function getLocationAccuracy()
-   {
-       return $this->locationAccuracy;
-   }
-
-   public function setLocationAccuracy($locationAccuracy): self
-   {
-       $this->locationAccuracy = $locationAccuracy;
-
-       return $this;
-   }
-
-
-   public function setGeometry(?string $geometry): self
-   {
-       $this->geometry = $geometry;
         return $this;
-   }
+    }
 
-   public function getGeometry(): ?string
-   {
-       return $this->geometry;
-   }
+    public function getId(): ?int {
+        return $this->id;
+    }
+        
+    public function getUserId(): ?int {
+        return $this->userId;
+    }
 
+    public function setUserId(?int $userId): OwnedEntitySimpleInterface {
+        $this->userId = $userId;
 
-   public function getElevation(): ?string
-   {
-       return $this->elevation;
-   }
+        return $this;
+    }
 
-   public function setElevation(?string $elevation): self
-   {
-       $this->elevation = $elevation;
+    public function getUserEmail(): ?string {
+        return $this->userEmail;
+    }
 
-       return $this;
-   }
+    public function setUserEmail(?string $userEmail): OwnedEntityFullInterface {
+        $this->userEmail = $userEmail;
 
-   public function getOsmCounty(): ?string
-   {
-       return $this->osmCounty;
-   }
+        return $this;
+    }
 
-   public function setOsmCounty(?string $osmCounty): self
-   {
-       $this->osmCounty = $osmCounty;
+    public function getUserPseudo(): ?string {
+        return $this->userPseudo;
+    }
 
-       return $this;
-   }
+    public function setUserPseudo(?string $userPseudo): OwnedEntityFullInterface {
+        $this->userPseudo = $userPseudo;
 
-   public function getOsmState(): ?string
-   {
-       return $this->osmState;
-   }
+        return $this;
+    }
 
-   public function setOsmState(?string $osmState): self
-   {
-       $this->osmState = $osmState;
+    public function getObserver(): ?string {
+        return $this->observer;
+    }
 
-       return $this;
-   }
+    public function setObserver(string $observer): self {
+        $this->observer = $observer;
 
-   public function getOsmPostcode(): ?string
-   {
-       return $this->osmPostcode;
-   }
+        return $this;
+    }
 
-   public function setOsmPostcode(?string $osmPostcode): self
-   {
-       $this->osmPostcode = $osmPostcode;
+    public function getObserverInstitution(): ?string {
+        return $this->observerInstitution;
+    }
 
-       return $this;
-   }
+    public function setObserverInstitution(string $observerInstitution): self {
+        $this->observerInstitution = $observerInstitution;
 
-   public function getOsmCountry(): ?string
-   {
-       return $this->osmCountry;
-   }
+        return $this;
+    }
 
-   public function setOsmCountry(?string $osmCountry): self
-   {
-       $this->osmCountry = $osmCountry;
+    public function getDateObserved(): ?\DateTimeInterface {
+        return $this->dateObserved;
+    }
 
-       return $this;
-   }
-
-   public function getOsmCountryCode(): ?string
-   {
-       return $this->osmCountryCode;
-   }
-
-   public function setOsmCountryCode(?string $osmCountryCode): self
-   {
-       $this->osmCountryCode = $osmCountryCode;
-
-       return $this;
-   }
-
-   public function getOsmId(): ?string
-   {
-       return $this->osmId;
-   }
-
-   public function setOsmId(string $osmId): self
-   {
-       $this->osmId = $osmId;
-
-       return $this;
-   }
-
-   public function getOsmPlaceId(): ?int
-   {
-       return $this->osmPlaceId;
-   }
-
-   public function setOsmPlaceId(int $osmPlaceId): self
-   {
-       $this->osmPlaceId = $osmPlaceId;
-
-       return $this;
-   }
+    public function getFormattedDateObserved(): ?string {
+        return (null !== $this->dateObserved) ? $this->dateObserved->format('Y-m-d H:i:s') : null;
+    }
 
 
-   public function getIdentiplanteScore(): ?int
-   {
-       return $this->identiplanteScore;
-   }
+    public function getFormattedDateCreated(): ?string {
+        return (null !== $this->dateCreated) ? $this->dateCreated->format('Y-m-d H:i:s') : null;
+    }
 
-   public function setIdentiplanteScore(?int $identiplanteScore): self
-   {
-       $this->identiplanteScore = $identiplanteScore;
+    public function getFormattedDateUpdated(): ?string {
+        return (null !== $this->dateUpdated) ? $this->dateUpdated->format('Y-m-d H:i:s') : null;
+    }
 
-       return $this;
-   }
+    public function getFormattedDatePublished(): ?string {
+        return (null !== $this->datePublished) ? $this->datePublished->format('Y-m-d H:i:s') : null;
+    }
 
-   public function getIsIdentiplanteValidated(): ?bool
-   {
-       return $this->isIdentiplanteValidated;
-   }
+    public function getDateObservedMonth(): ?float {
+	    if ( null !== $this->dateObserved ) {
+	    	return $this->dateObserved->format('m');
+        }
+    	return null;
+    }
 
-   public function setIsIdentiplanteValidated(bool $isIdentiplanteValidated): self
-   {
-       $this->isIdentiplanteValidated = $isIdentiplanteValidated;
+    public function getDateObservedDay(): ?float {
+	    if ( null !== $this->dateObserved ) {
+	    	return $this->dateObserved->format('d');
+	    }
+        return null;
+    }
 
-       return $this;
-   }
+    public function getDateObservedYear(): ?float {
+	    if ( null !== $this->dateObserved ) {
+	    	return $this->dateObserved->format('Y');
+	    }
+
+	    return null;
+    }
+
+    public function setDateObserved(\DateTimeInterface $dateObserved): self {
+        $this->dateObserved = $dateObserved;
+
+        return $this;
+    }
+
+    public function setDateCreated(?\DateTimeInterface $dateCreated): TimestampedEntityInterface {
+        $this->dateCreated = $dateCreated;
+
+        return $this;
+    }
+
+    public function getDateCreated(): ?\DateTimeInterface {
+        return $this->dateCreated;
+    }
+
+    public function setDateUpdated(?\DateTimeInterface $dateUpdated): TimestampedEntityInterface {
+        $this->dateUpdated = $dateUpdated;
+        
+        return $this;
+    }
+
+    public function getDateUpdated(): ?\DateTimeInterface {
+        return $this->dateUpdated;
+    }
+
+    public function getDatePublished(): ?\DateTimeInterface {
+        return $this->datePublished;
+    }
+
+    public function setDatePublished(\DateTimeInterface $datePublished): self {
+        $this->datePublished = $datePublished;
+
+        return $this;
+    }
+
+    public function getUserSciName(): ?string {
+        return $this->userSciName;
+    }
+
+    public function setUserSciName(string $userSciName): self {
+        $this->userSciName = $userSciName;
+
+        return $this;
+    }
+
+    public function getUserSciNameId(): ?int {
+        return $this->userSciNameId;
+    }
+
+    public function setUserSciNameId(?int $userSciNameId): self {
+        $this->userSciNameId = $userSciNameId;
+
+        return $this;
+    }
+
+    public function getAcceptedSciName(): ?string {
+        return $this->acceptedSciName;
+    }
+
+    public function getAcceptedSciNameId(): ?int {
+        return $this->acceptedSciNameId;
+    }
+
+    public function getValidSciName(): ?string {
+        return $this->validSciName;
+    }
+
+    public function getCoef(): ?string {
+        return $this->coef;
+    }
+
+    public function setCoef(?string $coef): self {
+        $this->coef = $coef;
+
+        return $this;
+    }
+
+    public function setValidSciName(string $validSciName): self {
+        $this->validSciName = $validSciName;
+
+        return $this;
+    }
+
+    public function getValidSciNameId(): ?int {
+        return $this->validSciNameId;
+    }
+
+    public function setValidSciNameId(int $validSciNameId): self {
+        $this->validSciNameId = $validSciNameId;
+
+        return $this;
+    }
+
+    public function getPlantnetId(): ?int {
+        return $this->plantnetId;
+    }
+
+    public function setFamily(string $family): self {
+        $this->family = $family;
+
+        return $this;
+    }
+
+    public function getFamily(): ?string {
+        return $this->family;
+    }
+
+    public function getTaxoRepo() : ?string {
+        return $this->taxoRepo;
+    }
+
+    public function setTaxoRepo(?string $taxoRepo): self {
+        $this->taxoRepo = $taxoRepo;
+
+        return $this;
+    }
+
+    public function getPhenology(): ?string {
+        return $this->phenology;
+    }
+
+    public function setPhenology($phenology): self {
+        $this->phenology = $phenology;
+
+        return $this;
+    }
+
+    public function getCertainty(): ?string {
+        return $this->certainty;
+    }
+
+    public function setCertainty(string $certainty): self {
+        $this->certainty = $certainty;
+
+        return $this;
+    }
+
+    public function getAnnotation(): ?string {
+        return $this->annotation;
+    }
+
+    public function setAnnotation(string $annotation): self {
+        $this->annotation = $annotation;
+
+        return $this;
+    }
+
+    public function getOccurrenceType() {
+        return $this->occurrenceType;
+    }
+
+    public function setOccurrenceType($occurrenceType): self {
+        $this->occurrenceType = $occurrenceType;
+
+        return $this;
+    }
+
+    public function getIsWild(): ?bool {
+        return $this->isWild;
+    }
+
+    public function setIsWild(bool $isWild): self {
+        $this->isWild = $isWild;
+
+        return $this;
+    }
+
+    public function getIndividualCount(): ?int {
+        return $this->individualCount;
+    }
+
+    public function setIndividualCount(int $individualCount): self {
+        $this->individualCount = $individualCount;
+
+        return $this;
+    }
+
+    public function getSampleHerbarium(): ?bool {
+        return $this->sampleHerbarium;
+    }
+
+    public function setSampleHerbarium(bool $sampleHerbarium): self {
+        $this->sampleHerbarium = $sampleHerbarium;
+
+        return $this;
+    }
+
+    public function getBibliographySource() {
+        return $this->bibliographySource;
+    }
+
+    public function getInputSource() {
+        return $this->inputSource;
+    }
+
+    public function setInputSource($inputSource): self {
+        $this->inputSource = $inputSource;
+
+        return $this;
+    }
+
+    public function getIsPublic(): ?bool {
+        return $this->isPublic;
+    }
+
+    public function setIsPublic(bool $isPublic): self {
+        $this->isPublic = $isPublic;
+
+        return $this;
+    }
+
+    public function getIsVisibleInCel(): ?bool {
+        return $this->isVisibleInCel;
+    }
+
+    public function setIsVisibleInCel(bool $isVisibleInCel): self {
+        $this->isVisibleInCel = $isVisibleInCel;
+
+        return $this;
+    }
+
+    public function getIsVisibleInVegLab(): ?bool {
+        return $this->isVisibleInVegLab;
+    }
+
+    public function setIsVisibleInVegLab(bool $isVisibleInVegLab): self {
+        $this->isVisibleInVegLab = $isVisibleInVegLab;
+
+        return $this;
+    }
+
+    public function getSignature(): ?string {
+        return $this->signature;
+    }
+
+
+    public function getGeodatum(): ?string {
+        return $this->geodatum;
+    }
+
+    public function setGeodatum(?string $geodatum): self {
+        $this->geodatum = $geodatum;
+
+        return $this;
+    }
+
+    public function getLocalityConsistency(): ?bool {
+        return $this->localityConsistency;
+    }
+
+
+    public function getLocality(): ?string {
+        return $this->locality;
+    }
+
+    public function setLocality(?string $locality): self {
+        $this->locality = $locality;
+
+        return $this;
+    }
+
+    public function getLocalityInseeCode(): ?string {
+        return $this->localityInseeCode;
+    }
+
+    public function setLocalityInseeCode(?string $localityInseeCode): self {
+        $this->localityInseeCode = $localityInseeCode;
+
+        return $this;
+    }
+
+    public function getSublocality(): ?string {
+        return $this->sublocality;
+    }
+
+    public function setSublocality(?string $sublocality): self {
+        $this->sublocality = $sublocality;
+
+        return $this;
+    }
+
+    public function getEnvironment(): ?string {
+        return $this->environment;
+    }
+
+    public function setEnvironment(?string $environment): self {
+        $this->environment = $environment;
+
+        return $this;
+    }
+
+    public function getStation(): ?string {
+        return $this->station;
+    }
+
+    public function setStation(?string $station): self {
+        $this->station = $station;
+
+        return $this;
+    }
+
+    public function getPublishedLocation() {
+        return $this->publishedLocation;
+    }
+
+    public function setPublishedLocation($publishedLocation): self {
+        $this->publishedLocation = $publishedLocation;
+
+        return $this;
+    }
+
+    public function getLocationAccuracy() {
+        return $this->locationAccuracy;
+    }
+
+    public function setLocationAccuracy($locationAccuracy): self {
+        $this->locationAccuracy = $locationAccuracy;
+
+        return $this;
+    }
+
+
+    public function setGeometry(?string $geometry): self {
+        $this->geometry = $geometry;
+        return $this;
+    }
+
+    public function getGeometry(): ?string {
+        return $this->geometry;
+    }
+
+
+    public function getElevation(): ?string {
+        return $this->elevation;
+    }
+
+    public function setElevation(?string $elevation): self {
+        $this->elevation = $elevation;
+
+        return $this;
+    }
+
+    public function getOsmCounty(): ?string {
+        return $this->osmCounty;
+    }
+
+    public function setOsmCounty(?string $osmCounty): self {
+        $this->osmCounty = $osmCounty;
+
+        return $this;
+    }
+
+    public function getOsmState(): ?string {
+        return $this->osmState;
+    }
+
+    public function setOsmState(?string $osmState): self {
+        $this->osmState = $osmState;
+
+        return $this;
+    }
+
+    public function getOsmPostcode(): ?string {
+        return $this->osmPostcode;
+    }
+
+    public function setOsmPostcode(?string $osmPostcode): self {
+        $this->osmPostcode = $osmPostcode;
+
+        return $this;
+    }
+
+    public function getOsmCountry(): ?string {
+        return $this->osmCountry;
+    }
+
+    public function setOsmCountry(?string $osmCountry): self {
+        $this->osmCountry = $osmCountry;
+
+        return $this;
+    }
+
+    public function getOsmCountryCode(): ?string {
+        return $this->osmCountryCode;
+    }
+
+    public function setOsmCountryCode(?string $osmCountryCode): self {
+        $this->osmCountryCode = $osmCountryCode;
+
+        return $this;
+    }
+
+    public function getOsmId(): ?string {
+        return $this->osmId;
+    }
+
+    public function setOsmId(string $osmId): self {
+        $this->osmId = $osmId;
+
+        return $this;
+    }
+
+    public function getOsmPlaceId(): ?int {
+        return $this->osmPlaceId;
+    }
+
+    public function setOsmPlaceId(int $osmPlaceId): self {
+        $this->osmPlaceId = $osmPlaceId;
+
+        return $this;
+    }
+
+
+    public function getIdentiplanteScore(): ?int {
+        return $this->identiplanteScore;
+    }
+
+    public function setIdentiplanteScore(?int $identiplanteScore): self {
+        $this->identiplanteScore = $identiplanteScore;
+
+        return $this;
+    }
+
+    public function getIsIdentiplanteValidated(): ?bool {
+        return $this->isIdentiplanteValidated;
+    }
+
+    public function setIsIdentiplanteValidated(bool $isIdentiplanteValidated): self {
+        $this->isIdentiplanteValidated = $isIdentiplanteValidated;
+
+        return $this;
+    }
    
 
 
-   public function getIdentificationAuthor(): ?string
-   {
-       return $this->identificationAuthor;
-   }
+    public function getIdentificationAuthor(): ?string {
+        return $this->identificationAuthor;
+    }
 
-   public function setIdentificationAuthor(?string $identificationAuthor): self
-   {
-       $this->identificationAuthor = $identificationAuthor;
+    public function setIdentificationAuthor(?string $identificationAuthor): self {
+        $this->identificationAuthor = $identificationAuthor;
 
-       return $this;
-   }
+        return $this;
+    }
 
-
-   public function __construct()
-   {
+    public function __construct() {
         $this->photos = new ArrayCollection();
         $this->userTagRelations = new ArrayCollection();
         $this->extendedFieldValues = new ArrayCollection();
-   }
+    }
 
-   public function getProject(): ?TelaBotanicaProject
-   {
-       return $this->project;
-   }
+    public function getProject(): ?TelaBotanicaProject {
+        return $this->project;
+    }
 
-   public function setProject(?TelaBotanicaProject $project): self
-   {
-       $this->project = $project;
-       return $this;
-   }
+    public function setProject(?TelaBotanicaProject $project): self {
+        $this->project = $project;
+        return $this;
+    }
 
-   public function getUserProfile(): ?UserProfileCel
-   {
-       return $this->userProfile;
-   }
-   public function setUserProfile(?UserProfileCel $userProfile): self
-   {
-       $this->userProfile = $userProfile;
-       return $this;
-   }
    /**
     * @return Collection|Photo[]
     */
-   public function getPhotos(): Collection
-   {
-       return $this->photos;
-   }
-   public function addPhoto(Photo $photo): self
-   {
+    public function getPhotos(): Collection {
+        return $this->photos;
+    }
+
+    public function addPhoto(Photo $photo): self {
        if (!$this->photos->contains($photo)) {
            $this->photos[] = $photo;
            $photo->setOccurrence($this);
        }
-       return $this;
-   }
-   public function removePhoto(Photo $photo): self
-   {
+        return $this;
+    }
+    public function removePhoto(Photo $photo): self {
        if ($this->photos->contains($photo)) {
            $this->photos->removeElement($photo);
            // set the owning side to null (unless already changed)
@@ -1317,14 +1168,11 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
                $photo->setOccurrence(null);
            }
        }
-       return $this;
-   }
+        return $this;
+    }
 
+    public function getUserOccurrenceTags(): array {
 
-
-
-    public function getUserOccurrenceTags(): array
-    {
         $tags = array();
 
         foreach($this->userTagRelations as $rel) {
@@ -1333,38 +1181,15 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $tags;
 
     }
-/*
-    public function addUserTag(UserOccurrenceTag $tag): self
-    {
-	$em = $this->getDoctrine()->getEntityManager();
-        $userTagRelation = new OccurrenceUserOccurrenceTagRelation();
-        $userTagRelation->setUserOccurrenceTag($tag);
-        $userTagRelation->setOccurrence($this);
-        $em->persist($userTagRelation);
-        $this->userTagRelations[] = $userTagRelation;
-    }
 
-   public function removeUserTag(UserOccurrenceTag $tag): self
-   {
-        $em = $this->getDoctrine()->getEntityManager();
-        foreach($this->userTagRelations as $rel) {
-            if ( $rel->getUserOccurrenceTag() ==  $tag ) {
-                $em->remove($rel);
-                $em->flush();
-            }
-        }
-   }
-*/
    /**
     * @return Collection|ExtendedFieldValue[]
     */
-   public function getExtendedFieldValues(): Collection
-   {
-       return $this->extendedFieldValues;
-   }
+    public function getExtendedFieldValues(): Collection {
+        return $this->extendedFieldValues;
+    }
 
-   public function addExtendedFieldValue( $extendedFieldValue): self
-   {
+    public function addExtendedFieldValue( $extendedFieldValue): self {
        if (!$this->extendedFieldValues->contains($extendedFieldValue)) {
            $this->extendedFieldValues[] = $extendedFieldValue;
            $extendedFieldValue->setOccurrence($this);
@@ -1372,8 +1197,8 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $this;
     }
 
-    public function removeExtendedFieldValue( $extendedFieldValue): self
-    {
+    public function removeExtendedFieldValue( $extendedFieldValue): self {
+
        if ($this->extendedFieldValues->contains($extendedFieldValue)) {
            $this->extendedFieldValues->removeElement($extendedFieldValue);
            // set the owning side to null (unless already changed)
@@ -1382,7 +1207,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
            }
        }
        
-       return $this;
+        return $this;
     }
 
     public function generateSignature() {
@@ -1397,7 +1222,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         }
 
         $this->signature = base64_encode($unencodedSignature);
-
     }
 
     public function __clone() {
@@ -1414,9 +1238,9 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         }
     }
 
-    public function __toString()
-    {
+    public function __toString() {
         $format = "Occurrence (id: %s)\n";
+
         return sprintf($format, $this->id);
     }
 

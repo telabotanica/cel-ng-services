@@ -16,7 +16,7 @@ use App\DBAL\LocationAccuracyEnumType;
 use App\DBAL\InputSourceEnumType;
 
 /**
- * Creates and persists 
+ * Creates and persists a bunch of test entities:
  *
  * <ul>
  *  <li>One <code>TelabotanicaProject</code> instances</li> 
@@ -34,7 +34,7 @@ class AppFixtures extends Fixture {
 
         $userProfile = new UserProfileCel();
         $userProfile->setLanguage('EN');
-        $userProfile->setUserId($userId);
+        $userProfile->setId($userId);
         $manager->persist($userProfile);
 
         return $userProfile;

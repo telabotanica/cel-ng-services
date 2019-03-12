@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Mot-clé utilisateurs des photos.
+ * Represents tag which can be associated to <code>Photo</code> instances.
  *
  * @ORM\Entity
  * @ApiResource(attributes={
@@ -23,43 +23,42 @@ use Symfony\Component\Validator\Constraints as Assert;
  * })
  * @ORM\Table(name="photo_tag",indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Mot-clé photo"})
  */
-class PhotoTag
-{
+class PhotoTag {
 
-   /**
-    * @Groups({"read"})
-    * @ORM\Id
-    * @ORM\GeneratedValue(strategy="IDENTITY")
-    * @ORM\Column(type="integer")
-    */
-   private $id = null;
-
-
-   /**
-    * ID de l'utilisateur.
-    *
-    * @Groups({"read"})
-    * @ORM\Column(name="user_id", type="integer", nullable=false, options={"comment":"ID de l'utilisateur"})
-    */
-   private $userId = null;
-
-   /**
-    * Mot-clé.
-    *
-    * @Assert\NotNull
-    * @Groups({"read", "write"})
-    * @ORM\Column(type="string", nullable=false, options={"comment":"Mot-clé"})
-    */
-   private $name = null;
+    /**
+     * @Groups({"read"})
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(type="integer")
+     */
+    private $id = null;
 
 
-   /**
-    * Hiérarchie (mots clés parents séparés par des /)
-    *
-    * @Groups({"read", "write"})
-    * @ORM\Column(type="string", nullable=true, options={"comment":"Hiérarchie (mots clés parents séparés par des /)"})
-    */
-   private $path = null;
+    /**
+     * ID de l'utilisateur.
+     *
+     * @Groups({"read"})
+     * @ORM\Column(name="user_id", type="integer", nullable=false, options={"comment":"ID de l'utilisateur"})
+     */
+    private $userId = null;
+    
+    /**
+     * Mot-clé.
+     *
+     * @Assert\NotNull
+     * @Groups({"read", "write"})
+     * @ORM\Column(type="string", nullable=false, options={"comment":"Mot-clé"})
+     */
+    private $name = null;
+    
+
+    /**
+     * Hiérarchie (mots clés parents séparés par des /)
+     *
+     * @Groups({"read", "write"})
+     * @ORM\Column(type="string", nullable=true, options={"comment":"Hiérarchie (mots clés parents séparés par des /)"})
+     */
+    private $path = null;
 
     /**
      * @ORM\OneToMany(targetEntity=PhotoPhotoTagRelation::class, cascade={"persist", "remove"}, mappedBy="photoTag")
@@ -67,43 +66,35 @@ class PhotoTag
      */
     protected $photoRelations;
 
-
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getUserId(): ?int
-    {
+    public function getUserId(): ?int {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): self
-    {
+    public function setUserId(int $userId): self {
         $this->userId = $userId;
 
         return $this;
     }
 
-    public function getName(): ?string
-    {
+    public function getName(): ?string {
         return $this->name;
     }
 
-    public function setName(string $name): self
-    {
+    public function setName(string $name): self {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getPath(): ?string
-    {
+    public function getPath(): ?string {
         return $this->path;
     }
 
-    public function setPath(string $path): self
-    {
+    public function setPath(string $path): self {
         $this->path = $path;
 
         return $this;
@@ -112,8 +103,7 @@ class PhotoTag
     /**
      * @return Collection|PhotoPhotoTagRelation[]
      */
-    public function getPhotoRelations(): Collection
-    {
+    public function getPhotoRelations(): Collection {
         return $this->photoRelations;
     }
 
@@ -121,8 +111,7 @@ class PhotoTag
     /**
      * @return Collection|Photo[]
      */
-    public function getPhotos(): Collection
-    {
+    public function getPhotos(): Collection {
         $photos = array();
         foreach($this->photoRelations as $rel) {
             $photos[] = $rel->getPhoto();
@@ -130,8 +119,7 @@ class PhotoTag
         return $photos;
     }
 
-    public function addPhoto(Photo $photo): self
-    {
+    public function addPhoto(Photo $photo): self {
         $pptRelation = new PhotoPhotoTagRelation();
         $pptRelation->setPhotoTag($this);
         $pptRelation->setPhoto($photo);
@@ -139,8 +127,7 @@ class PhotoTag
         $this->photoRelations[] = $pptRelation;
     }
 
-   public function removePhoto(Photo $photo): self
-   {
+   public function removePhoto(Photo $photo): self {
         $em = $this->getDoctrine()->getEntityManager();
         foreach($this->photoRelations as $rel) {
             if ( $rel->getPhoto() ==  $photo) {
@@ -149,7 +136,5 @@ class PhotoTag
             }
         }
    }
-
-
 
 }
