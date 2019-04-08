@@ -115,7 +115,6 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
      *
      * Idenfiant utilisateur de lu'tilisateur ayant publié l'observation (null si utilisateur anonyme).
      *
-     * @Groups({"read"})
      * @ORM\Column(name="user_id", type="integer", nullable=true, options={"comment":"ID de l'utilisateur"})
      */
     private $userId = null;
@@ -124,7 +123,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
      * Email de l'utilisateur.
      *
      * @Assert\NotNull
-     * @Groups({"read", "write"})
+     * @Groups({"write"})
      * @ORM\Column(name="user_email", type="string", nullable=false, options={"comment":"Email de l'utilisateur"})
      */
     private $userEmail = null;
@@ -133,7 +132,6 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
      * Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné.
      *
      * @Assert\NotNull
-     * @Groups({"read"})
      * @ORM\Column(name="user_pseudo", type="string", nullable=true, options={"comment":"Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné."})
      */
     private $userPseudo = null;
