@@ -3,10 +3,11 @@
 namespace App\Security\SSO;
 
 use App\Security\SSO\MisconfiguredSSOTokenValidatorException;
+use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * Authentication and user management using Tela Botanica's SSO
- * @todo : if annuaireURL null ou vide => return UnknownUser
+ *
  * @todo : param vide constructeur
  */
 class SSOTokenValidator {
@@ -16,21 +17,18 @@ class SSOTokenValidator {
 	/** The URL for the "annuaire" SSO Web Service */
 	protected $ignoreSSLIssues = false;
 
-
-	public function __construct($annuaireURL, $ignoreSSLIssues) {
-		$this->annuaireURL = $annuaireURL;
+	public function __construct() {
+		$this->annuaireURL = getenv('SSO_ANNUAIRE_URL');
 		// (for local testing only)
-		if (! empty($ignoreSSLIssues) && $ignoreSSLIssues === true) {
-			$this->ignoreSSLIssues = $ignoreSSLIssues;
-		}
-		
+	    $this->ignoreSSLIssues = getenv('IGNORE_SSL_ISSUES');
 	}
 
 	private function generateAuthCheckURL($token) {
 		$verificationServiceURL = $this->annuaireURL;
 		$verificationServiceURL = trim($verificationServiceURL, '/') . "/verifytoken";
 		$verificationServiceURL .= "?token=" . $token;
-                return $verificationServiceURL;
+
+        return $verificationServiceURL;
 	}
 
 	/**
@@ -40,7 +38,7 @@ class SSOTokenValidator {
 		if ( empty($this->annuaireURL) ) {
 			throw new MisconfiguredSSOTokenValidatorException();
 		}
-		$verificationServiceURL = $this->generateAuthCheckURL();
+		$verificationServiceURL = $this->generateAuthCheckURL($token);
 		$ch = curl_init();
 		$timeout = 5;
 		curl_setopt($ch, CURLOPT_URL, $verificationServiceURL);
@@ -52,6 +50,7 @@ class SSOTokenValidator {
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		}
+
 		$data = curl_exec($ch);
 		curl_close($ch);
 		$info = $data;

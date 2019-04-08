@@ -18,6 +18,7 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
     private $avatar;
     private $surname;
     private $lastName;
+    private $username;
     private $usePseudo;
     private $administeredProjectId;
     private $roles;
@@ -54,7 +55,7 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
     }
 
     public function isProjectAdmin() {
-        return (!is_null($this->administeredProjectId));
+        return ( null !== $this->administeredProjectId );
     }
 
     public function isLuser() {
@@ -97,7 +98,7 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
     }
 
     public function getUsername() {
-        return $this->usePseudo ? $this->pseudo : ($this->surname + ' ' + $this->lastName);
+        return $this->username;
     }
 
     public function getPseudo() {

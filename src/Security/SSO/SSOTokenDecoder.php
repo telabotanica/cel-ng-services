@@ -15,8 +15,8 @@ class SSOTokenDecoder {
 	/** The validator for the JWT tokens as used by SSO Web services */
 	protected $tokenValidator;
 
-	public function __construct($annuaireURL, $ignoreSSLIssues) {
-                $this->tokenValidator = new SSOTokenValidator($annuaireURL, $ignoreSSLIssues);
+	public function __construct() {
+        $this->tokenValidator = new SSOTokenValidator();
 	}
 
 	/**
@@ -25,26 +25,27 @@ class SSOTokenDecoder {
 	private function getUnknownUser() {
 		return array(
 			'sub' => null,
-			'id' => null, // @TODO replace with a session ID ?
+			'id' => null, 
 			'permissions' => array()
 		);
 	}
-
  	/**
 	 * Searches for a JWT SSO token in the $this->headerName HTTP header, validates
 	 * this token's authenticity against the "annuaire" SSO service and if
 	 * successful, decodes the user information and places them into $this->user
 	 */
 	public function getUserFromToken($token) {
+
 		// unknown user, by default
 		$user = $this->getUnknownUser();
-		$valid === false;
+		$valid = false;
 		//echo "Token : $token\n";
-		if ($token != null) {
+		if ($token !== null) {
 			// validate token
 			try {
 				$valid = $this->verifyToken($token);
 			} catch(Exception $e) {
+                // return the anonymous (unknown) user:
 				return $user;
 			}
 			
