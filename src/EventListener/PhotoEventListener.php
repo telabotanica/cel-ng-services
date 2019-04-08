@@ -64,7 +64,7 @@ class PhotoEventListener {
          $entity->fillPropertiesFromJsonFile($entity->json->getRealPath(), $forbiddenKeys);
       }
       $entity->fillPropertiesWithImageExif();
-      $imgUrl = $this->getHostUrl() . $this->uploaderHelper->asset($entity, 'file');
+      $imgUrl = $this->getHostUrl() . getenv('APP_PREFIX_PATH') . $this->uploaderHelper->asset($entity, 'file');
       $entity->setUrl($imgUrl);
     }
 
