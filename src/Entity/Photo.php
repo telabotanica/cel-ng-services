@@ -236,7 +236,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
      /**
       * @var integer|null
       * @Groups({"read"})
-      * @ORM\Column(type="integer", nullable=false)
+      * @ORM\Column(type="integer", nullable=false, options={"comment":"La taille du fichier en kb."})
       */
      public $size;
 
@@ -245,17 +245,17 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
       * @var string|null
       * @Assert\NotNull
       * @Groups({"read"})
-      * @ORM\Column(name="mime_type", type="string", nullable=false)
+      * @ORM\Column(name="mime_type", type="string", nullable=false, options={"comment":"Le type MIME associé à la photo."})
       */
      public $mimeType;
 
 
      /**
-      * Relative URL of the file.
+      * Absolute URL of the file.
       *
       * @var string|null
       * @Groups({"read"})
-      * @ORM\Column(name="url", type="string", nullable=false)
+      * @ORM\Column(name="url", type="string", nullable=false, options={"comment":"URL du fichier."})
       */
      public $url;
 

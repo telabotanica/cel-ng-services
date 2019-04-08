@@ -106,7 +106,6 @@ abstract class AbstractBulkAction
 
         $bits = explode('/', $path);
 
-
         if ( null !== $bits && sizeof($bits) == 4 ) {
         	return $bits[3];
         }
@@ -231,6 +230,7 @@ abstract class AbstractBulkAction
                     AbstractBulkAction::INVALID_PATH_MSG);
 		            return null;
                 }
+                $from = str_replace(getenv('APP_PREFIX_PATH'), '', $from);
                 $fromId = $this->extractIdFromPath($from);
 
                 if ( null == $fromId ) {
@@ -281,10 +281,11 @@ abstract class AbstractBulkAction
                 AbstractBulkAction::METHOD_NOT_ALLOWED);
 		    return null;
 	    }		
-
+            $path = str_replace(getenv('APP_PREFIX_PATH'), '', $path);
 		$request = Request::create(
             $path, $method, array(), array(), array(), 
             array(), json_encode($value));
+
 		$request->headers->set('Content-Type', 'application/json');
 
 		return $request;

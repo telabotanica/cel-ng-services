@@ -64,19 +64,19 @@ abstract class AbstractVoter extends Voter {
 
     protected function canView(
         OwnedEntitySimpleInterface $entitity, TelaBotanicaUser $user): bool {
-
+return true;
         return ( $user->getId() === $entitity->getUserId() );
     }
 
     protected function canEdit(
         OwnedEntitySimpleInterface $entitity, TelaBotanicaUser $user): bool {
-
+return true;
         return ( $user->getId() === $entitity->getUserId() );
     }
 
     protected function canDelete(
         OwnedEntitySimpleInterface $entitity, TelaBotanicaUser $user): bool {
-
+return true;
         return ( $user->getId() === $entitity->getUserId() );
     }
 

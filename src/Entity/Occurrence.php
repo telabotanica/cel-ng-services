@@ -1171,6 +1171,36 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $this;
     }
 
+   /**
+     * @return Collection|OccurrenceUserOccurrenceTagRelation[]
+     */
+    public function getUserTagRelations(): Collection {
+        return $this->userTagRelations;
+    }
+
+    public function addUserTagRelation(OccurrenceUserOccurrenceTagRelation $userTagRelation): self {
+
+        if (!$this->photoTagRelations->contains($userTagRelation)) {
+            $this->userTagRelations[] = $userTagRelation;
+            $photoTagRelation->setPhoto($this);
+        }
+
+        return $this;
+    }
+    
+    public function removeUserTagRelation(OccurrenceUserOccurrenceTagRelation $userTagRelation): self {
+
+        if ($this->userTagRelations->contains($userTagRelation)) {
+            $this->userTagRelations->removeElement($userTagRelation);
+            // set the owning side to null (unless already changed)
+            if ($userTagRelation->getPhoto() === $this) {
+                $userTagRelation->setPhoto(null);
+            }
+        }
+
+        return $this;
+    }
+
     public function getUserOccurrenceTags(): array {
 
         $tags = array();
@@ -1178,8 +1208,8 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         foreach($this->userTagRelations as $rel) {
             $tags[] = $rel;
         }
-        return $tags;
 
+        return $tags;
     }
 
    /**

@@ -17,37 +17,13 @@ use App\Security\SSO\SSOTokenValidator;
 use App\Security\SSO\SSOTokenDecoder;
 use App\Security\User\TelaBotanicaUser;
 
-// @todo handle translations?
-// @todo header name in conf?
 class YesAuthenticator  extends AbstractGuardAuthenticator
 {
-
-
-    private $em;
-    // @todo put these in config
-    private $tokenHeaderName = "Authorization";
-    private $annuaireURL = "Authorization";
-    private $ignoreSSLIssues = "Authorization";
-
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
-
-    /**
-     * Called on every request to decide if this authenticator should be
-     * used for the request. Returning false will cause this authenticator
-     * to be skipped.
-     */
     public function supports(Request $request)
     {
         return true;
     }
 
-    /**
-     * Called on every request. Return whatever credentials you want to
-     * be passed to getUser() as $credentials.
-     */
     public function getCredentials(Request $request)
     {
         return array(
@@ -55,20 +31,12 @@ class YesAuthenticator  extends AbstractGuardAuthenticator
         );
     }
 
-    // @todo set administered project ids
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        //$user = new TelaBotanicaUser(22, 'toto@wanadoo.fr', 'toto', 'litoto', 'teehell', 'teehell', '', array('administrator'), null);
         $user = new TelaBotanicaUser(22, 'toto@wanadoo.fr', 'toto', 'litoto', 'teehell', 'teehell', '', array(), null);
-        // if a User object, checkCredentials() is called
         return $user;
     }
 
-    /**
-     * Checks credentials - e.g. make sure the SSO JWT token is valid.
-     * Returns true if that's the case (which will cause authentication 
-     * success), else false.
-     */
     public function checkCredentials($credentials, UserInterface $user)
     {
         return true;
@@ -76,7 +44,6 @@ class YesAuthenticator  extends AbstractGuardAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        // Just let the request roll!
         return null;
     }
 
@@ -84,9 +51,6 @@ class YesAuthenticator  extends AbstractGuardAuthenticator
     {
         $data = array(
             'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
-
-            // or to translate this message
-            // $this->translator->trans($exception->getMessageKey(), $exception->getMessageData())
         );
 
         return new JsonResponse($data, Response::HTTP_FORBIDDEN);
@@ -98,7 +62,6 @@ class YesAuthenticator  extends AbstractGuardAuthenticator
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $data = array(
-            // you might translate this message
             'message' => 'Authentication Required'
         );
 

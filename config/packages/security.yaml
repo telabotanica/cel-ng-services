@@ -1,29 +1,20 @@
 security:
-    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
-    # providers:
-    #    webservice:
-    #        id: App\Security\User\WebserviceUserProvider
     providers:
-        user:
-            entity:
-                class: App\Security\User/TelaBotanicaUser
-                property: username
+        sso:
+            id: App\Security\SSOUserProvider
+            #id: App\Security\YesUserProvider
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: true
-            guard:
-                authenticators:
-                    #- App\Security\SSOAuthenticator
-                     - App\Security\YesAuthenticator
+            security: false
         main:
             anonymous: ~
             logout: ~
 
             guard:
                 authenticators:
-                    #- App\Security\SSOAuthenticator
-                     - App\Security\YesAuthenticator
+                    - App\Security\SSOAuthenticator
+                    #- App\Security\YesAuthenticator
 
             # activate different ways to authenticate
 
@@ -32,10 +23,4 @@ security:
 
             # form_login: true
             # https://symfony.com/doc/current/security/form_login_setup.html
-
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
 

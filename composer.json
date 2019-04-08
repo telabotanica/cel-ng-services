@@ -21,6 +21,7 @@
         "symfony/http-foundation": "^4.1",
         "symfony/lts": "^4@dev",
         "symfony/monolog-bundle": "^3.3",
+        "symfony/security-guard": "4.2.1",
         "symfony/web-server-bundle": "^4.1",
         "symfony/yaml": "^4.1",
         "tecnickcom/tcpdf": "^6.2",
