@@ -145,13 +145,16 @@ class EfloreApiClient {
             $data = $this->getUpperTaxaHierarchy($taxonId, $taxoRepo);
 
             if ( null !== $data ) {   
+                // Some varieties are sometimes not returned while they exist
+                // in the taxo repo...
+                if ( property_exists($data, $taxonId) ) {   
+                    $ancestorArray = (array)$data->$taxonId;
 
-                $ancestorArray = (array)$data->$taxonId;
-
-                if ( null !== $ancestorArray ) {
-                    foreach ($ancestorArray as $ancestor) {
-                        if ( $ancestor->{'rang.libelle'} == $taxoRank) {
-                            return $ancestor->nom_sci;
+                    if ( null !== $ancestorArray ) {
+                        foreach ($ancestorArray as $ancestor) {
+                            if ( $ancestor->{'rang.libelle'} == $taxoRank) {
+                                return $ancestor->nom_sci;
+                            }
                         }
                     }
                 }
