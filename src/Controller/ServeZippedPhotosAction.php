@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * Returns a zip archive containing the photos which ids have been passed as
@@ -26,8 +27,8 @@ final class ServeZippedPhotosAction {
     private $doctrine;
     private $storage;
     private $tokenStorage;
+    private $tmpFolder;
 
-    const TMP_FOLDER = '/tmp/';
     const ENTITY_FILE_PROPERTY_NAME = 'file';
     const ZIP_FILE_PREFIX = 'PhotosCel_';
     const ZIP_EXTENSION = ".zip";
@@ -55,6 +56,7 @@ final class ServeZippedPhotosAction {
     	$this->tokenStorage = $tokenStorage;
         $this->doctrine = $doctrine;
         $this->storage = $storage;
+        $this->tmpFolder = getenv('TMP_FOLDER');
     }
 
     /**
@@ -72,7 +74,7 @@ final class ServeZippedPhotosAction {
         $zip = new \ZipArchive;
         $zipName = ServeZippedPhotosAction::ZIP_FILE_PREFIX . time();
         $zipName .= ServeZippedPhotosAction::ZIP_EXTENSION;
-        $zipFilePath = ServeZippedPhotosAction::TMP_FOLDER . $zipName;
+        $zipFilePath = $this->tmpFolder  . $zipName;
 
         // @todo trycatch 500
         if ($zip->open(

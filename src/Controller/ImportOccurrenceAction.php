@@ -10,6 +10,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * Imports Occurrence resources by uploading a spreadsheet file (CSV or excel).
@@ -29,6 +31,7 @@ final class ImportOccurrenceAction {
     private $validator;
     private $doctrine;
     private $tokenStorage;
+    private $tmpFolder;
 
     const FILE_MIME_TYPES = array(
         'text/x-comma-separated-values', 'text/comma-separated-values', 
@@ -44,7 +47,6 @@ final class ImportOccurrenceAction {
         ' existe dans le carnet. Line/ligne: ';
     const IMPORT_OK = 'Occurrence succesfully imported. Observation importée' .
         ' avec succès. Line/ligne:';
-    const TMP_FOLDER = '/tmp/';
     const REQUEST_FILE_NAME = 'file';
 
     /**
@@ -66,9 +68,10 @@ final class ImportOccurrenceAction {
         TokenStorageInterface $tokenStorage, RegistryInterface $doctrine, 
         ValidatorInterface $validator) {
 
-	    $this->tokenStorage = $tokenStorage;
+	$this->tokenStorage = $tokenStorage;
         $this->validator = $validator;
         $this->doctrine = $doctrine;
+        $this->tmpFolder = getenv('TMP_FOLDER');
     }
 
     /**
@@ -95,11 +98,12 @@ final class ImportOccurrenceAction {
             } else {
                 $reader = new Xlsx();
             }
-	        $reader->setReadDataOnly(true);
+	    // @refactor streaming the result would be far nicer
+	    $reader->setReadDataOnly(true);
             $fileOriginalName = $file->getClientOriginalName();
-	        $file->move(ImportOccurrenceAction::TMP_FOLDER, $fileOriginalName);
+	        $file->move($this->tmpFolder, $fileOriginalName);
             $spreadsheet = $reader->load(
-                ImportOccurrenceAction::TMP_FOLDER . $fileOriginalName);
+                $this->tmpFolder . $fileOriginalName);
              
             return $spreadsheet->getActiveSheet()->toArray();
         }
