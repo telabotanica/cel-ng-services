@@ -7,28 +7,32 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method UserOccurrenceTag|null find($id, $lockMode = null, $lockVersion = null)
- * @method UserOccurrenceTag|null findOneBy(array $criteria, array $orderBy = null)
- * @method UserOccurrenceTag[]    findAll()
- * @method UserOccurrenceTag[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserOccurrenceTagRepository extends ServiceEntityRepository
-{
+class UserOccurrenceTagRepository extends ServiceEntityRepository {
 
-    
-
-    public function __construct(RegistryInterface $registry)
-    {
+    public function __construct(RegistryInterface $registry) {
         parent::__construct($registry, UserOccurrenceTag::class);
-         
+    }
+
+    /**
+     * @return UserOccurrenceTag[] Returns an array of UserOccurrenceTag 
+     * entities with the given user id.
+     */
+    public function findByUserId($userId) {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.userId = :val2')
+            ->setParameter('val2', $userId)
+            ->orderBy('p.id', 'ASC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
      * @return UserOccurrenceTag[] Returns an array of UserOccurrenceTag 
      * entities with the given name.
      */
-    public function findByNameAndUserId($name, $userId)
-    {
+    public function findByNameAndUserId($name, $userId) {
         return $this->createQueryBuilder('p')
             ->andWhere('p.name = :val1')
             ->setParameter('val1', $name)
@@ -37,12 +41,10 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository
             ->orderBy('p.id', 'ASC')
             ->setMaxResults(5)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
-    public function findByPathAndUserId($path, $userId)
-    {
+    public function findByPathAndUserId($path, $userId) {
         return $this->createQueryBuilder('p')
             ->andWhere('p.path = :val1')
             ->setParameter('val1', $path)
@@ -55,8 +57,7 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository
     }
 
 
-    public function getTagTree($userId)
-    {
+    public function getTagTree($userId) {
         $tree = [];
         $rootTags = $this->findByPathAndUserId('/', $userId);
         $tagHierarchy = array();
@@ -69,8 +70,7 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository
 
     }
 
-    public function findChildren($tagName, $userId)
-    {
+    public function findChildren($tagName, $userId) {
         return $this->getEntityManager()->createQuery("SELECT o FROM App:UserOccurrenceTag o WHERE o.userId =  :userId AND o.path LIKE :parentName")
             ->setParameter('parentName', '%'.$tagName)
             ->setParameter('userId', $userId)
