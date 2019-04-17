@@ -11,7 +11,8 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 /**
  * Populates various properties of <code>Occurrence</code> instances 
  * based on CEL business rules before they are persisted/updated.
- * The properties can be "family", "datePublished" and "isPublic".
+ * The properties can be "family", "dateUpdated", "datePublished" and 
+ * "isPublic".
  *
  * @package App\EventListener
  */
@@ -26,15 +27,15 @@ class OccurrenceEventListener {
     public function prePersist(LifecycleEventArgs $args) { 
         $entity = $args->getEntity();
 
-        // only act on "Occurrence" entities
+        // only act on "Occurrence" class instances:
         if (!$entity instanceof Occurrence) {
             return;
         }
 
         $this->doCommon($entity);
 
-        // If isPublic status has been set to true, set the occurrence 
-        // datePublished to now:
+        // If isPublic status has just been set to true, set the occurrence
+        // datePublished member value to "now":
         if ( $entity->getIsPublic() ) {
             $entity->setDatePublished(new \DateTime());
         }
@@ -62,12 +63,13 @@ class OccurrenceEventListener {
      * @param LifecycleEventArgs $args The Lifecycle Event emitted.
      */
     public function preUpdate(LifecycleEventArgs $args) {
-        // only act on "Occurrence" entities
+        $entity = $args->getEntity();
+
+        // only act on "Occurrence" class instances:
         if (!$entity instanceof Occurrence) {
             return;
         }
 
-        $entity = $args->getEntity();
         $entity->setDateUpdated(new \DateTime());
 
         // If isPublic status has been changed to true, set the occurrence 
@@ -92,18 +94,4 @@ class OccurrenceEventListener {
 
     }
 
-/*
-
-    public function persistRelatedPhotos(LifecycleEventArgs $args) {
- 
-        $entity = $args->getEntity();
-
-        // only act on some "GenericEntity" entity
-        if (!$entity instanceof Occurrence) {
-            return;
-        }
-
-        $entity->generateSignature();
-    }
-*/
 }
