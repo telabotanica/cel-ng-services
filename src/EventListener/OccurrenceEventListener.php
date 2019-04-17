@@ -62,13 +62,13 @@ class OccurrenceEventListener {
      * @param LifecycleEventArgs $args The Lifecycle Event emitted.
      */
     public function preUpdate(LifecycleEventArgs $args) {
-        $entity = $args->getEntity();
-        $entity->setDateUpdated(new \DateTime());
-
         // only act on "Occurrence" entities
         if (!$entity instanceof Occurrence) {
             return;
         }
+
+        $entity = $args->getEntity();
+        $entity->setDateUpdated(new \DateTime());
 
         // If isPublic status has been changed to true, set the occurrence 
         // datePublished to "now":
@@ -79,8 +79,6 @@ class OccurrenceEventListener {
         }
 
         $this->doCommon($entity);
-
-
     }
 
     private function doCommon(Occurrence $occ) {
