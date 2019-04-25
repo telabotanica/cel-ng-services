@@ -23,7 +23,7 @@ class PhenologyEnumType extends Type {
     const THIRTY_THIRTY_NINE = '30-39: développement des tiges, croissance des rosettes';
     const FORTY_FORTYNINE = '40-49: développement des organes de propagation végétative';
     const FIFTY_FIFTYNINE = '50-59: apparition de l\'inflorescence, épiaison';
-    const SIXTY_SIXTYNINE = 'floraison';
+    const SIXTY_SIXTYNINE = '60-69: floraison';
     const SIXTYONE = '61: par ex, environ 10% des fleurs épanouies';
     const SIXTYFIVE = '65: par ex, environ 50% des fleurs épanouies';
     const SEVENTY_SEVENTYNINE = '70-79: fructification';
