@@ -60,9 +60,6 @@ class OwnedEntityEventListener {
                     $pseudo = $currentUser->getSurname() . ' ' . $currentUser->getLastName();
                     $entity->setUserPseudo($pseudo);
                 }
-                if  ( $entity instanceof Occurrence ) {
-                    $entity->setObserver($entity->getUserPseudo());
-                }
             }
         } else {
             $entity->setUserId(-1);

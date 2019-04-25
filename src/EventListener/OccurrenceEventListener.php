@@ -89,9 +89,10 @@ class OccurrenceEventListener {
             // Force it to be private:
             $occ->setIsPublic(false);
         }
-
+        if  ( null == $occ->getObserver() ) {
+            $occ->setObserver($occ->getUserPseudo());
+        }   
         $occ->generateSignature();
-
     }
 
 }
