@@ -18,6 +18,13 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
  */
 class OccurrenceEventListener {
 
+
+    private $tokenStorage;
+
+    public function __construct(TokenStorageInterface $tokenStorage = null)  {
+        $this->tokenStorage = $tokenStorage;
+    }
+
     /**
      * Populates various properties of <code>Occurrence</code> instances 
      * based on CEL business rules before they are persisted.
@@ -89,10 +96,32 @@ class OccurrenceEventListener {
             // Force it to be private:
             $occ->setIsPublic(false);
         }
+
         if  ( null == $occ->getObserver() ) {
-            $occ->setObserver($occ->getUserPseudo());
+            if ( null !== $currentUser = $this->getUser() ) {
+                $pseudo = $currentUser->getSurname() . ' ' . $currentUser->getLastName();
+                $occ->setObserver($pseudo);
+            }
         }   
         $occ->generateSignature();
+    }
+
+
+    protected function getUser() {
+        if (!$this->tokenStorage) {
+            throw new \LogicException('The SecurityBundle is not registered in your application.');
+        }
+
+        if (null === $token = $this->tokenStorage->getToken()) {
+            return;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
+            return;
+        }
+
+        return $user;
     }
 
 }
