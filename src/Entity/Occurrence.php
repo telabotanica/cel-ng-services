@@ -873,6 +873,12 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $this;
     }
 
+    public function setBibliographySource(string $bibliographySource): self {
+        $this->bibliographySource = $bibliographySource;
+
+        return $this;
+    }
+
     public function getBibliographySource() {
         return $this->bibliographySource;
     }
