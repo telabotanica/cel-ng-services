@@ -7,6 +7,18 @@ fos_elastica:
     indexes:
         occurrences: 
             index_name: cel2_occurrences
+            settings:
+                index:
+                    analysis:
+                        analyzer:
+                            occ_analyzer:
+                                type: custom
+                                tokenizer: keyword
+                                filter: ["asciifolding", "lowercase", "french_stem"]
+                        normalizer:
+                            occ_normalizer:
+                                type: custom
+                                filter: ["asciifolding", "lowercase"]
             types:
                 occurrence:
                     properties:
@@ -55,6 +67,7 @@ fos_elastica:
                             type: "text"
                         userSciName_keyword:
                             type: "keyword" 
+                            normalizer: "occ_normalizer"
                         userSciNameId: 
                             type: "long"
                         acceptedSciName: ~
@@ -77,7 +90,6 @@ fos_elastica:
                         occurrenceType: ~
                         isWild: 
                             type: "boolean"
-                        coef: "text"
                         phenology: ~
                         sampleHerbarium: 
                             type: "boolean"
@@ -103,6 +115,7 @@ fos_elastica:
                             type: "text"
                         locality_keyword:
                             type: "keyword"
+                            normalizer: "occ_normalizer"
                         localityInseeCode:
                             type: "text"
                         sublocality: ~
@@ -150,6 +163,18 @@ fos_elastica:
 
         photos: 
             index_name: cel2_photos
+            settings:
+                index:
+                    analysis:
+                        analyzer:
+                            photo_analyzer:
+                                type: custom
+                                tokenizer: keyword
+                                filter: ["asciifolding", "lowercase", "french_stem"]
+                        normalizer:
+                            photo_normalizer:
+                                type: custom
+                                filter: ["asciifolding", "lowercase"]
             types:
                 photo:
                     properties:
@@ -205,6 +230,8 @@ fos_elastica:
                         # sortable property
                         locality:
                             type: "text"
+                        frenchDep:
+                            type: "long"
                         locality_keyword:
                             type: "keyword"
                         osmCounty: ~
