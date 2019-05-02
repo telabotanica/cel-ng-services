@@ -3,16 +3,16 @@
 namespace App\Elastica\Query;
 
 
-class OccurrenceQuery extends Query
-{
+class OccurrenceQuery extends Query {
+
     private $dateObservedDay;
     private $dateObservedMonth;
     private $dateObservedYear;
     private $family;
-    private $county;
+    private $osmCounty;
     private $userSciName;
-    private $locality;
-    private $country;
+    private $osmCountry;
+    private $osmLocality;
     private $isPublic;
     private $certainty;
     private $projectId;
@@ -20,34 +20,30 @@ class OccurrenceQuery extends Query
     private $tags = [];
     private $id = [];
 
-    public function __construct($request)
-    {
+    public function __construct($request) {
         parent::__construct($request);
         $this->id = $request->query->get('id');
         $this->dateObservedDay = $request->query->get('dateObservedDay');
         $this->dateObservedMonth = $request->query->get('dateObservedMonth');
         $this->dateObservedYear = $request->query->get('dateObservedYear');
         $this->family = $request->query->get('family');
-        $this->county = $request->query->get('county');
+        $this->osmCounty = $request->query->get('osmCounty');
         $this->projectId = $request->query->get('projectId');
         $this->signature = $request->query->get('signature');
         $this->userSciName = $request->query->get('userSciName');
-        $this->locality = $request->query->get('locality');
-        $this->country = $request->query->get('country');
+        $this->osmLocality = $request->query->get('osmLocality');
+        $this->osmCountry = $request->query->get('osmCountry');
         $this->isPublic = $request->query->get('isPublic');
         $this->certainty = $request->query->get('certainty');
         $this->identiplanteScore = $request->query->get('identiplanteScore');
         $this->isIdentiplanteValidated = $request->query->get('isIdentiplanteValidated');
         $this->tags = $request->query->get('tags');
-
-
     }
 
     // @todo enable and tests
-    public function containsFilter()
-    {
+    public function containsFilter() {
 
-return true;
+        return true;
 /*
         return ( null !== $this->dateObservedDay || 
             null !== $this->dateObservedMonth || 
@@ -109,20 +105,20 @@ return true;
 		$this->userSciName = $userSciName;
 	}
 
-	public function getLocality(){
-		return $this->locality;
+	public function getOsmLocality(){
+		return $this->osmLocality;
 	}
 
-	public function setLocality($locality){
-		$this->locality = $locality;
+	public function setOsmLocality($locality){
+		$this->osmLocality = $locality;
 	}
 
-	public function getCountry(){
-		return $this->country;
+	public function getOsmCountry(){
+		return $this->osmCountry;
 	}
 
-	public function setCountry($country){
-		$this->country = $country;
+	public function setOsmCountry($country){
+		$this->osmCountry = $country;
 	}
 
 	public function getIsPublic(){
@@ -149,7 +145,6 @@ return true;
 		$this->tags = $tags;
 	}
 
-
 	public function getId(){
 		return $this->id;
 	}
@@ -175,12 +170,12 @@ return true;
 		$this->identiplanteScore = $identiplanteScore;
 	}
 
-	public function getCounty(){
-		return $this->county;
+	public function getOsmCounty(){
+		return $this->osmCounty;
 	}
 
 	public function setCounty($county){
-		$this->county = $county;
+		$this->osmCounty = $county;
 	}
 
 	public function getSignature(){

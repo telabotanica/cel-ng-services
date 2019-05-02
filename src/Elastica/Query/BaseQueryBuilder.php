@@ -82,7 +82,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
      * CEL <code>Query</code> and enhanced with the access control
      * filters for given <code>TelaBotanicaUser</code>.
      */
-    public function build(TelaBotanicaUser $user, QueryInterface $occSearch) : Query {
+    public function build(?TelaBotanicaUser $user, QueryInterface $occSearch) : Query {
         $esQuery = new Query();
         $globalQuery = new BoolQuery();
         $acQuery = $this->buildAccessControlQuery($user);

@@ -19,7 +19,7 @@ final class OccurrenceQueryBuilder extends BaseQueryBuilder {
             array(
                 'dateObservedDay', 'dateObservedMonth', 'dateObservedYear', 
                 'family', 'isIdentiplanteValidated', 'identiplanteScore', 
-                'userSciName', 'locality', 'country', 'county', 'isPublic', 
+                'userSciName', 'osmLocality', 'osmCountry', 'osmCounty', 'isPublic', 
                 'certainty', 'projectId', 'signature', 'tags'), 
             array(
                 'family', 'station', 'annotation', 'userSciName', 'locality', 
