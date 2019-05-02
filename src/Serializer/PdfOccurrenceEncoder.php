@@ -20,7 +20,7 @@ class PdfOccurrenceEncoder implements EncoderInterface, DecoderInterface {
         $pdfGenerator = new OccurrencePdfGenerator();
         $pdf = $pdfGenerator->export($data);
         $now = date_format(new \DateTime('now'), 'd_m_Y_H_i_s');
-        $filename = getenv('TMP_FOLDER') . $now . '.pdf';
+        $filename = getenv('TMP_FOLDER') . '/' . $now . '.pdf';
         $pdfGenerator->pdf->Output($filename,'F');
 
         return file_get_contents($filename);
