@@ -20,11 +20,12 @@ final class OccurrenceQueryBuilder extends BaseQueryBuilder {
                 'dateObservedDay', 'dateObservedMonth', 'dateObservedYear', 
                 'family', 'isIdentiplanteValidated', 'identiplanteScore', 
                 'userSciName', 'osmLocality', 'osmCountry', 'osmCounty', 'isPublic', 
-                'certainty', 'projectId', 'signature', 'tags'), 
+                'certainty', 'projectId', 'signature', 'tags', 'frenchDep'), 
             array(
                 'family', 'station', 'annotation', 'userSciName', 'locality', 
                 'sublocality', 'environment', 'taxoRepo', 'certainty'), 
-            array('id') );
+            array('id')
+        );
     }
 
 }
