@@ -41,7 +41,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @package App\Entity  
  *
  * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"read"}},
+ *     "normalization_context"={"groups"={"photo_read"}},
  *     "denormalization_context"={"groups"={"write"}},
  *     "formats"={"jsonld", "json", "jsonpatch"={"application/json-patch+json"}},
  *     "filters"={IsPublicFilter::class, CertaintyFilter::class, DateShotYearFilter::Class, DateShotMonthFilter::Class, DateShotDayFilter::Class, DateObservedYearFilter::class, DateObservedMonthFilter::class, DateObservedDayFilter::class, UserSciNameFilter::class, CountryFilter::class, CountyFilter::Class, FamilyFilter::Class, ProjectIdFilter::Class}},
@@ -103,7 +103,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
    /**
-     * @Groups({"read"})
+     * @Groups({"photo_read"})
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @ORM\Column(type="integer")
@@ -115,6 +115,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
      *
      * Idenfiant utilisateur de lu'tilisateur ayant publié l'observation (null si utilisateur anonyme).
      *
+     * @Groups({"none"})
      * @ORM\Column(name="user_id", type="integer", nullable=true, options={"comment":"ID de l'utilisateur"})
      */
     private $userId = null;
@@ -122,8 +123,8 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Email de l'utilisateur.
      *
+     * @Groups({"none"})
      * @Assert\NotNull
-     * @Groups({"write"})
      * @ORM\Column(name="user_email", type="string", nullable=false, options={"comment":"Email de l'utilisateur"})
      */
     private $userEmail = null;
@@ -131,6 +132,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné.
      *
+     * @Groups({"none"})
      * @Assert\NotNull
      * @ORM\Column(name="user_pseudo", type="string", nullable=true, options={"comment":"Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné."})
      */
@@ -139,7 +141,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Nom du fichier image.
      *
-     * @Groups({"read"})
+     * @Groups({"photo_read"})
      * @ORM\Column(name="original_name", type="string", nullable=false,  length=190, options={"comment":"Nom du fichier image"})
      */
     private $originalName = null;
@@ -147,7 +149,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Date de la prise de vue.
      * 
-     * @Groups({"read", "write"})
+     * @Groups({"photo_read", "write"})
      * @ORM\Column(name="date_shot", type="datetime", nullable=true, options={"comment":"Date de la prise de vue"})
      */
     private $dateShot = null;
@@ -156,7 +158,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Latitude de la photo.
      * 
-     * @Groups({"read", "write"})
+     * @Groups({"photo_read", "write"})
      * @ORM\Column(type="float", nullable=true, options={"comment":"Latitude de la photo"})
      */
     private $latitude = null;
@@ -164,7 +166,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Longitude de la photo.
      * 
-     * @Groups({"read", "write"})
+     * @Groups({"photo_read", "write"})
      * @ORM\Column(type="float", nullable=true, options={"comment":"Longitude de la photo"})
      */
     private $longitude = null;
@@ -173,7 +175,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
      * Date de l'import de la photo.
      *
      * @Assert\NotNull
-     * @Groups({"read"})
+     * @Groups({"photo_read"})
      * @ORM\Column(name="date_created", type="datetime", nullable=false, options={"comment":"Date de l'import du fichier"})
      */
     private $dateCreated = null;
@@ -181,7 +183,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Date de dernière modification.
      *
-     * @Groups({"read"})
+     * @Groups({"photo_read"})
      * @ORM\Column(name="date_updated", type="datetime", nullable=true, options={"comment":"Date de dernière modification"})
      */
     private $dateUpdated = null;
@@ -189,7 +191,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Date à laquelle la photo a été liée à une obs.
      *
-     * @Groups({"read"})
+     * @Groups({"photo_read"})
      * @ORM\Column(name="date_linked_to_occurrence", type="datetime", nullable=true, options={"comment":"Date à laquelle la photo a été liée à une obs"})
      */
     private $dateLinkedToOccurrence = null;
@@ -224,7 +226,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
      /**
       * @var string|null
-      * @Groups({"read"})
+      * @Groups({"photo_read"})
       * @ORM\Column(name="content_url", type="string", nullable=false)
       * @ApiProperty(iri="http://schema.org/contentUrl")
       */
@@ -233,7 +235,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
      /**
       * @var integer|null
-      * @Groups({"read"})
+      * @Groups({"photo_read"})
       * @ORM\Column(type="integer", nullable=false, options={"comment":"La taille du fichier en kb."})
       */
      public $size;
@@ -242,7 +244,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
      /**
       * @var string|null
       * @Assert\NotNull
-      * @Groups({"read"})
+      * @Groups({"photo_read"})
       * @ORM\Column(name="mime_type", type="string", nullable=false, options={"comment":"Le type MIME associé à la photo."})
       */
      public $mimeType;
@@ -252,7 +254,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
       * Absolute URL of the file.
       *
       * @var string|null
-      * @Groups({"read"})
+      * @Groups({"photo_read"})
       * @ORM\Column(name="url", type="string", nullable=false, options={"comment":"URL du fichier."})
       */
      public $url;
@@ -271,7 +273,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
       * @ORM\ManyToOne(targetEntity="Occurrence", inversedBy="photos")
       * @ORM\JoinColumn(name="occurrence_id", referencedColumnName="id")
       * @ApiSubresource(maxDepth=1)
-      * @Groups({"read", "write"}) 
+      * @Groups({"photo_read", "write"}) 
       */
      private $occurrence;
 
@@ -403,7 +405,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
     public function getDateShotYear(): ?float {
 
-       return $this->dateShot->format('y');
+       return $this->dateShot->format('Y');
    }
 
     public function getDateShotDay(): ?float {
