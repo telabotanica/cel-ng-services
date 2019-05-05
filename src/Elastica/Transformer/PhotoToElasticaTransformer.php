@@ -75,14 +75,10 @@ class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface
             $data['osmCounty'] = $occ->getOsmCounty();
             $data['osmCountry'] = $occ->getOsmCountry();
             $data['osmCountryCode'] = $occ->getOsmCountryCode();
+            $data['frenchDep'] = $occ->getFrenchDep();
 
-            // Flatten Project associated with the Occurrence resource if any:
-            if ( null !== $occ->getProject()) {
-                $project = [
-                    'id:' => $occ->getProject()->getId(),
-                    'label:' => $occ->getProject()->getLabel(),
-                ];
-                $data['project'] = $project;
+           if ( null !== $occ->getProject()) {
+                $data['projectId'] = $occ->getProject()->getId();
             }
 
         }

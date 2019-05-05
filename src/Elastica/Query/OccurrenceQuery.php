@@ -12,7 +12,7 @@ class OccurrenceQuery extends Query {
     private $osmCounty;
     private $userSciName;
     private $osmCountry;
-    private $osmLocality;
+    private $locality;
     private $frenchDep;
     private $isPublic;
     private $certainty;
@@ -33,7 +33,7 @@ class OccurrenceQuery extends Query {
         $this->frenchDep = $request->query->get('frenchDep');
         $this->signature = $request->query->get('signature');
         $this->userSciName = $request->query->get('userSciName');
-        $this->osmLocality = $request->query->get('osmLocality');
+        $this->locality = $request->query->get('locality');
         $this->osmCountry = $request->query->get('osmCountry');
         $this->isPublic = $request->query->get('isPublic');
         $this->certainty = $request->query->get('certainty');
@@ -107,12 +107,12 @@ class OccurrenceQuery extends Query {
 		$this->userSciName = $userSciName;
 	}
 
-	public function getOsmLocality() {
-		return $this->osmLocality;
+	public function getLocality() {
+		return $this->locality;
 	}
 
-	public function setOsmLocality($locality) {
-		$this->osmLocality = $locality;
+	public function setLocality($locality) {
+		$this->locality = $locality;
 	}
 
 	public function getOsmCountry() {

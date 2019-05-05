@@ -20,8 +20,8 @@ final class PhotoQueryBuilder extends BaseQueryBuilder {
                 'dateShotDay', 'dateShotMonth', 'dateShotYear', 
                 'dateObservedDay', 'dateObservedMonth', 'dateObservedYear', 
                 'family', 'isIdentiplanteValidated', 'identiplanteScore', 
-                'userSciName', 'osmLocality', 'osmCountry', 'osmCounty', 'isPublic', 
-                'certainty', 'projectId', 'tags'), 
+                'userSciName', 'locality', 'osmCountry', 'osmCounty', 'isPublic', 
+                'certainty', 'projectId', 'tags', 'frenchDep'), 
             array('family', 'station', 'annotation', 'userSciName', 'locality', 
                   'sublocality', 'environment', 'taxoRepo', 'certainty'), 
             array('id') 
