@@ -28,13 +28,8 @@ fos_elastica:
                             type: "geo_shape"
                         userId: 
                             type: "long"
-                        project:
-                            type: "object"
-                            properties:
-                                id:
-                                    type: "long"
-                                label:
-                                    type: "text"
+                        projectId: 
+                            type: "long"
                         userEmail: ~
                         userPseudo: ~
                         observer: ~

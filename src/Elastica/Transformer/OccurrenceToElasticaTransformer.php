@@ -104,7 +104,6 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
         $data['taxoRepo'] = $occ->getTaxoRepo();
         $data['frenchDep'] = $occ->getFrenchDep();
 
-        // Flatten associated Project resource if any:
         if ( null !== $occ->getProject()) {
             $data['projectId'] = $occ->getProject()->getId();
         }
