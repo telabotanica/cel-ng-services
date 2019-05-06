@@ -7,6 +7,7 @@ use App\TelaBotanica\Eflore\Api\EfloreApiClient;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Populates various properties of <code>Occurrence</code> instances 
@@ -20,9 +21,14 @@ class OccurrenceEventListener {
 
 
     private $tokenStorage;
+    private $em;
 
-    public function __construct(TokenStorageInterface $tokenStorage = null)  {
+    public function __construct(
+        TokenStorageInterface $tokenStorage = null,
+        EntityManagerInterface $em)  {
+
         $this->tokenStorage = $tokenStorage;
+        $this->em = $em;
     }
 
     /**
@@ -90,6 +96,23 @@ class OccurrenceEventListener {
         $this->doCommon($entity);
     }
 
+    public function preRemove(LifecycleEventArgs $args) {
+        $entity = $args->getEntity();
+
+        // only act on "Occurrence" class instances:
+        if (!$entity instanceof Occurrence) {
+            return;
+        }
+
+        $entity->getPhotos();
+        foreach ($entity->getPhotos() as $photo){
+            $photo->setOccurrence(null);
+            $this->em->persist($photo);
+        
+        }
+        $this->em->flush();
+    }
+
     private function doCommon(Occurrence $occ) {
         // If the occurrence cannot be published:
         if ( ! ($occ->isPublishable()) ) {
@@ -103,7 +126,7 @@ class OccurrenceEventListener {
                 $occ->setObserver($pseudo);
             }
         }   
-        $occ->generateSignature();
+        $occ->generateSignature($this->getUser()->getId());
     }
 
 
