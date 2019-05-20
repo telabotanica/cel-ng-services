@@ -103,7 +103,7 @@ final class ImportOccurrenceAction {
             $fileOriginalName = $file->getClientOriginalName();
 	        $file->move($this->tmpFolder, $fileOriginalName);
             $spreadsheet = $reader->load(
-                $this->tmpFolder . $fileOriginalName);
+                $this->tmpFolder . '/' . $fileOriginalName);
              
             return $spreadsheet->getActiveSheet()->toArray();
         }
@@ -162,7 +162,7 @@ final class ImportOccurrenceAction {
 			                $em->flush();
 
 			                // Look for duplicate occurrences (same signature):
-			                $occ->generateSignature();
+			                $occ->generateSignature($user->getId());
 			                $sign = $occ->getSignature();
 			                $duplicates = $occRepo->findBySignature($sign, $user);
 
