@@ -16,8 +16,6 @@ use Symfony\Component\Security\Core\Security;
  *
  * @package App\DataProvider
  */
-//@refactor: use generics instead of absreact/inheritance, this is 
-//           the perfect case *if usable in services.yaml*...
 abstract class BaseCollectionDataProvider 
     implements CollectionDataProviderInterface, 
                RestrictedDataProviderInterface {
