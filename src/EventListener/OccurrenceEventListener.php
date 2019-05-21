@@ -126,7 +126,13 @@ class OccurrenceEventListener {
                 $occ->setObserver($pseudo);
             }
         }   
-        $occ->generateSignature($this->getUser()->getId());
+        if ( null !== $this->getUser() ) {
+            $occ->generateSignature($this->getUser()->getId());
+        }
+        else {
+            $occ->generateSignature(-1);           
+        }
+ 
     }
 
 
