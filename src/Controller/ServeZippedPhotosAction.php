@@ -74,7 +74,7 @@ final class ServeZippedPhotosAction {
         $zip = new \ZipArchive;
         $zipName = ServeZippedPhotosAction::ZIP_FILE_PREFIX . time();
         $zipName .= ServeZippedPhotosAction::ZIP_EXTENSION;
-        $zipFilePath = $this->tmpFolder  . $zipName;
+        $zipFilePath = $this->tmpFolder . '/' . $zipName;
 
         // @todo trycatch 500
         if ($zip->open(
