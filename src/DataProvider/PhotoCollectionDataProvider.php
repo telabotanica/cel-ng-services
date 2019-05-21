@@ -5,8 +5,8 @@ namespace App\DataProvider;
 use App\Entity\Photo;
 
 /**
- * <code>BaseCollectionDataProvider</code> class for <code>Photo</code> 
- * entities.
+ * <code>BaseCollectionDataProvider</code> implementation for 
+ * <code>Photo</code> resources/entities.
  *
  * @package App\DataProvider
  */

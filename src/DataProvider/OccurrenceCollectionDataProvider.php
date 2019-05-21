@@ -5,8 +5,8 @@ namespace App\DataProvider;
 use App\Entity\Occurrence;
 
 /**
- * <code>BaseCollectionDataProvider</code> class for <code>Occurrence</code> 
- * entities.
+ * <code>BaseCollectionDataProvider</code> implementation for 
+ * <code>Occurrence</code> entities/resources.
  *
  * @package App\DataProvider
  */
