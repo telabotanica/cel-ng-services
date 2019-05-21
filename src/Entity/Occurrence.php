@@ -1104,6 +1104,15 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $this;
     }
 
+    public function getFrenchDep(): ?int {
+        if ( null !== $this->localityInseeCode ) {
+            if ( ctype_digit($this->localityInseeCode) ) {
+                $intZip = (int)$this->localityInseeCode;
+                return (int)$intZip/1000;
+            }
+        } 
+        return null;
+    }
 
     public function getIdentiplanteScore(): ?int {
         return $this->identiplanteScore;
@@ -1246,9 +1255,9 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $this;
     }
 
-    public function generateSignature() {
+    public function generateSignature($userId) {
         $unencodedSignature = '';
-        $signatureBits = [(string)$this->getUserId(), $this->getDateObservedMonth(), 
+        $signatureBits = [(string)$userId, $this->getDateObservedMonth(), 
                           $this->getDateObservedDay(), $this->getDateObservedYear(), 
                           $this->getUserSciName(), $this->getGeometry(), 
                           $this->getLocality()];
@@ -1256,8 +1265,9 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         foreach($signatureBits as $bit) {
             $unencodedSignature = $unencodedSignature . '-' . $bit;
         }
-
-        $this->signature = base64_encode($unencodedSignature);
+        // We must urlencode the because of the "Unicode Problem":
+        // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding 
+        $this->signature = base64_encode(rawurlencode($unencodedSignature));
     }
 
     public function __clone() {
