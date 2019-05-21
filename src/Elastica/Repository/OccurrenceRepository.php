@@ -7,6 +7,8 @@ use App\Elastica\Query\BaseQueryBuilder;
 use App\Elastica\Query\OccurrenceQuery;
 use App\Elastica\Query\OccurrenceQueryBuilder;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 /**
  * Implementation of <code>AbstractElasticRepository</code> dedicated to 
  * <code>Occurrence</code> entities/resources.
@@ -14,6 +16,7 @@ use App\Elastica\Query\OccurrenceQueryBuilder;
  * @package App\Elastica\Repository
  */
 class OccurrenceRepository extends AbstractElasticRepository {
+
 
     /**
      * @inheritdoc
@@ -31,7 +34,7 @@ class OccurrenceRepository extends AbstractElasticRepository {
 
 
     /**
-     * Returns true if an Occurrence with same
+     * Returns true if an Occurrence with the same
      * locality/geometry/userId/observedDate/serSciName already exists.
      * Else returns false.
      *
@@ -40,9 +43,6 @@ class OccurrenceRepository extends AbstractElasticRepository {
      */
     public function hasDuplicate($occ) : bool {
 
-        if ($occ->getSignature() == null) {
-            $occ->generateSignature();
-        } 
 
         $result = $this->createQueryBuilder('p')
             ->andWhere('p.signature = :val')
@@ -54,5 +54,7 @@ class OccurrenceRepository extends AbstractElasticRepository {
 
         return ( sizeof($result) > 0 );
     }
+
+
 
 }
