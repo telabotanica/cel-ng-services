@@ -3,6 +3,7 @@
 namespace App\Security\SSO;
 
 use App\Security\SSO\MisconfiguredSSOTokenValidatorException;
+
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
@@ -18,8 +19,7 @@ class SSOTokenValidator {
 	protected $ignoreSSLIssues = false;
 
 	public function __construct() {
-		$this->annuaireURL = getenv('SSO_ANNUAIRE_URL');
-		// (for local testing only)
+	    $this->annuaireURL = getenv('SSO_ANNUAIRE_URL');
 	    $this->ignoreSSLIssues = getenv('IGNORE_SSL_ISSUES');
 	}
 
