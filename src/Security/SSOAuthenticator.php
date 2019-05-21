@@ -32,8 +32,8 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
      * @internal Should this authenticator be used for the request?
      */
     public function supports(Request $request) {
-        //We want credentials to be checked for all requests
-        return true;
+        //We want credentials to be checked for all requests to the API
+        return ( preg_match('/.*\\/api\\/.+/', $request->getUri() ) );
     }
 
     /**
