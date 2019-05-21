@@ -54,6 +54,11 @@ class SSOTokenValidator {
 		$data = curl_exec($ch);
 		curl_close($ch);
 		$info = $data;
+
+        if ( curl_errno($ch) ) {
+            throw new Exception ('curl erreur: ' . curl_errno());
+        }
+
 		$info = json_decode($info, true);
 		return ($info === true);
 	}
