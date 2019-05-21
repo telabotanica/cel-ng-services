@@ -96,7 +96,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          }
  *    })
  * @ORM\Entity(repositoryClass="App\Repository\PhotoRepository")
- * @ORM\Table(name="photo", indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="user_id__original_name", columns={"user_id", "original_name"})}, options={"comment":"Les noms originaux doivent être uniques pour un même utilisateur."})
+ * @ORM\Table(name="photo", indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Les noms originaux doivent être uniques pour un même utilisateur."})
  * @Vich\Uploadable
  *
  */
