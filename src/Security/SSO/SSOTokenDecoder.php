@@ -20,7 +20,7 @@ class SSOTokenDecoder {
 	}
 
 	/**
-	 * Returns an unknown pseudo-user.
+	 * Returns the information array for an unknown user.
 	 */
 	private function getUnknownUser() {
 		return array(
@@ -29,13 +29,13 @@ class SSOTokenDecoder {
 			'permissions' => array()
 		);
 	}
+
  	/**
 	 * Searches for a JWT SSO token in the $this->headerName HTTP header, validates
 	 * this token's authenticity against the "annuaire" SSO service and if
-	 * successful, decodes the user information and places them into $this->user
+	 * successful, returns the decoded user information.
 	 */
 	public function getUserFromToken($token) {
-
 		// unknown user, by default
 		$user = $this->getUnknownUser();
 		$valid = false;
@@ -57,6 +57,7 @@ class SSOTokenDecoder {
 				}
 			}
 		}
+
 		return $user;
 	}
 
@@ -75,6 +76,7 @@ class SSOTokenDecoder {
 		$parts = explode('.', $token);
 		$payload = $parts[1];
 		$payload = $this->urlsafeB64Decode($payload);
+
 		return json_decode($payload, true);
 	}
 
@@ -88,6 +90,7 @@ class SSOTokenDecoder {
 			$padlen = 4 - $remainder;
 			$input .= str_repeat('=', $padlen);
 		}
+
 		return base64_decode(strtr($input, '-_', '+/'));
 	}
 
