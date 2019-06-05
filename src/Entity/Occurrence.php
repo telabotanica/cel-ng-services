@@ -1221,10 +1221,14 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         $tags = array();
 
         foreach($this->userTagRelations as $rel) {
-            $tags[] = $rel;
+            $tags[] = $rel->getUserOccurrenceTag();
         }
 
         return $tags;
+    }
+
+    public function getUserOccurrenceTagRelations(): array {
+        return $this->userTagRelations ;
     }
 
    /**
@@ -1235,6 +1239,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     }
 
     public function addExtendedFieldValue( $extendedFieldValue): self {
+
        if (!$this->extendedFieldValues->contains($extendedFieldValue)) {
            $this->extendedFieldValues[] = $extendedFieldValue;
            $extendedFieldValue->setOccurrence($this);

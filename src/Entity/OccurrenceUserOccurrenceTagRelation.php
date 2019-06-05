@@ -39,7 +39,7 @@ class OccurrenceUserOccurrenceTagRelation {
     /**
      *
      * @Groups({"read", "write"})
-     * @ORM\ManyToOne(targetEntity=Occurrence::class, inversedBy="userTagRelations")
+     * @ORM\ManyToOne(targetEntity=Occurrence::class, inversedBy="userTagRelations", cascade={"persist"})
      * @ORM\JoinColumn(name="occurrence_id", referencedColumnName="id", nullable=false)
      * @ApiSubresource(maxDepth=1)
      */

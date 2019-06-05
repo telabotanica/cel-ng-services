@@ -149,7 +149,20 @@ services:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
 
-    # This is not wired. Thanks to API platform?
+    app.event.listener.photo.photo.tag.relation.event.listener:
+        class: App\EventListener\PhotoPhotoTagRelationEventListener
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.event_listener, event: postRemove }
+
+    app.event.listener.occurrence.user.occurrence.tag.relation.event.listener:
+        class: App\EventListener\OccurrenceUserOccurrenceTagRelationEventListener
+        arguments: ['@fos_elastica.object_persister.occurrences.occurrence']
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.event_listener, event: postRemove }
+
+    # This is not autowired. Thanks to API platform?
     app.event.subscriber.add.photo.url.subscriber:
         class: App\EventSubscriber\AddPhotoUrlSubscriber
         tags:
@@ -164,15 +177,6 @@ services:
         class: App\EventListener\XcountResponseListener
         tags:
            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
-
-    # ########################################################################
-    # CUSTOM ELASTICA FINER
-    # ########################################################################
-
-#    app.elastica.finder.altruist.transformed.finder:
-#        class:      App\Search\AltruistTransformedFinder
-#        tags:
-#           - { name: fos_elastica.finder.class }
 
     # ########################################################################
     # VALIDATORS

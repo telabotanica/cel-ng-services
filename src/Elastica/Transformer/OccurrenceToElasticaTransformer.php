@@ -38,12 +38,11 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
             $tags[] = $nestedTag;
         }
 */
-
         // For the KISS principle-sake, we use the string data type instead of
         // nested. Please note that string can contain arrays:
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/array.html
         foreach($occ->getUserOccurrenceTags() as $tag){
-            $tags[] = $tag->getUserOccurrenceTag()->getName();
+            $tags[] = $tag->getName();
         }
 
         $data['userOccurrenceTags'] = $tags;
