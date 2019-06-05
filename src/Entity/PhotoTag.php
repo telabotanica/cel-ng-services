@@ -1,7 +1,8 @@
 <?php
 
-
 namespace App\Entity;
+
+use App\Entity\OwnedEntitySimpleInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,7 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * })
  * @ORM\Table(name="photo_tag",indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Mot-clé photo"})
  */
-class PhotoTag {
+class PhotoTag implements OwnedEntitySimpleInterface {
 
     /**
      * @Groups({"read"})
@@ -74,11 +75,12 @@ class PhotoTag {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): self {
+    public function setUserId(?int $userId): OwnedEntitySimpleInterface {
         $this->userId = $userId;
 
         return $this;
     }
+
 
     public function getName(): ?string {
         return $this->name;
