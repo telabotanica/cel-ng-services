@@ -1,6 +1,6 @@
 <?php
 namespace App\Utils;
-  
+
 use App\Entity\Occurrence;
 use App\Entity\OccurrenceUserOccurrenceTagRelation;
 use App\Entity\Photo;
@@ -77,7 +77,7 @@ class ArrayToOccurrenceTransformer
      *         in the $taxoRepo repository. Returns null if it cannot be 
      *         retrieved.
      */
-	public function transform(array $csvLine, TelaBotanicaUser $user): Occurrence {
+	public function transform(array $csvLine, TelaBotanicaUser $user) {
 		$resultMsgs = array();
 		$em = $this->doctrine->getManager();     
 
@@ -188,7 +188,7 @@ class ArrayToOccurrenceTransformer
     	    $occ->setGeometry('{"type" : "Point","coordinates" : [' . $csvLine[$this->headerIndexArray['Latitude']] . ',' . $csvLine[$this->headerIndexArray['Longitude']] . ']}');
         }
 
-        foreach (FromArrayOccurrenceCreator::CSV_HEADER_OCC_PROP_MAP as $svHeader => $propertyName) {
+        foreach (ArrayToOccurrenceTransformer::CSV_HEADER_OCC_PROP_MAP as $svHeader => $propertyName) {
 	        if ( null !== $csvLine[$this->headerIndexArray[$svHeader]] ) {
                 $setterMethodName = 'set' . ucfirst($propertyName);
 		        $occ->$setterMethodName($csvLine[$this->headerIndexArray[$svHeader]]);
