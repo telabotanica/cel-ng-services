@@ -126,20 +126,14 @@ fos_elastica:
                         osmCountryCode: ~
                         osmId: ~
                         osmPlaceId: ~
-                            # sortable property
+                        # sortable property
                         identiplanteScore:
                             type: "long"
                         identiplanteScore_keyword:
                             type: "keyword"
                         isIdentiplanteValidated:
                             type: "boolean"
-                        userOccurrenceTags:
-                            type: "nested"
-                            properties:
-                                id: ~
-                                userId: ~
-                                name: ~
-                                path: ~
+                        userOccurrenceTags: ~
                     persistence:
                         driver: orm
                         model: App\Entity\Occurrence
@@ -149,10 +143,11 @@ fos_elastica:
                         repository: App\Elastica\Repository\OccurrenceRepository
                         model_to_elastica_transformer:
                             service: app.search.occurrence_to_elastica_transformer
-                        # When deleting some entities then reloading, elasticsearch sometimes
-                        # sometimes cries because he cannot find corresponding Doctrine objects
-                        # when the index is queried before deletions are not yet effective on 
-                        # the index... 
+                        # When deleting some entities then reloading, 
+                        # elasticsearch sometimes sometimes cries because 
+                        # he cannot find the corresponding Doctrine objects 
+                        # It happens when the index is queried before deletions 
+                        # are not yet effective in the index... 
                         elastica_to_model_transformer:
                             ignore_missing: true
 
@@ -234,13 +229,7 @@ fos_elastica:
                         osmCountryCode: ~
                         projectId: 
                             type: "long"
-                        photoTags:
-                            type: "nested"
-                            properties:
-                                id: ~
-                                userId: ~
-                                name: ~
-                                path: ~
+                        photoTags: ~
                     persistence:
                         driver: orm
                         model: App\Entity\Photo

@@ -25,9 +25,10 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
  
     // @refactor DRY this using meta prog black magic + an abstract class
 	protected function buildData($occ) {
+        // The document to be built based on provided Occurrence:
 		$data = [];
         $tags = [];
-
+/*
         foreach($occ->getUserOccurrenceTags() as $tag){
             $nestedTag = array(
                 'name' => $tag->getUserOccurrenceTag()->getName(),
@@ -36,6 +37,15 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
             );
             $tags[] = $nestedTag;
         }
+*/
+
+        // For the KISS principle-sake, we use the string data type instead of
+        // nested. Please note that string can contain arrays:
+        // https://www.elastic.co/guide/en/elasticsearch/reference/current/array.html
+        foreach($occ->getUserOccurrenceTags() as $tag){
+            $tags[] = $tag->getUserOccurrenceTag()->getName();
+        }
+
         $data['userOccurrenceTags'] = $tags;
 
 		$data['id'] = $occ->getId();
