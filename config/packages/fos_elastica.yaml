@@ -133,7 +133,7 @@ fos_elastica:
                             type: "keyword"
                         isIdentiplanteValidated:
                             type: "boolean"
-                        userOccurrenceTags: ~
+                        tags: ~
                     persistence:
                         driver: orm
                         model: App\Entity\Occurrence
@@ -229,7 +229,7 @@ fos_elastica:
                         osmCountryCode: ~
                         projectId: 
                             type: "long"
-                        photoTags: ~
+                        tags: ~
                     persistence:
                         driver: orm
                         model: App\Entity\Photo
