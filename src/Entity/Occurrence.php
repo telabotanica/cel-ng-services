@@ -1195,9 +1195,9 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
 
     public function addUserTagRelation(OccurrenceUserOccurrenceTagRelation $userTagRelation): self {
 
-        if (!$this->photoTagRelations->contains($userTagRelation)) {
+        if (!$this->userTagRelations->contains($userTagRelation)) {
             $this->userTagRelations[] = $userTagRelation;
-            $photoTagRelation->setPhoto($this);
+            $userTagRelation->setPhoto($this);
         }
 
         return $this;

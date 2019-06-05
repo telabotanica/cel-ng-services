@@ -76,7 +76,6 @@ class UserOccurrenceTag implements OwnedEntitySimpleInterface
 
     public function __construct()
     {
-        $this->occurrences = new ArrayCollection();
         $this->occurrenceRelations = new ArrayCollection();
     }
 
@@ -124,18 +123,21 @@ class UserOccurrenceTag implements OwnedEntitySimpleInterface
     /**
      * @return Collection|Occurrence[]
      */
-    public function getOccurrences(): Collection
-    {
-        return $this->occurrences;
+    public function getOccurrences(): Collection {
+        $occz = array();
+        foreach($this->occurrenceRelations as $rel) {
+            $occz[] = $rel->getOccurrence();
+        }
+        return $occz;
     }
 
     public function addOccurrence(Occurrence $occ): self
     {
-        $userTagRelations = new PhotoPhotoTagRelation();
+        $userTagRelations = new OccurrenceUserOccurrenceTagRelation();
         $userTagRelations->setUserOccurrenceTag($occ);
         $userTagRelations->setOccurrence($this);
         $userTagRelations->persist();
-        $this->photoRelations[] = $userTagRelations;
+        $this->occurrenceRelations[] = $userTagRelations;
     }
 
    public function removeOccurrence(Occurrence $tag): self

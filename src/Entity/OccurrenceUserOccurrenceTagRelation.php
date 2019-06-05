@@ -39,7 +39,7 @@ class OccurrenceUserOccurrenceTagRelation {
     /**
      *
      * @Groups({"read", "write"})
-     * @ORM\ManyToOne(targetEntity=Occurrence::class, inversedBy="photoRelations")
+     * @ORM\ManyToOne(targetEntity=Occurrence::class, inversedBy="userTagRelations")
      * @ORM\JoinColumn(name="occurrence_id", referencedColumnName="id", nullable=false)
      * @ApiSubresource(maxDepth=1)
      */
@@ -47,7 +47,7 @@ class OccurrenceUserOccurrenceTagRelation {
 
      /**
       * @Groups({"read", "write"})
-      * @ORM\ManyToOne(targetEntity=UserOccurrenceTag::class, inversedBy="photoRelations")
+      * @ORM\ManyToOne(targetEntity=UserOccurrenceTag::class, inversedBy="occurrenceRelations")
       * @ORM\JoinColumn(name="user_occurrence_tag_id", referencedColumnName="id", nullable=false)
       * @ApiSubresource(maxDepth=1)
       */
@@ -68,7 +68,7 @@ class OccurrenceUserOccurrenceTagRelation {
         $this->userOccurrenceTag = $userOccurrenceTag;
                
         return $this;
-    }
+    } 
     
     /**
      * @return Occurrence
