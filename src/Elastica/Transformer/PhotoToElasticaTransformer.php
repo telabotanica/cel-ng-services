@@ -47,7 +47,7 @@ class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface
             $tags[] = $tag->getName();
         }
 
-        $data['photoTags'] = $tags;
+        $data['tags'] = $tags;
 
         $data['id'] = $photo->getId();
         $data['userId'] = $photo->getUserId();

@@ -55,12 +55,12 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         $getttterName = 'get' . ucfirst($fieldName);
 
         if (null !== $occSearch->$getttterName()) {
+
             $valueArray = $occSearch->$getttterName();
             if (sizeof($valueArray)>0) {
                 $orBoolQuery = new BoolQuery();
                 foreach($valueArray as $value) {
-
-                    $orBoolQuery = $this->addShouldQuery($orBoolQuery, intval($value), $fieldName);
+                    $orBoolQuery = $this->addShouldQuery($orBoolQuery, $value, $fieldName);
                 }           
                 $fFilter = $fFilter->addMust($orBoolQuery);
             }

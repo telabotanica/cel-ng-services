@@ -45,7 +45,7 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
             $tags[] = $tag->getName();
         }
 
-        $data['userOccurrenceTags'] = $tags;
+        $data['tags'] = $tags;
 
 		$data['id'] = $occ->getId();
 		$data['id_keyword'] = $occ->getId();
