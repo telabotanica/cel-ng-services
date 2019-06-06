@@ -16,12 +16,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Represents tag which can be associated to <code>Photo</code> instances.
  *
- * @ORM\Entity
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
  *     "formats"={"jsonld", "json"},
  *     "denormalization_context"={"groups"={"write"}}
  * })
+ * @ORM\Entity(repositoryClass="App\Repository\PhotoTagRepository")
  * @ORM\Table(name="photo_tag",indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Mot-clé photo"})
  */
 class PhotoTag implements OwnedEntitySimpleInterface {

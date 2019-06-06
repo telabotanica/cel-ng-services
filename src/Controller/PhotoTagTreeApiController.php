@@ -2,26 +2,26 @@
 
 namespace App\Controller;
 
-use App\Entity\UserOccurrenceTag;
+use App\Entity\PhotoTag;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class UserOccurrenceTagTreeApiController extends Controller {
-
+class PhotoTagTreeApiController extends Controller {
+ 
     /**
      *
-     * @Route("/api/userOccurrenceTagTrees", name="api_user_occurrence_tag_trees")
+     * @Route("/api/photoTagTrees", name="api_photo_tag_trees")
      */
     public function getTree() {
  
         $user = $this->getUser();
     
         $tree = $this->getDoctrine()
-		    ->getRepository(UserOccurrenceTag::class)
-		    ->getTagTree($user->getId());
-
+        	->getRepository(PhotoTag::class)
+        	->getTagTree($user->getId());
+ 
         return new JsonResponse($tree);
     }
 

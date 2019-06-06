@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  */
+// @refactor Make an AbstractHierarchicalEntityRepository for this and userocctag 
 class UserOccurrenceTagRepository extends ServiceEntityRepository {
 
     public function __construct(RegistryInterface $registry) {
@@ -23,7 +24,6 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
             ->andWhere('p.userId = :val2')
             ->setParameter('val2', $userId)
             ->orderBy('p.id', 'ASC')
-            ->setMaxResults(5)
             ->getQuery()
             ->getResult();
     }
@@ -39,7 +39,6 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
             ->andWhere('p.userId = :val2')
             ->setParameter('val2', $userId)
             ->orderBy('p.id', 'ASC')
-            ->setMaxResults(5)
             ->getQuery()
             ->getResult();
     }
@@ -51,7 +50,6 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
             ->andWhere('p.userId = :val2')
             ->setParameter('val2', $userId)
             ->orderBy('p.id', 'ASC')
-            ->setMaxResults(5)
             ->getQuery()
             ->getResult();
     }
@@ -66,8 +64,8 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
             $tagHierarchy[] = $this->generateTagTree($rootTag, $tree, $userId);
 
         }
-        return $tree;
 
+        return $tree;
     }
 
     public function findChildren($tagName, $userId) {
@@ -78,8 +76,7 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
     }
 
 
-    private function generateTagTree($entity, &$arr = [], $userId)
-    {
+    private function generateTagTree($entity, &$arr = [], $userId) {
         $name = $entity->getName();
         $children = $this->findChildren($entity->getName(), $userId);
         $arr += [$entity->getName() => null];

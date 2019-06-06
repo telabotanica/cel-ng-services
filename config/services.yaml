@@ -151,6 +151,7 @@ services:
 
     app.event.listener.photo.photo.tag.relation.event.listener:
         class: App\EventListener\PhotoPhotoTagRelationEventListener
+        arguments: ['@fos_elastica.object_persister.photos.photo']
         tags:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: postRemove }

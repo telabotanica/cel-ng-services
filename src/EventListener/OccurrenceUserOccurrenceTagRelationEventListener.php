@@ -4,7 +4,6 @@ namespace App\EventListener;
 
 use App\Entity\OccurrenceUserOccurrenceTagRelation;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;

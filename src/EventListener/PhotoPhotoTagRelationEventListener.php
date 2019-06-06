@@ -4,7 +4,7 @@ namespace App\EventListener;
 
 use App\Entity\PhotoPhotoTagRelation;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -17,9 +17,12 @@ use Doctrine\ORM\EntityManagerInterface;
 class PhotoPhotoTagRelationEventListener {
 
     private $em;
+    private $persister;
 
     public function __construct(
+        ObjectPersisterInterface $persister,
         EntityManagerInterface $em)  {
+        $this->persister = $persister;
         $this->em = $em;
     }
 
@@ -38,7 +41,7 @@ class PhotoPhotoTagRelationEventListener {
             return;
         }
         
-        $this->em->persist($entity->getPhoto());
+        $this->persister->replaceOne($entity->getPhoto()); 
     }
 
     /**
@@ -56,7 +59,7 @@ class PhotoPhotoTagRelationEventListener {
             return;
         }
 
-        $this->em->persist($entity->getPhoto());
+        $this->persister->replaceOne($entity->getPhoto()); 
     }
 
 
