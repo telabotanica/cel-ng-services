@@ -122,7 +122,10 @@ class OccurrenceEventListener {
 
         if  ( null == $occ->getObserver() ) {
             if ( null !== $currentUser = $this->getUser() ) {
-                $pseudo = $currentUser->getSurname() . ' ' . $currentUser->getLastName();
+                $pseudo = $currentUser->getPseudo();
+                if ( $pseudo == null ) {
+                    $pseudo = $currentUser->getSurname() . ' ' . $currentUser->getLastName();
+                }
                 $occ->setObserver($pseudo);
             }
         }   
