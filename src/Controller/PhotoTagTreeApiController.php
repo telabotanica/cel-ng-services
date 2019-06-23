@@ -6,9 +6,9 @@ use App\Entity\PhotoTag;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class PhotoTagTreeApiController extends Controller {
+class PhotoTagTreeApiController extends AbstractController {
  
     /**
      *
@@ -21,8 +21,9 @@ class PhotoTagTreeApiController extends Controller {
         $tree = $this->getDoctrine()
         	->getRepository(PhotoTag::class)
         	->getTagTree($user->getId());
- 
-        return new JsonResponse($tree);
+        $treeWithRoot = ["Tous les mots-clés" => $tree];
+
+        return new JsonResponse($treeWithRoot);
     }
 
 }

@@ -6,9 +6,9 @@ use App\Entity\UserOccurrenceTag;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class UserOccurrenceTagTreeApiController extends Controller {
+class UserOccurrenceTagTreeApiController extends AbstractController {
 
     /**
      *
@@ -21,8 +21,8 @@ class UserOccurrenceTagTreeApiController extends Controller {
         $tree = $this->getDoctrine()
 		    ->getRepository(UserOccurrenceTag::class)
 		    ->getTagTree($user->getId());
-
-        return new JsonResponse($tree);
+        $treeWithRoot = ["Tous les mots-clés" => $tree];
+        return new JsonResponse($treeWithRoot);
     }
 
 }
