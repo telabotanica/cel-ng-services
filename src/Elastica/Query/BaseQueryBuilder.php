@@ -118,6 +118,8 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         }
 
         $esQuery = $this->customizeWithSortParameters($esQuery, $occSearch);
+        // Pretty handy to debug:
+        //die(json_encode(["query" =>$esQuery->getQuery()->toArray()]));
 
         return $esQuery;
     }

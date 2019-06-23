@@ -29,24 +29,12 @@ class PhotoToElasticaTransformer  implements ModelToElasticaTransformerInterface
         $tags = [];
         $occ = $photo->getOccurrence();
 
-/*
-        foreach($photo->getPhotoTags() as $tag){
-            $nestedTag = array(
-                'name' => $tag->getName(),
-                'path' => $tag->getPath(),
-                'id' => $tag->getId(),
-            );
-            $tags[] = $nestedTag;
-        }
-*/
-
         // For the KISS principle-sake, we use the string data type instead of
         // nested. Please note that string can contain arrays:
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/array.html
         foreach($photo->getPhotoTags() as $tag){
             $tags[] = $tag->getName();
         }
-
         $data['tags'] = $tags;
 
         $data['id'] = $photo->getId();

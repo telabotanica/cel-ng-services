@@ -28,23 +28,13 @@ class OccurrenceToElasticaTransformer implements ModelToElasticaTransformerInter
         // The document to be built based on provided Occurrence:
 		$data = [];
         $tags = [];
-/*
-        foreach($occ->getUserOccurrenceTags() as $tag){
-            $nestedTag = array(
-                'name' => $tag->getUserOccurrenceTag()->getName(),
-                'path' => $tag->getUserOccurrenceTag()->getPath(),
-                'id' => $tag->getUserOccurrenceTag()->getId(),
-            );
-            $tags[] = $nestedTag;
-        }
-*/
+
         // For the KISS principle-sake, we use the string data type instead of
         // nested. Please note that string can contain arrays:
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/array.html
         foreach($occ->getUserOccurrenceTags() as $tag){
             $tags[] = $tag->getName();
         }
-
         $data['tags'] = $tags;
 
 		$data['id'] = $occ->getId();
