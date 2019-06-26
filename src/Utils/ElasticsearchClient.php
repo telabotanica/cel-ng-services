@@ -31,6 +31,7 @@ return $results->getNbResults();
 // https://stackoverflow.com/questions/27146787/count-query-with-php-elastica-and-symfony2-foselasticabundle/31162189
 */
 //@refactor if not int throw ElasticsearchCountException
+//@refactor: use public static const var for 'occurrence' and 'photo' + use them in ImportOccurrenceAction
 class ElasticsearchClient {
     
     /**
@@ -41,7 +42,7 @@ class ElasticsearchClient {
         Query $esQuery, string $resourceTypeName): int {
         $queryAsArray = $esQuery->getQuery()->toArray();
         $strQuery = json_encode(["query" => $queryAsArray]);
-        $ch = curl_init(ElasticsearchClient::buildUrl($resourceTypeName));
+        $ch = curl_init(ElasticsearchClient::buildCountUrl($resourceTypeName));
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $strQuery);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -61,14 +62,75 @@ class ElasticsearchClient {
         return intVal($resp->count);
     }
 
-    public static function buildUrl(string $resourceTypeName): string {
-        $url = getenv('ELASTICSEARCH_INDEX_URL');
-        $url .= $resourceTypeName;
+
+    /**
+     * Returns the total number of hits for given <code>Query</code> and type
+     * name of the resource/entity in ES.
+     */
+    public static function deleteById(
+        int $id, string $resourceTypeName): string {
+
+        $ch = curl_init(ElasticsearchClient::buildDeleteByIdUrl($resourceTypeName, $id));
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+
+        //execute delete
+        $result = curl_exec($ch);
+        //close connection
+        curl_close($ch);
+
+        return $result;
+    }
+
+
+    /**
+     * Returns the total number of hits for given <code>Query</code> and type
+     * name of the resource/entity in ES.
+     */
+    public static function deleteByIds(
+        array $ids, string $resourceTypeName): array {
+
+        $responses = array();
+        foreach ($ids as $id){
+            $responses[] = ElasticsearchClient::deleteById($id, $resourceTypeName);
+        }
+
+        return $responses;
+    }
+
+    public static function buildCountUrl(string $resourceTypeName): string {
+        $url = ElasticsearchClient::buildBaseUrl($resourceTypeName);
         $url .= '/_count';
 
         return $url;
     }
  
+
+    public static function buildDeleteByIdUrl(string $resourceTypeName, int $id): string {
+        $url = ElasticsearchClient::buildBaseUrl($resourceTypeName);
+        $url .= '/';
+        $url .= $id;
+
+        return $url;
+    }
+
+    public static function buildBaseUrl(string $resourceTypeName): string {
+        $url = null;
+        // @refactor use class constants here (and in OccRepo + PhotoRepo as well
+        if ($resourceTypeName == 'occurrence')  {
+            $url = getenv('ELASTICSEARCH_OCC_INDEX_URL');
+        }
+        if ($resourceTypeName == 'photo')  {
+            $url = getenv('ELASTICSEARCH_PHOTO_INDEX_URL');
+        }      
+        // @refactor Else we should raise a custom exception  
+        $url .= $resourceTypeName;
+
+        return $url;
+    }
+
 }
 
 
