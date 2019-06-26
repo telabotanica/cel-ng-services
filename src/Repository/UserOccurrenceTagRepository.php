@@ -69,7 +69,7 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
     }
 
     public function findChildren($tagName, $userId) {
-        return $this->getEntityManager()->createQuery("SELECT o FROM App:UserOccurrenceTag o WHERE o.userId =  :userId AND o.path LIKE :parentName")
+        return $this->getEntityManager()->createQuery("SELECT o FROM App:UserOccurrenceTag o WHERE o.userId =  :userId AND o.path = :parentName")
             ->setParameter('parentName', '%'.$tagName)
             ->setParameter('userId', $userId)
             ->getResult();
@@ -78,6 +78,7 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
 
     private function generateTagTree($entity, &$arr = [], $userId) {
         $name = $entity->getName();
+//echo(var_dump($name) + "-");
         $children = $this->findChildren($entity->getName(), $userId);
         $arr += [$entity->getName() => null];
 
