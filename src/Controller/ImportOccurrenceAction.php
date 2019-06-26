@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\OccurrenceType;
 use App\Utils\ArrayToOccurrenceTransformer;
+use App\Utils\ElasticsearchClient;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
@@ -32,13 +33,21 @@ final class ImportOccurrenceAction {
     private $doctrine;
     private $tokenStorage;
     private $tmpFolder;
+    protected $esClient;
 
+    // All of a sudden, symfony $file->getMimeType() started to return twice 
+    // the mime-type.. Investigate this...
     const FILE_MIME_TYPES = array(
         'text/x-comma-separated-values', 'text/comma-separated-values', 
         'application/octet-stream', 'application/vnd.ms-excel', 
         'application/x-csv', 'text/x-csv', 'text/csv', 'application/csv', 
         'application/excel', 'application/vnd.msexcel', 'text/plain', 
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/x-comma-separated-valuestext/x-comma-separated-values', 'text/comma-separated-valuestext/comma-separated-values', 
+        'application/octet-streamapplication/octet-stream', 'application/vnd.ms-excelapplication/vnd.ms-excel', 
+        'application/x-csvapplication/x-csv', 'text/x-csvtext/x-csv', 'text/csvtext/csv', 'application/csvapplication/csv', 
+        'application/excelapplication/excel', 'application/vnd.msexcelapplication/vnd.msexcel', 'text/plaintext/plain', 
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheetapplication/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     const UNREGISTERED_SECURITY_BUNDLE_MSG = 'The SecurityBundle is not ' .
         'registered in your application.';
     const IMPORT_OK_POSSIBLE_DUPLICATE_MSG = 'Occurrence succesfully ' . 
@@ -85,11 +94,13 @@ final class ImportOccurrenceAction {
      *         file activesheet.
      */
     public function extractArrayFromSpreadsheet($file): array {
+//die($file->getMimeType());
 
+//echo in_array($file->getMimeType(),ImportOccurrenceAction::FILE_MIME_TYPES);
+ 
         if ( in_array(
                 $file->getMimeType(), 
                 ImportOccurrenceAction::FILE_MIME_TYPES) ) {
-		        
             $extension = $file->getClientOriginalExtension();
          
             // @todo use an elvis operator here
@@ -103,11 +114,10 @@ final class ImportOccurrenceAction {
             $fileOriginalName = $file->getClientOriginalName();
 	        $file->move($this->tmpFolder, $fileOriginalName);
             $spreadsheet = $reader->load(
-                $this->tmpFolder . '/' . $fileOriginalName);
-             
+                $this->tmpFolder . '/' . $fileOriginalName);          
             return $spreadsheet->getActiveSheet()->toArray();
         }
-
+        // @refactor: throw a custom exception
         return null;
     }
 
@@ -146,6 +156,7 @@ final class ImportOccurrenceAction {
             $em->getConnection()->beginTransaction();
             $jsonResp = array();
             $occCount = 0;
+            $persistedOccIds = array();
 
             try {
                 foreach( $occArray as $occAsArray ) {
@@ -160,6 +171,7 @@ final class ImportOccurrenceAction {
                             // 'photos' index):
 	                        $em->persist($occ);	
 			                $em->flush();
+                            $persistedOccIds[] = $occ->getId();
 
 			                // Look for duplicate occurrences (same signature):
 			                $occ->generateSignature($user->getId());
@@ -208,17 +220,20 @@ final class ImportOccurrenceAction {
                 } // end foreach( $occArray as $occAsArray )
                 $em->flush();
                 $em->getConnection()->commit();
-            } catch (Exception $e) {
-                $em->getConnection()->rollBack();
 
+            } catch (\Throwable $e) {
+                $em->getConnection()->rollBack();
+                // Delete associated ES documents to avoid creating orphans 
+                // and, thus, having  an out of sync ES index:
+                $this->deleteDocumentsByIds($persistedOccIds);
                 // swallow the Exception and inform the caller using the 
                 // exception message:
                 $jsonResp[] = $this->buildAtomicResponse(
-                    -1, 500, null, $occAsArray, $e.getMessage());
+                    -1, 500, null, $occAsArray, $e->getMessage());
 
                 return new Response(
                     json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, 
-                    $e.getMessage());
+                    [$e->getMessage()]);
             }
         }
     	$jsonResp = new Response(
@@ -238,6 +253,10 @@ final class ImportOccurrenceAction {
                 'body' => $body
             )
         );
+    }
+
+    private static function deleteDocumentsByIds(array $ids) {
+        ElasticsearchClient::deleteByIds($ids, 'occurrence');
     }
 
     protected function getUser() {

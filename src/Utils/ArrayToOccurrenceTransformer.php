@@ -38,7 +38,7 @@ class ArrayToOccurrenceTransformer
             'Espèce' => 'userSciName',
             'Numéro nomenclatural' => 'userSciNameId',
             'Abondance' => 'coef',
-            "Type d'observation" => 'observationType',
+            "Type d'observation" => 'occurrenceType',
             "Floutage" => 'publishedLocation',
             "Phénologie" => 'phenology',
             "Echantillon d'herbier" => 'sampleHerbarium',
@@ -185,7 +185,7 @@ class ArrayToOccurrenceTransformer
         $long = $csvLine[$this->headerIndexArray['Longitude']];
         
         if ( ( null !== $lat ) && ( null !== $long ) ) {
-    	    $occ->setGeometry('{"type" : "Point","coordinates" : [' . $csvLine[$this->headerIndexArray['Latitude']] . ',' . $csvLine[$this->headerIndexArray['Longitude']] . ']}');
+    	    $occ->setGeometry('{"type" : "Point","coordinates" : [' .  $csvLine[$this->headerIndexArray['Longitude']] . ',' . $csvLine[$this->headerIndexArray['Latitude']] . ']}');
         }
 
         foreach (ArrayToOccurrenceTransformer::CSV_HEADER_OCC_PROP_MAP as $svHeader => $propertyName) {
