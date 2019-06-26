@@ -32,6 +32,13 @@ class OccurrenceRepository extends AbstractElasticRepository {
         return new OccurrenceQueryBuilder();
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function getEntityName(): string {
+        return "occurrence";
+    }
+
 
     /**
      * Returns true if an Occurrence with the same

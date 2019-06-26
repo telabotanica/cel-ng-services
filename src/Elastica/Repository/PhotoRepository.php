@@ -31,4 +31,11 @@ class PhotoRepository extends AbstractElasticRepository
         return new PhotoQueryBuilder();
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function getEntityName(): string {
+        return "photo";
+    }
+
 }

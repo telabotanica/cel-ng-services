@@ -41,6 +41,8 @@ abstract class AbstractElasticRepository extends Repository
      */
     abstract protected function getBuilder(): BaseQueryBuilder;
 
+    abstract protected function getEntityName(): string;
+
     /**
      * @inheritdoc
      */
@@ -76,7 +78,7 @@ abstract class AbstractElasticRepository extends Repository
         $queryBuilder = $this->getBuilder();
         $esQuery = $queryBuilder->build($user, $query);
 
-        return ElasticsearchClient::count($esQuery, 'occurrence');
+        return ElasticsearchClient::count($esQuery, $this->getEntityName());
 
     }
 
