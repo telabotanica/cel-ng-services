@@ -78,7 +78,7 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
 
     private function generateTagTree($entity, &$arr = [], $userId) {
         $name = $entity->getName();
-//echo(var_dump($name) + "-");
+//echo(var_dump($name));
         $children = $this->findChildren($entity->getName(), $userId);
         $arr += [$entity->getName() => null];
 
