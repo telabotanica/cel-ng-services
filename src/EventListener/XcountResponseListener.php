@@ -44,6 +44,12 @@ class XcountResponseListener {
             $results = $repository->countWithRequest($request, $user);
             $responseHeaders->set('X-count', $results);
         }
+        else if ( $request->attributes->get('_route') === "api_photos_get_collection") {
+
+            $repository = $this->repositoryManager->getRepository('App:Photo');
+            $results = $repository->countWithRequest($request, $user);
+            $responseHeaders->set('X-count', $results);
+        }
     } 
 
 }
