@@ -30,11 +30,6 @@ class OwnedEntityEventListener {
     // @perf @todo: optimize this... find another workaround...
     public function prePersist(LifecycleEventArgs $args) {
 
-        // OMG, I cannot believe this has to be done... Else, the token is not set 
-        // because of a concurrency race...
-        // https://stackoverflow.com/questions/37854796/token-storage-in-symfony2-has-no-token
-        // https://stackoverflow.com/questions/39350442/symfony-3-doctrine-listener-service-inject-token-storage-doesnt-work
-        sleep(0.01);
         $entity = $args->getEntity();
 
         // Why the hell doesn't the following work? 
