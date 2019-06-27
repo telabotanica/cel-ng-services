@@ -32,10 +32,13 @@ class SSOUserExtractor {
 
     public function extractUser(Request $request) {
         $token = $this->extractTokenFromRequest($request);
+/*
         $isValid = $this->validateToken($token);
         $user = $this->extractUserFromToken($token);
         //die(var_dump($user));
         return ($isValid && null !== $user) ? $user : null;
+*/
+return $this->extractUserFromToken($token);
     }
 
     public function extractUserFromToken(string $token) {

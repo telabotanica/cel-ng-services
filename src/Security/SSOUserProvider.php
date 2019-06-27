@@ -11,36 +11,28 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\HttpFoundation\Request;
 
-class SSOUserProvider implements UserProviderInterface 
-{
-
-
+class SSOUserProvider implements UserProviderInterface {
 
     protected $requestStack;
 
-    public function __construct(RequestStack $requestStack)
-    {
+    public function __construct(RequestStack $requestStack) {
         $this->requestStack = $requestStack;
     }
  
-    public function loadUserByUsername($username)
-    {
+    public function loadUserByUsername($username) {
         //return $this->fetchUser($username);
         return $this->getUser();
     }
 
-    public function refreshUser(UserInterface $user)
-    {
+    public function refreshUser(UserInterface $user) {
         $userExtractor = new SSOUserExtractor();
         $request = $this->requestStack->getCurrentRequest();
 //        die(var_dump($request->headers));
+//echo "refreshUser ";
         return $userExtractor->extractUser($request);
-
     }
 
-    public function supportsClass($class)
-    {
-
+    public function supportsClass($class) {
         return TelaBotanicaUser::class === $class;
     }
 

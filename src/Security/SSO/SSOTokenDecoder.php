@@ -41,6 +41,7 @@ class SSOTokenDecoder {
 		$valid = false;
 		//echo "Token : $token\n";
 		if ($token !== null) {
+/*
 			// validate token
 			try {
 				$valid = $this->verifyToken($token);
@@ -50,12 +51,13 @@ class SSOTokenDecoder {
 			}
 			
 			if ($valid === true) {
+*/
 				// decode user's email address from token
 				$tokenData = $this->decodeToken($token);
 				if ($tokenData != null && $tokenData["sub"] != "") {
 					$user = $tokenData;
 				}
-			}
+	//		}
 		}
 
 		return $user;
