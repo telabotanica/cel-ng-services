@@ -60,7 +60,7 @@ final class ImportOccurrenceAction {
 
     /**
      * Returns a new <code>ImportOccurrenceAction</code> instance 
-     * initialized with (injected) services passed as parameters.
+     * initialized with (injected) services.
      *
      * @param TokenStorageInterface $tokenStorage The injected 
      *        <code>TokenStorageInterface</code> service.

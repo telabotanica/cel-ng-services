@@ -8,13 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-/**
- * @method UserOccurrenceTag|null find($id, $lockMode = null, $lockVersion = null)
- * @method UserOccurrenceTag|null findOneBy(array $criteria, array $orderBy = null)
- * @method UserOccurrenceTag[]    findAll()
- * @method UserOccurrenceTag[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-//@todo deleteme
+//@refactor transfer responsability for findBySignature to elastica repository+ deleteme
 class OccurrenceRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
