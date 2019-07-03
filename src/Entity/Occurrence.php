@@ -8,6 +8,7 @@ use App\DBAL\OccurrenceTypeEnumType;
 use App\DBAL\InputSourceEnumType;
 use App\Controller\OccurrenceBulkAction;
 use App\Controller\ImportOccurrenceAction;
+use App\Controller\ExportOccurrenceAction;
 use App\Entity\Photo;
 use App\Filter\Occurrence\IsPublicFilter;
 use App\Filter\Occurrence\CertaintyFilter;
@@ -88,6 +89,24 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *                      }
  *                  },
  *                  "summary" = "Import Occurrence resources by uploading a spreadsheet file (excel or CSV).",
+ *                  "produces" = "application/json"
+ *              }
+ *          },
+ *          "export"={
+ *              "method"="POST",
+ *              "path"="/occurrences/export",
+ *              "controller"=ExportOccurrenceAction::class,
+ *              "swagger_context"={
+ *                  "parameters"={},
+ *                  "responses"={ 
+ *                      "207"= {
+ *                          "description" = "The export was performed succesfully."
+ *                      },
+ *                      "500"= {
+ *                          "description" = "An error occured during export."
+ *                      }
+ *                  },
+ *                  "summary" = "Export Occurrence resources by generating a spreadsheet file (excel or CSV).",
  *                  "produces" = "application/json"
  *              }
  *          }
