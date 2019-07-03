@@ -32,8 +32,8 @@ class UserProfileCel {
     * Unique identifier for the profile. Equals the user ID in the SSO system.
     *
     * @ORM\Id
-    * @ORM\GeneratedValue(strategy="IDENTITY")
     * @ORM\Column(type="integer")
+    * @ORM\GeneratedValue(strategy="NONE")
     * @Groups({"read"})    
     */
    private $id = null;
@@ -171,7 +171,7 @@ class UserProfileCel {
     public function setAdministeredProject(?TelaBotanicaProject $administeredProject): self {
 
         $this->administeredProject = $administeredProject;
-
+a
         return $this;
     }
 
