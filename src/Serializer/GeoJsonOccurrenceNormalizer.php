@@ -40,6 +40,7 @@ final class GeoJsonOccurrenceNormalizer implements NormalizerInterface, Denormal
         $result['properties'] = array(
             'id' => $object->getID(),
             'userSciName' => $object->getUserSciName(),
+            'isPublic' => $object->getIsPublic(),
             'locality' => $object->getLocality(),            
             'dateObserved' => $object->getDateObserved());
         
