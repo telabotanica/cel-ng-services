@@ -31,7 +31,7 @@ return $results->getNbResults();
 // https://stackoverflow.com/questions/27146787/count-query-with-php-elastica-and-symfony2-foselasticabundle/31162189
 */
 //@refactor if not int throw ElasticsearchCountException
-//@refactor: use public static const var for 'occurrence' and 'photo' + use them in ImportOccurrenceAction
+//@refactor: use public static const var for 'occurrence' and 'photo' + use them in ImportOccurrenceAction + syncdoc command
 class ElasticsearchClient {
     
     /**
@@ -76,7 +76,7 @@ class ElasticsearchClient {
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
-        //execute delete
+        //execute delete using ES API
         $result = curl_exec($ch);
         //close connection
         curl_close($ch);
@@ -100,7 +100,7 @@ class ElasticsearchClient {
         return $responses;
     }
 
-    public static function buildCountUrl(string $resourceTypeName): string {
+    private static function buildCountUrl(string $resourceTypeName): string {
         $url = ElasticsearchClient::buildBaseUrl($resourceTypeName);
         $url .= '/_count';
 
@@ -108,7 +108,7 @@ class ElasticsearchClient {
     }
  
 
-    public static function buildDeleteByIdUrl(string $resourceTypeName, int $id): string {
+    private static function buildDeleteByIdUrl(string $resourceTypeName, int $id): string {
         $url = ElasticsearchClient::buildBaseUrl($resourceTypeName);
         $url .= '/';
         $url .= $id;
@@ -116,7 +116,7 @@ class ElasticsearchClient {
         return $url;
     }
 
-    public static function buildBaseUrl(string $resourceTypeName): string {
+    private static function buildBaseUrl(string $resourceTypeName): string {
         $url = null;
         // @refactor use class constants here (and in OccRepo + PhotoRepo as well
         if ($resourceTypeName == 'occurrence')  {
