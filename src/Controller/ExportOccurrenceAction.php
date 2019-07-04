@@ -34,11 +34,16 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
         "dateObservedDay" => 'jour',
         "dateObservedMonth" => 'mois',
         "dateObservedYear" => 'annee',
-
-        "projectId" => 'occurrenceType',
-        'certainty'      => 'isPublic',
-        'isPublic' => 'userSciName',
+        'certainty'      => 'certitude',
+        'isPublic' => 'transmission',
     );
+
+
+    private const PARAM_VALUE_MAPPING = array(
+        'true'   => 1,
+        'false' => 0
+    );
+
     private const BASE_EXPORT_WEB_SERVICE_URL = "https://api.tela-botanica.org/service:cel:CelWidgetExport/export";
 
 
@@ -49,8 +54,7 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
      * Returns a new <code>BaseCollectionDataProvider</code> instance 
      * initialized with (injected) services passed as parameters.
      *
-     * @param Security $security The injected <code>Security</code> service.
-     * @param RepositoryManagerInterface $repositoryManager The injected 
+     * @param Security $security The injected <code>Security</code> service.<     * @param RepositoryManagerInterface $repositoryManager The injected 
      *        <code>RepositoryManagerInterface</code> service.
      * @param RequestStack $requestStack The injected <code>RequestStack</code>
      *        service.
@@ -68,9 +72,11 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
     }
 
 
-    public function __invoke(Request $request) {
+    public function __invoke(Request $request) {        
+
+        set_time_limit(0);
         $url = $this->buildUrl($request);
-        echo $url;
+
         try {
             $fp = fopen($url, 'rb');
             header("Content-Disposition:attachment;filename=cel_export.csv");
@@ -83,6 +89,7 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
             $jsonResp = array('errorMessage' => $t.getMessage());
             return new Response(json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, []);
         }   
+        set_time_limit(30);
         exit;
     }
 
@@ -90,30 +97,47 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
         $this->paramsAsString = '';
         $paramNames = array_keys($params);
         foreach($paramNames as $paramName) {
-            $wsParamName = ExportOccurrenceController::PARAM_MAPPING[$paramNames];
-            if ( array_key_exists($paramName, ExportOccurrenceController::PARAM_MAPPING) ) {                  
-                $this->addParamToTargetUrl($wsParamName, $params[$wsParamName]);
+
+            
+            if ( array_key_exists($paramName, ExportOccurrenceAction::PARAM_MAPPING) ) {  
+                $wsParamName = ExportOccurrenceAction::PARAM_MAPPING[$paramName];                
+                $this->addParamToTargetUrl($wsParamName, $params[$paramName]);
             }
-            else {
-                // @refactor: throw custom exception here:
+            if ( $paramName == "projectId" ) {
+                $this->processProject($params['projectId']);
             }
-            $this->processTrickyParams();
+            if ( $paramName == "ids" ) {
+                $this->processIds($params['ids']);
+            }
+            if ( $paramName == "tags" ) {
+                $this->processTags($params['tags']);
+            }
         }
-        if ( array_key_exists('tags[]', $params) ) {                  
-            echo "";
-        }
+        $this->paramsAsString = substr($this->paramsAsString, 1);
 
         return $this->paramsAsString; 
     }
 
     private function processTags($tags) {
-        $this->paramsAsString = $this->paramsAsString ;
-
+        $wsTags = "";
+        foreach($tags as $tag) {
+            $wsTags = $wsTags . $tag . "ET"; 
+        }
+        $wsTags =  substr(trim($wsTags), 0, -2);
+        $this->addParamToTargetUrl("mots-cles", $wsTags);
     }
 
    private function processProject($projectId) {
-        $this->paramsAsString = $this->paramsAsString ;
+        $prj = $this->entityManager->getRepository('App:TelaBotanicaProject')->find($projectId);
+        $this->addParamToTargetUrl("programme", $prj->getLabel());
+    }
 
+   private function processIds($ids) {
+        foreach($ids as $id) {
+            $wsIds = $wsIds . $id . ","; 
+        }
+        $wsIds =  substr(trim($wsIds), 0, -1);
+        $this->addParamToTargetUrl("obsids", $wsIds);
     }
 
    private function addAccessControlParameter() {
@@ -122,7 +146,7 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
         if (!$user->isTelaBotanicaAdmin()) {
             // Project admins: limit to occurrence belonging to the project
             if ($user->isProjectAdmin()) {
-                $this->addParamToTargetUrl("projet", $user->getAdministeredProjectId());
+                $this->addParamToTargetUrl("prj", $user->getAdministeredProjectId());
             }
             // Simple users: limit to her/his occurrences
             else if (!is_null($user)){
@@ -130,27 +154,32 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
             }
             // Not even logged in user: limit to only public occurrences
             else {
-                $this->addParamToTargetUrl("public", 1);
+                $this->addParamToTargetUrl("transmission", 1);
             }
         }
         // else, Tela-botanica admin: no restrictions!
 
     }
 
-   protected function processTrickyParams() {
-            $this->processTags(null);
-            $this->processProject(null);
+    protected function addParamToTargetUrl($name, $value) {
+        $this->paramsAsString = $this->paramsAsString . '&' . $name . '=' . $this->translateParamValue($value);
     }
 
-    protected function addParamToTargetUrl($name, $value) {
-        $this->paramsAsString = $this->paramsAsString . '&' . $name . '=' . $value;
+
+    protected function translateParamValue($value) {
+        if ( array_key_exists($value, ExportOccurrenceAction::PARAM_VALUE_MAPPING) ) {   
+            return ExportOccurrenceAction::PARAM_VALUE_MAPPING[$value];
+        }
+        else {
+            return $value;
+        }
     }
 
     private function buildUrl($request) {
         $params = $request->query->all();
         $this->buildParamString($params);
-        $this->processTrickyParams();
         $this->addAccessControlParameter();
+        $this->paramsAsString = $this->paramsAsString . "&debut=0&limite=20000&format=csv&colonnes=standardexport,standard";
 
         return ExportOccurrenceAction::BASE_EXPORT_WEB_SERVICE_URL . '?' . $this->paramsAsString; 
     }
