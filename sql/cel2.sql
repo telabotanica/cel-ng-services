@@ -1,19 +1,35 @@
--- MySQL dump 10.15  Distrib 10.0.38-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.17  Distrib 10.3.15-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: testsf
 -- ------------------------------------------------------
--- Server version	10.0.38-MariaDB-0+deb8u1
+-- Server version	10.3.15-MariaDB-1:10.3.15+maria~jessie-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `change_log`
+--
+
+DROP TABLE IF EXISTS `change_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `change_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `entity_id` int(11) DEFAULT NULL COMMENT 'ID de l''entité',
+  `action_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Action sur l''entité à répercuter dans l''index',
+  `entity_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nom de l''entité sur laquelle porte l''action à répercuter.',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `del_update_notfications`
@@ -131,17 +147,17 @@ CREATE TABLE `occurrence` (
   `certainty` enum('à déterminer','douteux','certain') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Certitude de l identification taxonomique(DC2Type:certaintyenum)',
   `annotation` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Commentaires concernant l''obs',
   `occurrence_type` enum('observation de terrain','issue de la bibliographie','donnée d''herbier') COLLATE utf8mb4_unicode_ci DEFAULT 'observation de terrain' COMMENT 'Type de donnée - observation de terrain, issue de la bibliographie, donnée d''herbier(DC2Type:occurrencetypeenum)',
-  `is_wild` tinyint(1) DEFAULT '1' COMMENT 'Indique si l''individu observé était sauvage ou cultivé',
+  `is_wild` tinyint(1) DEFAULT 1 COMMENT 'Indique si l''individu observé était sauvage ou cultivé',
   `coef` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `phenology` enum('00-09: germination, développement des bourgeons','10-19: développement des feuilles','11: par ex, environ 10% des feuilles épanouies','15: par ex, environ 50% des feuilles épanouies','20-29: formation de pousses latérales, tallage','30-39: développement des tiges, croissance des rosettes','40-49: développement des organes de propagation végétative','60-69: floraison','61: par ex, environ 10% des fleurs épanouies','65: par ex, environ 50% des fleurs épanouies','70-79: fructification','80-89: maturité des fruits et des graines','85: par ex, 50% des fruits matures','90-99: sénescence et dormance','91: par ex, environ 10% des feuilles jaunes','95: par ex, environ 50% des feuilles jaunes') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `sample_herbarium` tinyint(1) DEFAULT '0' COMMENT 'Indique la présence / l''absence d''une part d''herbier associée à l''obs',
+  `sample_herbarium` tinyint(1) DEFAULT 0 COMMENT 'Indique la présence / l''absence d''une part d''herbier associée à l''obs',
   `bibliography_source` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Source bibliographique',
   `input_source` enum('CEL','widget','VegLab','PlantNet','autre') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Interface utilisée pour la saisie de l''obs - CEL, VegLab, widget,  PlantNet, autre(DC2Type:inputsourceenum)',
-  `is_public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indique si l''obs est publique ou non',
-  `is_visible_in_cel` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Indique si l''obs s''affiche dans le CEL ou non',
-  `is_visible_in_veg_lab` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indique si l''obs s''affiche dans VegLab ou non',
+  `is_public` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Indique si l''obs est publique ou non',
+  `is_visible_in_cel` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Indique si l''obs s''affiche dans le CEL ou non',
+  `is_visible_in_veg_lab` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Indique si l''obs s''affiche dans VegLab ou non',
   `signature` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Vérification des doublons',
-  `geometry` longtext COLLATE utf8mb4_unicode_ci COMMENT 'Localisation précise de l''obs',
+  `geometry` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Localisation précise de l''obs',
   `elevation` int(11) DEFAULT NULL COMMENT 'Altitude',
   `geodatum` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT 'WGS84' COMMENT 'Système géodésique',
   `locality` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Localité où se trouve l''obs',
@@ -159,15 +175,15 @@ CREATE TABLE `occurrence` (
   `osm_country_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Champ complété automatiquement par osm - code pays',
   `osm_id` bigint(20) DEFAULT NULL COMMENT 'Champ complété automatiquement par osm - id osm',
   `osm_place_id` int(11) DEFAULT NULL COMMENT 'Champ complété automatiquement par osm - id de l''instance géographique',
-  `identiplante_score` int(11) DEFAULT '0' COMMENT 'Score de l''observation sur identiplante',
-  `is_identiplante_validated` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Statut validé (ou non) de l''observation sur identiplante',
+  `identiplante_score` int(11) DEFAULT 0 COMMENT 'Score de l''observation sur identiplante',
+  `is_identiplante_validated` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Statut validé (ou non) de l''observation sur identiplante',
   `identification_author` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Nom de la personne ayant identifié l''espèce observée (si différente de l''observateur)',
   `taxo_repo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT 'Référentiel taxonomique',
   PRIMARY KEY (`id`),
   KEY `IDX_BEFD81F3166D1F9C` (`project_id`),
   KEY `user_id_idx` (`user_id`),
   CONSTRAINT `FK_BEFD81F3166D1F9C` FOREIGN KEY (`project_id`) REFERENCES `tb_project` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=477 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1630 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -186,7 +202,7 @@ CREATE TABLE `occurrence_user_occurrence_tag` (
   KEY `IDX_B06FBA58768D75C5` (`user_occurrence_tag_id`),
   CONSTRAINT `FK_B06FBA5830572FAC` FOREIGN KEY (`occurrence_id`) REFERENCES `occurrence` (`id`),
   CONSTRAINT `FK_B06FBA58768D75C5` FOREIGN KEY (`user_occurrence_tag_id`) REFERENCES `user_occurrence_tag` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table de jointure entre occurrence et user_occurrence_tag.';
+) ENGINE=InnoDB AUTO_INCREMENT=1211 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table de jointure entre occurrence et user_occurrence_tag.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -230,11 +246,10 @@ CREATE TABLE `photo` (
   `mime_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id__original_name` (`user_id`,`original_name`),
   KEY `IDX_14B7841830572FAC` (`occurrence_id`),
   KEY `user_id_idx` (`user_id`),
   CONSTRAINT `FK_14B7841830572FAC` FOREIGN KEY (`occurrence_id`) REFERENCES `occurrence` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms originaux doivent être uniques pour un même utilisateur.';
+) ENGINE=InnoDB AUTO_INCREMENT=179 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms originaux doivent être uniques pour un même utilisateur.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -247,11 +262,11 @@ DROP TABLE IF EXISTS `photo_tag`;
 CREATE TABLE `photo_tag` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'ID de l''utilisateur',
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mot-clé',
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Hiérarchie (mots clés parents séparés par des /)',
   PRIMARY KEY (`id`),
   KEY `user_id_idx` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Mot-clé photo';
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Mot-clé photo';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -270,7 +285,7 @@ CREATE TABLE `photo_tag_photo` (
   KEY `IDX_3BA5CB3FEF6D1439` (`photo_tag_id`),
   CONSTRAINT `FK_3BA5CB3F7E9E4C8C` FOREIGN KEY (`photo_id`) REFERENCES `photo` (`id`),
   CONSTRAINT `FK_3BA5CB3FEF6D1439` FOREIGN KEY (`photo_tag_id`) REFERENCES `photo_tag` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table de jointure entre Photo et PhotoTag.';
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table de jointure entre Photo et PhotoTag.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -287,7 +302,7 @@ CREATE TABLE `project_settings` (
   `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Titre du wigdet à afficher',
   `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Logo du projet',
   `language` varchar(2) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Langue du projet',
-  `description` longtext COLLATE utf8mb4_unicode_ci,
+  `description` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `taxo_restriction_value` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Liste de valeurs possibles pour le taxon. Prend la forme ''repository_name: taxoId1,taxoId2, ...,taxoIdn''',
   `type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_type` tinyint(1) DEFAULT NULL,
@@ -376,12 +391,12 @@ DROP TABLE IF EXISTS `user_occurrence_tag`;
 CREATE TABLE `user_occurrence_tag` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'ID de l''utilisateur',
-  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mot-clé',
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Hiérarchie (mots clés parents séparés par des /)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id__name` (`user_id`,`name`),
   KEY `user_id_idx` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur).';
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur).';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -392,16 +407,15 @@ DROP TABLE IF EXISTS `user_profile_cel`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_profile_cel` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `administered_project_id` int(11) DEFAULT NULL,
-  `anonymize_data` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Anonymisation des données d''observation',
-  `is_end_user_licence_accepted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Validation des conditions d''utilisation',
-  `always_display_advanced_fields` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Validation des conditions d''utilisation',
+  `anonymize_data` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Anonymisation des données d''observation',
+  `is_end_user_licence_accepted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Validation des conditions d''utilisation',
+  `always_display_advanced_fields` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Validation des conditions d''utilisation',
   `language` enum('EN','FR') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FR' COMMENT 'langage choisi pour communiquer dans l''interface.(DC2Type:languageenum)',
   PRIMARY KEY (`id`),
-  KEY `IDX_EEE77E506C1DD863` (`administered_project_id`),
-  CONSTRAINT `FK_EEE77E506C1DD863` FOREIGN KEY (`administered_project_id`) REFERENCES `tb_project` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des préférences utilisateurs';
+  KEY `IDX_EEE77E506C1DD863` (`administered_project_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des préférences utilisateurs';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -413,4 +427,4 @@ CREATE TABLE `user_profile_cel` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-05-21  9:14:34
+-- Dump completed on 2019-07-04  7:18:24
