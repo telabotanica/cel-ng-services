@@ -46,13 +46,11 @@ class PhotoTag implements OwnedEntitySimpleInterface {
     /**
      * Mot-clé.
      *
-     * @Assert\NotNull
      * @Groups({"read", "write"})
      * @ORM\Column(type="string", nullable=true, options={"comment":"Mot-clé"})
      */
     private $name = null;
     
-
     /**
      * Hiérarchie (mots clés parents séparés par des /)
      *
