@@ -44,7 +44,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *
  * @ApiResource(attributes={
  *      "normalization_context"={"groups"={"read"}},
- *      "formats"={"jsonld", "json", "geojson"={"application/vnd.geo+json"}, "jsonpatch"={"application/json-patch+json"}, "pdf"={"application/pdf"}},
+ *      "formats"={"jsonld", "json", "geojson"={"application/vnd.geo+json"}, "jsonpatch"={"application/json-patch+json"}, "pdf"={"application/pdf"}, "csv"={"text/csv"}},
  *      "denormalization_context"={"groups"={"write"}},
  *      "filters"={IsPublicFilter::class, CertaintyFilter::class, DateObservedYearFilter::class, DateObservedMonthFilter::class, DateObservedDayFilter::class, UserSciNameFilter::class, CountryFilter::class, IdentiplanteScoreFilter::Class, IsIdentiplanteValidatedFilter::Class, CountyFilter::Class, FamilyFilter::Class, ProjectIdFilter::Class}},
  *      itemOperations={
