@@ -14,10 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class PlantnetProxyController extends AbstractController {
  
-    // @refactor put this in .env it's not the irght place but it avoids publishing publically the api key if public git repo
-    private const PLANTNET_API_KEY = "2a100TzNkm9Gtc9CbJ16pWYfyO";
-    private const PLANTNET_API_URL = "https://my-api.plantnet.org/v1/identify/all";
-
     /**
      *
      * @Route("/api/plantnet", name="api_plantnet")
@@ -42,7 +38,7 @@ var_dump($t);
     }
 
     private function buildUrl($request) {
-        return PlantnetProxyController::PLANTNET_API_URL . '?' . urldecode($request->getQueryString()) . '&api-key=' . PlantnetProxyController::PLANTNET_API_KEY; 
+        return getenv('PLANTNET_API_URL') . '?' . urldecode($request->getQueryString()) . '&api-key=' . getenv('PLANTNET_API_KEY'); 
     }
 
 }

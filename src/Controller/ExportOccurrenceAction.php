@@ -44,10 +44,6 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
         'false' => 0
     );
 
-    private const BASE_EXPORT_WEB_SERVICE_URL = "https://api.tela-botanica.org/service:cel:CelWidgetExport/export";
-
-
-
     private $paramsAsString;
 
     /**
@@ -181,7 +177,7 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
         $this->addAccessControlParameter();
         $this->paramsAsString = $this->paramsAsString . "&debut=0&limite=20000&format=csv&colonnes=standardexport,standard";
 
-        return ExportOccurrenceAction::BASE_EXPORT_WEB_SERVICE_URL . '?' . $this->paramsAsString; 
+        return getenv('EXPORT_SERVICE_URL') . '?' . $this->paramsAsString; 
     }
 
 }
