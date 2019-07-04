@@ -171,7 +171,7 @@ class UserProfileCel {
     public function setAdministeredProject(?TelaBotanicaProject $administeredProject): self {
 
         $this->administeredProject = $administeredProject;
-a
+
         return $this;
     }
 
