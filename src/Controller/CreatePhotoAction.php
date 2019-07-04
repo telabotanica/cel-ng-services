@@ -8,6 +8,7 @@ use App\Form\PhotoType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +28,8 @@ final class CreatePhotoAction {
     private $validator;
     private $doctrine;
     private $formFactory;
+    // the <code>Security</code> service to retrieve the current user:
+    protected $security;
 
     const DUPLICATE_NAME_MSG = "A photo with the same name is already present "
         . "in the user gallery. This is not allowed.";
@@ -39,6 +42,7 @@ final class CreatePhotoAction {
      *        <code>RegistryInterface</code> service.
      * @param FormFactoryInterface $formFactory The injected 
      *        <code>FormFactoryInterface</code> service.
+     * @param Security $security The injected <code>Security</code> service.<
      * @param ValidatorInterface $validator The injected 
      *        <code>ValidatorInterface</code> service.
      * @return CreatePhotoAction Returns a new  
@@ -47,10 +51,11 @@ final class CreatePhotoAction {
      */
     public function __construct(
         RegistryInterface $doctrine, 
+        Security $security, 
         FormFactoryInterface $formFactory, 
         ValidatorInterface $validator) {
-
         $this->validator = $validator;
+        $this->security = $security;
         $this->doctrine = $doctrine;
         $this->factory = $formFactory;
     }
@@ -72,9 +77,8 @@ final class CreatePhotoAction {
         $form->handleRequest($request);
         $file = $request->files->get('file');
         $originalName = $file->getClientOriginalName();
-        $findByArray = array('originalName' => $originalName);
-        $photoWithSameName = $photoRepo->findBy($findByArray);
-
+        $userId = $this->security->getToken()->getUser()->getId();
+        $photoWithSameName = $photoRepo->findByOriginalNameAndUserId($originalName, $userId);
 
         if ( (sizeof($photoWithSameName)==0) ) {
 
