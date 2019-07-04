@@ -1,9 +1,10 @@
-# For sortable properties, we must add a keyword type field which MUST be named <propertyname>'_keyword'.
+# For sortable properties, we must add a keyword type field which MUST 
+# follow the following naming convention <propertyname>'_keyword'.
 # Cause: "Fielddata is disabled on text fields by default. Set fielddata=true on [userSciName] in order to load fielddata in memory by uninverting the inverted index. 
 # *Note that this can however use significant memory*. Alternatively use a keyword field instead. [reason: all shards failed]"   
 fos_elastica:
     clients:
-        default: { host: 127.0.0.1, port: 9200 }
+        default: { host: '%env(FOS_ELASTICA_CLIENTS_DEFAULT_HOST)%', port: '%env(FOS_ELASTICA_CLIENTS_DEFAULT_PORT)%' }
     indexes:
         occurrences: 
             index_name: cel2_occurrences
