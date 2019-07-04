@@ -71,7 +71,7 @@ class ExifExtractionUtils {
      */
    public function getShootingDate() {
        // If no exifd in image
-       if ( is_bool($this->exifIfdzero) ) {
+       if ( is_bool($this->exifIfdzero) || empty($this->exifIfdzero['DateTime'])){
         return  new \DateTime();
        }
        return new \DateTime($this->exifIfdzero['DateTime']);
