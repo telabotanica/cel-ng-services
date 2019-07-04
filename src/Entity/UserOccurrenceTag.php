@@ -52,7 +52,7 @@ class UserOccurrenceTag implements OwnedEntitySimpleInterface {
     *
     * @Assert\NotNull
     * @Groups({"read", "write"})
-    * @ORM\Column(type="string", nullable=false, options={"comment":"Mot-clé"}, length=190)
+    * @ORM\Column(type="string", nullable=true, options={"comment":"Mot-clé"}, length=190)
     */
    private $name = null;
 

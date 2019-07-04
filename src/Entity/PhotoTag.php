@@ -48,7 +48,7 @@ class PhotoTag implements OwnedEntitySimpleInterface {
      *
      * @Assert\NotNull
      * @Groups({"read", "write"})
-     * @ORM\Column(type="string", nullable=false, options={"comment":"Mot-clé"})
+     * @ORM\Column(type="string", nullable=true, options={"comment":"Mot-clé"})
      */
     private $name = null;
     
