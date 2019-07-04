@@ -3,12 +3,15 @@
 namespace App\EventListener;
 
 use App\Entity\Photo;
+use App\Vich\TelaDirectoryNamer;
+use App\Vich\TelaNamer;
 use App\TelaBotanica\Eflore\Api\EfloreApiClient;
 
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -23,14 +26,19 @@ class PhotoEventListener {
 
     private $uploaderHelper;
     private $requestContext;
+    private $em;
 
-    public function __construct(UploaderHelper $uploaderHelper, RequestContext $requestContext) {
+    public function __construct(UploaderHelper $uploaderHelper, 
+        RequestContext $requestContext,
+        EntityManagerInterface $em) {
+
         $this->uploaderHelper = $uploaderHelper;
 		$this->requestContext = $requestContext;
+        $this->em = $em;
     }
 
     /**
-     * Populates 'url' and exif related properties of <code>Photo</code>
+     * Populates exif related properties of <code>Photo</code>
      * instances  before they are persisted. Also updates other properties 
      * based on values passed in the uploaded JSON file if any.
      *
@@ -66,6 +74,50 @@ class PhotoEventListener {
       $entity->fillPropertiesWithImageExif();
       $imgUrl = $this->getHostUrl() . getenv('APP_PREFIX_PATH') . $this->uploaderHelper->asset($entity, 'file');
       $entity->setUrl($imgUrl);
+    }
+
+
+    /**
+     * Moves the file from the tmp folder it was saved to.
+     * to tela image API dedicated folder. Populates 'url' with the tela 
+     * image API path for this photo;
+     *
+     * @param LifecycleEventArgs $args The Lifecycle Event emitted.
+     */
+    public function postPersist(LifecycleEventArgs $args) {
+
+        $entity = $args->getEntity();
+
+        // only act on some "Photo" entity
+        if (!$entity instanceof Photo) {
+            return;
+        }
+
+      $obsStrId = str_pad(strval($entity->getId()), 9, "0", STR_PAD_LEFT);
+
+      $srcPhotoName  = $this->buildSrcPhotoName($entity);
+      $targetPhotoName = TelaNamer::buildFileName($entity);
+      $targetFolder = TelaDirectoryNamer::buildTelaPhotoApiFolder($entity);
+      $srcFolder = getEnv("TMP_FOLDER");
+
+      $this->moveFile($srcFolder, $srcPhotoName,$targetFolder, $targetPhotoName);
+
+      $imgUrl = getEnv('BASE_TELA_PHOTO_API_URL') .$targetPhotoName;
+      $entity->setUrl($imgUrl);
+      $this->em->persist($entity);
+    }
+
+    private function buildSrcPhotoName($entity) {
+        return substr(strrchr($this->uploaderHelper->asset($entity, 'file'),'/'),1);
+    }
+
+
+
+    private function moveFile($srcFolder, $srcPhotoName,$targetFolder, $photoName) {
+        if (!is_dir($targetFolder) ){
+         mkdir($targetFolder, 0777, true);
+        }
+      rename($srcFolder . $srcPhotoName, $targetFolder . $photoName);
     }
 
     /**

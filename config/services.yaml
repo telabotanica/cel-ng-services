@@ -136,6 +136,7 @@ services:
         class: App\EventListener\PhotoEventListener
         tags:
             - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: postPersist }
 
     app.event.listener.owned.entity.event.listener:
         class: App\EventListener\OwnedEntityEventListener
@@ -187,4 +188,12 @@ services:
         class: App\Validator\NoDuplicateConstraintValidator
         arguments: ["@doctrine.orm.entity_manager"]
 
+
+    vich_uploader.mappings.media_object.namer:
+        class: App\Vich\TelaNamer
+        public: true
+
+    vich_uploader.mappings.media_object.directory_namer:
+        class: App\Vich\TelaDirectoryNamer
+        public: true
 
