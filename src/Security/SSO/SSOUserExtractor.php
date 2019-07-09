@@ -35,7 +35,7 @@ class SSOUserExtractor {
     public function extractUser(Request $request) {
         $token = $this->extractTokenFromRequest($request);
         if ( null === $token) {
-            throw new UnloggedAccessException('You must be logged to access this part of the app.');
+            throw new UnloggedAccessException('You must be logged into tela-botanica SSO system to access this part of the app.');
         }
         return $this->extractUserFromToken($token);
     }

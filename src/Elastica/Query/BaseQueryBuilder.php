@@ -164,7 +164,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
 
         $acQuery = null;
         if ( $user === null ) {
-            throw new UnloggedAccessException('You must be logged to access this part of the app.');
+            throw new UnloggedAccessException('You must be logged into tela-botanica SSO system to access this part of the app.');
         } 
         else if (!$user->isTelaBotanicaAdmin()) {
             // Project admins: limit to occurrence belonging to the project
