@@ -188,6 +188,9 @@ services:
         class: App\Validator\NoDuplicateConstraintValidator
         arguments: ["@doctrine.orm.entity_manager"]
 
+    # ########################################################################
+    # VICH UPLOAD - PHOTO NAMER/PHOTO DIRECTORY_NAMER
+    # ########################################################################
 
     vich_uploader.mappings.media_object.namer:
         class: App\Vich\TelaNamer
@@ -196,4 +199,12 @@ services:
     vich_uploader.mappings.media_object.directory_namer:
         class: App\Vich\TelaDirectoryNamer
         public: true
+
+    # ########################################################################
+    # COMMANDS
+    # ########################################################################
+
+    App\Elastica\Command\SyncDocumentIndexCommand:
+        tags:
+            - { name: 'console.command', command: 'cel:sync-es' }
 

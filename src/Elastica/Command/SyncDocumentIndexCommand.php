@@ -37,7 +37,7 @@ class SyncDocumentIndexCommand extends ContainerAwareCommand {
     
     protected function configure() {
         $this
-            ->setName('cel:sync-doc-index')
+            ->setName('cel:sync-es')
             ->setDescription('Keep in sync the elasticsearch index using notifications stored in the change_log table.');
     }
 
