@@ -17,7 +17,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  *
- * @todo: put the SSO URL in .env files
  */
 class SSOAuthenticator extends AbstractGuardAuthenticator {
 

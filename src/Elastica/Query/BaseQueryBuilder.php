@@ -3,6 +3,7 @@
 namespace App\Elastica\Query;
 
 use App\Security\User\TelaBotanicaUser;
+use App\Security\User\UnloggedAccessException;
 
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
@@ -162,7 +163,10 @@ class BaseQueryBuilder implements QueryBuilderInteface {
     protected function buildAccessControlQuery($user) {
 
         $acQuery = null;
-        if (!$user->isTelaBotanicaAdmin()) {
+        if ( $user === null ) {
+            throw new UnloggedAccessException('You must be logged to access this part of the app.');
+        } 
+        else if (!$user->isTelaBotanicaAdmin()) {
             // Project admins: limit to occurrence belonging to the project
             if ($user->isProjectAdmin()) {
                 $acQuery = new Match();

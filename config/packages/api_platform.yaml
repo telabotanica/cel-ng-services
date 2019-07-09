@@ -18,6 +18,5 @@ api_platform:
              apiKey:
                 name: Authorization
                 type: header
-    collection:
-        pagination:
-            maximum_items_per_page: 5
+    exception_to_status:
+        App\Security\User\UnloggedAccessException: 403

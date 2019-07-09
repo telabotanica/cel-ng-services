@@ -41,23 +41,11 @@ class SSOTokenDecoder {
 		$valid = false;
 		//echo "Token : $token\n";
 		if ($token !== null) {
-/*
-			// validate token
-			try {
-				$valid = $this->verifyToken($token);
-			} catch(Exception $e) {
-                // return the anonymous (unknown) user:
-				return $user;
+			// decode user's email address from token
+			$tokenData = $this->decodeToken($token);
+			if ($tokenData != null && $tokenData["sub"] != "") {
+				$user = $tokenData;
 			}
-			
-			if ($valid === true) {
-*/
-				// decode user's email address from token
-				$tokenData = $this->decodeToken($token);
-				if ($tokenData != null && $tokenData["sub"] != "") {
-					$user = $tokenData;
-				}
-	//		}
 		}
 
 		return $user;

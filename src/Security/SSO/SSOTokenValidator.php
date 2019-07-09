@@ -35,7 +35,6 @@ class SSOTokenValidator {
 	 * Verifies the authenticity of a token using the "annuaire" SSO service
 	 */
 	public function validateToken($token) {
-//echo "validateToken ";
 		if ( empty($this->annuaireURL) ) {
 			throw new MisconfiguredSSOTokenValidatorException();
 		}
