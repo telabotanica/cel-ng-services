@@ -7,8 +7,6 @@ use App\Vich\TelaDirectoryNamer;
 use App\Vich\TelaNamer;
 use App\TelaBotanica\Eflore\Api\EfloreApiClient;
 
-use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
-
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,15 +22,13 @@ use Symfony\Component\Routing\RequestContext;
  */
 class PhotoEventListener {
 
-    private $uploaderHelper;
     private $requestContext;
     private $em;
 
-    public function __construct(UploaderHelper $uploaderHelper, 
+    public function __construct(
         RequestContext $requestContext,
         EntityManagerInterface $em) {
 
-        $this->uploaderHelper = $uploaderHelper;
 		$this->requestContext = $requestContext;
         $this->em = $em;
     }
@@ -72,15 +68,14 @@ class PhotoEventListener {
          $entity->fillPropertiesFromJsonFile($entity->json->getRealPath(), $forbiddenKeys);
       }
       $entity->fillPropertiesWithImageExif();
-      $imgUrl = $this->getHostUrl() . getenv('APP_PREFIX_PATH') . $this->uploaderHelper->asset($entity, 'file');
-      $entity->setUrl($imgUrl);
+        // Sets the Url to empty 
+      $entity->setUrl("");
     }
 
 
     /**
-     * Moves the file from the tmp folder it was saved to.
-     * to tela image API dedicated folder. Populates 'url' with the tela 
-     * image API path for this photo;
+     * Moves the file from the tmp folder to tela image API dedicated folder. 
+     * Sets the 'url' property value to the tela image API URL for the photo.
      *
      * @param LifecycleEventArgs $args The Lifecycle Event emitted.
      */
@@ -93,50 +88,26 @@ class PhotoEventListener {
             return;
         }
 
-      $obsStrId = str_pad(strval($entity->getId()), 9, "0", STR_PAD_LEFT);
-
-      $srcPhotoName  = $this->buildSrcPhotoName($entity);
-      $targetPhotoName = TelaNamer::buildFileName($entity);
-      $targetFolder = TelaDirectoryNamer::buildTelaPhotoApiFolder($entity);
+      $srcPhotoName  = $entity->getOriginalName();
+      $targetPhotoName = TelaNamer::buildTelaPhotoApiFileName($entity);
+      $targetFolder = TelaDirectoryNamer::buildTelaPhotoApiFolderName($entity);
       $srcFolder = getEnv("TMP_FOLDER");
 
-      $this->moveFile($srcFolder, $srcPhotoName,$targetFolder, $targetPhotoName);
+      // Moving the file from temp to tela photo API base folder:
+      $this->moveFile($srcFolder, $srcPhotoName, $targetFolder, $targetPhotoName);
 
-      $imgUrl = getEnv('BASE_TELA_PHOTO_API_URL') .$targetPhotoName;
+      // Setting URL:
+      $imgUrl = getEnv('BASE_TELA_PHOTO_API_URL').$targetPhotoName;
+      $entity->setContentUrl($targetFolder . '/' . $targetPhotoName);
       $entity->setUrl($imgUrl);
       $this->em->persist($entity);
     }
-
-    private function buildSrcPhotoName($entity) {
-        return substr(strrchr($this->uploaderHelper->asset($entity, 'file'),'/'),1);
-    }
-
-
 
     private function moveFile($srcFolder, $srcPhotoName,$targetFolder, $photoName) {
         if (!is_dir($targetFolder) ){
          mkdir($targetFolder, 0777, true);
         }
-      rename($srcFolder . $srcPhotoName, $targetFolder . $photoName);
-    }
-
-    /**
-     * Returns the host URL (<scheme>://<host>:<port>).
-     *
-     * @return string the host URL.
-     */
-    private function getHostUrl(): string {
-        $scheme = $this->requestContext->getScheme();
-        $url = $scheme.'://'.$this->requestContext->getHost();
-        $httpPort = $this->requestContext->getHttpPort();
-        if ('http' === $scheme && $httpPort && 80 !== $httpPort) {
-            return $url.':'.$httpPort;
-        }
-        $httpsPort = $this->requestContext->getHttpsPort();
-        if ('https' === $scheme && $httpsPort && 443 !== $httpsPort) {
-            return $url.':'.$httpsPort;
-        }
-        return $url;
+        rename($srcFolder . '/' . $srcPhotoName, $targetFolder . '/' .  $photoName);
     }
 
 }

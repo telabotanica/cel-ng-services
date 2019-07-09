@@ -93,10 +93,7 @@ final class ServeZippedPhotosAction {
                 $photos = $occRepo->findById($id);
                 if (sizeof($photos)>0) {
                     $photo = $photos[0];
-                    $filePath = $this->storage->resolvePath(
-                        $photo, 
-                        ServeZippedPhotosAction::ENTITY_FILE_PROPERTY_NAME);
-                    $zip->addFile($filePath, $photo->getOriginalName());
+                    $zip->addFile($photo->getContentUrl(), basename($photo->getContentUrl()));
                 }
             }
 
