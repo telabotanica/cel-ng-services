@@ -129,6 +129,7 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
     }
 
    private function processIds($ids) {
+        $wsIds = '';
         foreach($ids as $id) {
             $wsIds = $wsIds . $id . ","; 
         }
