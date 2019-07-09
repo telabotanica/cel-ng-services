@@ -37,7 +37,14 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
         'certainty'      => 'certitude',
         'isPublic' => 'transmission',
     );
-
+    private const HEADERS = array(
+        "Content-Disposition:attachment;filename=cel_export.csv",
+        "Content-Type:text/csv; charset=UTF-8",
+        "isIdentiplanteValidated" => 'validation_identiplante',
+        "Cache-Control:no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+        "Keep-Alive:timeout=30",
+        "Pragma:no-cache"
+    );
 
     private const PARAM_VALUE_MAPPING = array(
         'true'   => 1,
@@ -69,12 +76,18 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
 
 
     public function __invoke(Request $request) {        
-
+        // This can be a looooong operation, let's disable the timeout
+        // momentarily:
         set_time_limit(0);
         $url = $this->buildUrl($request);
 
         try {
             $fp = fopen($url, 'rb');
+            
+            foreach(ExportOccurrenceAction::HEADERS as $header) {
+                // Why the hell do we get a silent 500 error when executing this...?
+                // header($header);
+            }
             header("Content-Disposition:attachment;filename=cel_export.csv");
             header("Content-Type:text/csv; charset=UTF-8");
             header("Cache-Control:no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
@@ -82,9 +95,12 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
             header("Pragma:no-cache");
             fpassthru($fp);
         } catch (\Throwable $t) {
+            // Translate the error message raised by the proxied service: 
             $jsonResp = array('errorMessage' => $t.getMessage());
+            // Return a  500 with an informative msg as JSON:
             return new Response(json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, []);
         }   
+        // Restore the timeout to its default, 30 secs, value:
         set_time_limit(30);
         exit;
     }
@@ -158,12 +174,12 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
 
     }
 
-    protected function addParamToTargetUrl($name, $value) {
+    private function addParamToTargetUrl($name, $value) {
         $this->paramsAsString = $this->paramsAsString . '&' . $name . '=' . $this->translateParamValue($value);
     }
 
 
-    protected function translateParamValue($value) {
+    private function translateParamValue($value) {
         if ( array_key_exists($value, ExportOccurrenceAction::PARAM_VALUE_MAPPING) ) {   
             return ExportOccurrenceAction::PARAM_VALUE_MAPPING[$value];
         }
