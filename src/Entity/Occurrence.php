@@ -1297,14 +1297,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     public function __clone() {
         if ($this->id) {
             $this->setId(null);
-/*
-            if ( null !== $this->project ) {
-                $this->project = clone $this->project;
-            }
-            if ( null !== $this->userProfile ) {
-                $this->userProfile = clone $this->userProfile;
-            }    
-*/
+
         }
     }
 
