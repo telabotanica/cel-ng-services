@@ -7,6 +7,7 @@ use App\Entity\Photo;
 use App\Entity\UserOccurrenceTag;
 use App\Security\User\TelaBotanicaUser;
 use App\DBAL\CertaintyEnumType;
+use App\DBAL\TaxoRepoEnumType;
 
 use DateTime;
 use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
@@ -20,8 +21,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @internal Only used during spreadsheet file import.
  * @package App\Utils
  */
-class ArrayToOccurrenceTransformer
-{
+class ArrayToOccurrenceTransformer {
 
     private $doctrine;
     private $lineCount = 0;
@@ -51,6 +51,18 @@ class ArrayToOccurrenceTransformer
             "Commune" => 'locality',
             "Pays" => 'osmCountry',
             'Referentiel taxonomique' => 'taxoRepo'
+        );
+
+    // Map between CSV headers (keys) and Occurrence members (values)
+    const ALLOWED_TAXO_REPOS = array(
+            TaxoRepoEnumType::BDTFE, 
+            TaxoRepoEnumType::BDTFX, 
+            TaxoRepoEnumType::TAXREF, 
+            TaxoRepoEnumType::BDTFER, 
+            TaxoRepoEnumType::VASCAN, 
+            TaxoRepoEnumType::APD, 
+            TaxoRepoEnumType::LBF, 
+            TaxoRepoEnumType::OTHERUNKNOWN
         );
 
     public function __construct(RegistryInterface $doctrine)
@@ -117,6 +129,7 @@ class ArrayToOccurrenceTransformer
         }
 	}
 
+    //@refactor put this in the repo
     private function populateWithPhotos($occ, $user, $photoOriginalNames) {
 
         $em = $this->doctrine->getManager();
@@ -126,15 +139,16 @@ class ArrayToOccurrenceTransformer
             $photos = $photoRepo->findByOriginalNameAndUserId(
                 $imageName, $user->getId());
             if ( sizeof($photos)>0 ) {
-                $occ->addPhoto($photo[0]);
+
+                $occ->addPhoto($photos[0]);
             }
-            // @todo if >1, then log a warning
+            // @todo if >1, then throw an exception
         }
 
     	return $occ;
     }
 
-
+    //@refactor put this in the repo
     private function populateWithUserTags($occ, $user, $tagNames) {
 
         $em = $this->doctrine->getManager();
@@ -172,6 +186,7 @@ class ArrayToOccurrenceTransformer
     	return $occ;
     }
 
+    //@refactor put this in the repo
     private function populateWithUserInfo($occ, $user) {
 		$occ->setUserId($user->getId());
 		$occ->setUserEmail($user->getEmail());
@@ -185,20 +200,36 @@ class ArrayToOccurrenceTransformer
         $long = $csvLine[$this->headerIndexArray['Longitude']];
         
         if ( ( null !== $lat ) && ( null !== $long ) ) {
-    	    $occ->setGeometry('{"type" : "Point","coordinates" : [' .  $csvLine[$this->headerIndexArray['Longitude']] . ',' . $csvLine[$this->headerIndexArray['Latitude']] . ']}');
+    	    $occ->setGeometry('{"type" : "Point","coordinates" : [' .  $long . ',' . $lat . ']}');
         }
 
         foreach (ArrayToOccurrenceTransformer::CSV_HEADER_OCC_PROP_MAP as $svHeader => $propertyName) {
-	        if ( null !== $csvLine[$this->headerIndexArray[$svHeader]] ) {
-                $setterMethodName = 'set' . ucfirst($propertyName);
-		        $occ->$setterMethodName($csvLine[$this->headerIndexArray[$svHeader]]);
-	        }         
+
+	        if ( array_key_exists($svHeader, $this->headerIndexArray) && array_key_exists($this->headerIndexArray[$svHeader], $csvLine) ) {
+	            if ( null !== $csvLine[$this->headerIndexArray[$svHeader]] ) {
+
+                    if ( $svHeader == 'Referentiel taxonomique') {
+
+                         if ( in_array($csvLine[$this->headerIndexArray[$svHeader]], ArrayToOccurrenceTransformer::ALLOWED_TAXO_REPOS ) 
+                            && null !== $csvLine[$this->headerIndexArray[$svHeader]] && '' !== $csvLine[$this->headerIndexArray[$svHeader]]) {
+	                        $occ->setTaxoRepo($csvLine[$this->headerIndexArray[$svHeader]]);
+                        }
+                        else {
+
+                            throw new UnknowTaxoRepositoryException();
+                        }
+                    }
+                    else {
+                        $setterMethodName = 'set' . ucfirst($propertyName);
+	                    $occ->$setterMethodName($csvLine[$this->headerIndexArray[$svHeader]]);
+                    }
+	            }         
+            }
         }
 
-        $obsDate = $csvLine[$this->headerIndexArray["Date"]];
-	    if ( null !== $obsDate ) {
-		    $occ->setDateObserved(
-                DateTime::createFromFormat('d/m/Y', $obsDate));
+        $strObsDate = $csvLine[$this->headerIndexArray["Date"]];
+	    if ( null !== $strObsDate ) {
+		    $occ->setDateObserved($this->datishToDate($strObsDate));
 	    }
 
 	    return $occ;	
@@ -213,6 +244,22 @@ class ArrayToOccurrenceTransformer
 		}
 		return false;
 	}
+
+
+    // @refactor create a normalizer interface and a BooleanNormalizer
+	private function datishToDate(string $datish): DateTime {
+
+            if ( strlen($datish) === 8 )  {
+                return DateTime::createFromFormat('d/m/y', $datish);
+            }
+            else if ( strlen($datish) === 10 ) {
+               return DateTime::createFromFormat('d/m/Y', $datish);
+            } 
+            else {
+                throw new InvalidDateFormatException();
+            }
+	}
+
 }
 
 
