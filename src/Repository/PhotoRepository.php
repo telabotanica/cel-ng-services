@@ -24,16 +24,15 @@ class PhotoRepository extends ServiceEntityRepository
      */
     public function findByOriginalNameAndUserId($name, $userId)
     {
+
+
         return $this->createQueryBuilder('p')
             ->andWhere('p.originalName = :val')
             ->setParameter('val', $name)
-            ->andWhere('p.userId = :val')
-            ->setParameter('val', $userId)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(5)
+            ->andWhere('p.userId = :val1')
+            ->setParameter('val1', $userId)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
     
 }
