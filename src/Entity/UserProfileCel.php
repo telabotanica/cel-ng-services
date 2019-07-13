@@ -10,7 +10,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -29,6 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *            "defaults"={"_api_receive"=false},},
  *     "get"={"method"="GET"}
  * })
+ * @ApiFilter(SearchFilter::class, properties={"userId": "exact"})
  */
 class UserProfileCel {
 
@@ -58,13 +61,13 @@ class UserProfileCel {
    private $anonymizeData = false;
 
    /**
-    * Validation des conditions d'utilisation.
+    * Validation des conditions d'utilisation. True by default as the profile is created only afetr the DUA has been accepted
     *
     * @Assert\NotNull
-    * @ORM\Column(name="is_end_user_licence_accepted", type="boolean", nullable=false, options={"comment":"Validation des conditions d'utilisation", "default": false})
+    * @ORM\Column(name="is_end_user_licence_accepted", type="boolean", nullable=false, options={"comment":"Validation des conditions d'utilisation", "default": true})
     * @Groups({"read", "write"})    
     */
-   private $isEndUserLicenceAccepted = false;
+   private $isEndUserLicenceAccepted = true;
 
 
    /**
