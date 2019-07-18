@@ -98,9 +98,9 @@ class PhotoEventListener {
       $this->moveFile($srcFolder, $srcPhotoName, $targetFolder, $targetPhotoName);
 
       // Setting URL:
-      $imgUrl = getEnv('BASE_TELA_PHOTO_API_URL').$targetPhotoName;
+      $imgUrl = getEnv('BASE_TELA_PHOTO_API_URL').$targetUrlPhotoName;
       $entity->setContentUrl($targetFolder . '/' . $targetPhotoName);
-      $entity->setUrl($targetUrlPhotoName);
+      $entity->setUrl($imgUrl);
       $this->em->persist($entity);
     }
 
