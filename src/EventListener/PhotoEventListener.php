@@ -90,6 +90,7 @@ class PhotoEventListener {
 
       $srcPhotoName  = $entity->getOriginalName();
       $targetPhotoName = TelaNamer::buildTelaPhotoApiFileName($entity);
+      $targetUrlPhotoName = TelaNamer::buildTelaPhotoApiUrlFileName($entity);
       $targetFolder = TelaDirectoryNamer::buildTelaPhotoApiFolderName($entity);
       $srcFolder = getEnv("TMP_FOLDER");
 
@@ -99,7 +100,7 @@ class PhotoEventListener {
       // Setting URL:
       $imgUrl = getEnv('BASE_TELA_PHOTO_API_URL').$targetPhotoName;
       $entity->setContentUrl($targetFolder . '/' . $targetPhotoName);
-      $entity->setUrl($imgUrl);
+      $entity->setUrl($targetUrlPhotoName);
       $this->em->persist($entity);
     }
 
