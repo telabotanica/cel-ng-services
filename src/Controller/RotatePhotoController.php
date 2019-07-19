@@ -65,6 +65,7 @@ class RotatePhotoController extends AbstractController {
 
             return new Response(json_encode($jsonResp), Response::HTTP_OK, []);
         } catch (\Throwable $t) {
+var_dump($t);
             $jsonResp = array('errorMessage' => $t.getMessage());
             return new Response(json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, []);
         }   
@@ -73,9 +74,10 @@ class RotatePhotoController extends AbstractController {
 
     private function rotatePhoto($photo, $degrees) {
         $source = $this->loadImage($photo);
+        $mimetype = $photo->getMimeType();
         // Rotate the image:
         $rotate = imagerotate($source, $degrees, 0);
-        this.saveImage($rotate, $photo->getContentUrl());
+        $this->saveImage($rotate, $mimetype, $photo->getContentUrl());
     }
 
     private function loadImage($photo) {
@@ -89,7 +91,8 @@ class RotatePhotoController extends AbstractController {
         throw new \Exception('The image is neither a jpeg nor a png.');        
     }
 
-    private function saveImage($photo) {
+
+    private function extractMimeType($photo) {
         // Load the image
         if ( $photo->getMimeType() == 'image/jpeg' ) {
             return imagejpeg($photo);
@@ -97,6 +100,19 @@ class RotatePhotoController extends AbstractController {
         else if ( $photo->getMimeType() == 'image/png' ) {
             imagesavealpha($photo, true);
             return imagepng($photo);
+        }
+        throw new \Exception('The image is neither a jpeg nor a png.');        
+    }
+
+
+    private function saveImage($img, $mimetype, $path) {
+        // Load the image
+        if ( $mimetype == 'image/jpeg' ) {
+            return imagejpeg($img, $path);
+        }
+        else if ( $mimetype == 'image/png' ) {
+            imagesavealpha($img, true);
+            return imagepng($img, $path);
         }
         throw new \Exception('The image is neither a jpeg nor a png.');        
     }
