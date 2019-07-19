@@ -66,7 +66,6 @@ class RotatePhotoController extends AbstractController {
             return new Response(json_encode($jsonResp), Response::HTTP_OK, []);
         } catch (\Throwable $t) {
             $jsonResp = array('errorMessage' => $t.getMessage());
-
             return new Response(json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, []);
         }   
         exit;
@@ -84,7 +83,7 @@ class RotatePhotoController extends AbstractController {
     private function loadImage($photo) {
         // Load the image
         if ( $photo->getMimeType() == 'image/jpeg' ) {
-            return imagecreatefromjpg($photo->getContentUrl());
+            return imagecreatefromjpeg($photo->getContentUrl());
         }
         else if ( $photo->getMimeType() == 'image/png' ) {
             return imagecreatefrompng($photo->getContentUrl());
