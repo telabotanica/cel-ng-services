@@ -75,9 +75,7 @@ class RotatePhotoController extends AbstractController {
         $source = $this->loadImage($photo);
         // Rotate the image:
         $rotate = imagerotate($source, $degrees, 0);
-        imagejpeg($rotate); 
-        imagedestroy($rotate);
-        imagedestroy($source);
+        this.saveImage($rotate, $photo->getContentUrl());
     }
 
     private function loadImage($photo) {
@@ -87,6 +85,18 @@ class RotatePhotoController extends AbstractController {
         }
         else if ( $photo->getMimeType() == 'image/png' ) {
             return imagecreatefrompng($photo->getContentUrl());
+        }
+        throw new \Exception('The image is neither a jpeg nor a png.');        
+    }
+
+    private function saveImage($photo) {
+        // Load the image
+        if ( $photo->getMimeType() == 'image/jpeg' ) {
+            return imagejpeg($photo);
+        }
+        else if ( $photo->getMimeType() == 'image/png' ) {
+            imagesavealpha($photo, true);
+            return imagepng($photo);
         }
         throw new \Exception('The image is neither a jpeg nor a png.');        
     }
