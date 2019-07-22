@@ -232,6 +232,12 @@ class ArrayToOccurrenceTransformer {
 		    $occ->setDateObserved($this->datishToDate($strObsDate));
 	    }
 
+
+        $taxoRepo = $csvLine[$this->headerIndexArray['Référentiel taxonomique']];
+	    if ( ( null == $taxoRepo ) || ( '' == $taxoRepo ) )  {
+		    $occ->setTaxoRepo('Autre/inconnu');
+	    }
+
 	    return $occ;	
 	
     }
