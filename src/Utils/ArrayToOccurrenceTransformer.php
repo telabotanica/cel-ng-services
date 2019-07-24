@@ -53,7 +53,6 @@ class ArrayToOccurrenceTransformer {
             'Referentiel taxonomique' => 'taxoRepo'
         );
 
-    // Map between CSV headers (keys) and Occurrence members (values)
     const ALLOWED_TAXO_REPOS = array(
             TaxoRepoEnumType::BDTFE, 
             TaxoRepoEnumType::BDTFX, 
@@ -156,32 +155,33 @@ class ArrayToOccurrenceTransformer {
             'App\Entity\UserOccurrenceTag');
 
         foreach($tagNames as $tagName) {
+            if ( ( $tagName !== '' ) && ( null !== $tagName ) ) {
+                $tags = $userOccurrenceTagRepo->findByNameAndUserId(
+                    $tagName, $user->getId());
 
-            $tags = $userOccurrenceTagRepo->findByNameAndUserId(
-                $tagName, $user->getId());
+                if ( sizeof($tags)>0 ) {
+                    // creates and persists a new OccurrenceUserOccurrenceTag 
+                    // relation with 
+		            $rel = new OccurrenceUserOccurrenceTagRelation(); 
+                    $rel->setUserOccurrenceTag($tags[0]);
+                    $rel->setOccurrence($occ);
+		            $em->persist($rel);
+                }
+                else {
+                    $newTag = new UserOccurrenceTag();
+                    $newTag->setName($tagName);
+		            // make it a root tag
+                    $newTag->setPath('/');
+                    $newTag->setUserId($user->getId());
+                    $em->persist($newTag);
+		            $rel = new OccurrenceUserOccurrenceTagRelation(); 
+                    $rel->setUserOccurrenceTag($newTag);
+                    $rel->setOccurrence($occ);
+		            $em->persist($rel);
 
-            if ( sizeof($tags)>0 ) {
-                // creates and persists a new OccurrenceUserOccurrenceTag 
-                // relation with 
-		        $rel = new OccurrenceUserOccurrenceTagRelation(); 
-                $rel->setUserOccurrenceTag($tags[0]);
-                $rel->setOccurrence($occ);
-		        $em->persist($rel);
+                }
+                // @todo if >1, then log a warning
             }
-            else {
-                $newTag = new UserOccurrenceTag();
-                $newTag->setName($tagName);
-		        // make it a root tag
-                $newTag->setPath('/');
-                $newTag->setUserId($user->getId());
-                $em->persist($newTag);
-		        $rel = new OccurrenceUserOccurrenceTagRelation(); 
-                $rel->setUserOccurrenceTag($newTag);
-                $rel->setOccurrence($occ);
-		        $em->persist($rel);
-
-            }
-            // @todo if >1, then log a warning
         }
     	return $occ;
     }
