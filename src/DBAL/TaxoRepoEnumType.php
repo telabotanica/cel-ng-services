@@ -15,13 +15,14 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 class TaxoRepoEnumType extends Type {
 
     const TAXO_REPO_ENUM = 'taxorepoenum';
-    const BDTFE = 'bdtfe';
+    const BDTXA = 'bdtxa';
     const BDTFX = 'bdtfx';
-    const TAXREF = 'taxref';
-    const BDTFER = 'bdtfer';
-    const VASCAN = 'vascan';
+    const BDTFXR = 'bdtfxr';
+    const BDTRE = 'bdtre';
+    const FLORICAL = 'florical';
     const APD = 'apd';
     const LBF = 'lbf';
+    const AUBLET = 'aublet';
     const OTHERUNKNOWN = 'Autre/inconnu';
 
     /**
@@ -29,7 +30,7 @@ class TaxoRepoEnumType extends Type {
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) {
  
-        return "ENUM('bdtfe', 'bdtfx', 'taxref', 'bdtfer', 'vascan', 'apd', 'lbf', 'Autre/inconnu')";
+        return "ENUM('bdtxa', 'bdtfx', 'bdtfxr', 'bdtre', 'florical', 'apd', 'lbf', 'aublet', 'Autre/inconnu')";
     }
 
     /**
@@ -45,7 +46,7 @@ class TaxoRepoEnumType extends Type {
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform) {
  
-        if (!in_array($value, array(null, self::BDTFE, self::BDTFX, self::TAXREF, self::BDTFER, self::VASCAN, self::APD, self::LBF, self::OTHERUNKNOWN))) {
+        if (!in_array($value, array(null, self::BDTXA, self::BDTFX, self::BDTFXR, self::BDTRE, self::FLORICAL, self::APD, self::LBF, self::AUBLET, self::OTHERUNKNOWN))) {
             throw new \InvalidArgumentException("Invalid taxo repository");
         }
         return $value;

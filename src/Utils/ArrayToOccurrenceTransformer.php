@@ -54,15 +54,15 @@ class ArrayToOccurrenceTransformer {
         );
 
     const ALLOWED_TAXO_REPOS = array(
-            TaxoRepoEnumType::BDTFE, 
             TaxoRepoEnumType::BDTFX, 
-            TaxoRepoEnumType::TAXREF, 
-            TaxoRepoEnumType::BDTFER, 
-            TaxoRepoEnumType::VASCAN, 
+            TaxoRepoEnumType::BDTXA, 
+            TaxoRepoEnumType::BDTFXR, 
+            TaxoRepoEnumType::BDTRE, 
+            TaxoRepoEnumType::FLORICAL, 
             TaxoRepoEnumType::APD, 
+            TaxoRepoEnumType::AUBLET, 
             TaxoRepoEnumType::LBF, 
-            TaxoRepoEnumType::OTHERUNKNOWN
-        );
+            TaxoRepoEnumType::OTHERUNKNOWN);
 
     public function __construct(RegistryInterface $doctrine)
     {
