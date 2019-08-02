@@ -44,7 +44,7 @@ class UserCustomFieldOccurrence
     * Valeur renseignée par l'utilisateur.
     *
     * @Assert\NotNull
-    * @ORM\Column(type="string", nullable=false, options={"comment":"Valeur renseignée par l'utilisateur"})
+    * @ORM\Column(type="text", nullable=false, options={"comment":"Valeur renseignée par l'utilisateur"})
     */
    private $value = null;
 

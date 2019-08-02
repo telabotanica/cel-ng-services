@@ -142,7 +142,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
      * Nom du fichier image.
      *
      * @Groups({"photo_read"})
-     * @ORM\Column(name="original_name", type="string", nullable=false,  length=190, options={"comment":"Nom du fichier image"})
+     * @ORM\Column(name="original_name", type="string", nullable=false,  length=255, options={"comment":"Nom du fichier image"})
      */
     private $originalName = null;
 
@@ -571,6 +571,11 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
        return $this->url;
    }
+
+    public function getMiniatureUrl(): ?string {
+       return str_replace('O', 'S', $this->url);
+   }
+
 
     public function setUrl(?string $url): self {
 

@@ -158,7 +158,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Observateur.
     *
     * @Groups({"read", "write"})
-    * @ORM\Column(type="string", nullable=false, options={"comment":"Observateur"})
+    * @ORM\Column(type="string", nullable=false, options={"comment":"Observateur", "default": null})
     */
    private $observer = null;
 
@@ -269,7 +269,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Commentaires concernant l'obs.
     *
     * @Groups({"read", "write"})
-    * @ORM\Column(type="string", nullable=true, options={"comment":"Commentaires concernant l'obs"})
+    * @ORM\Column(type="text", nullable=true, options={"comment":"Commentaires concernant l'obs"})
     */
    private $annotation = null;
 
@@ -361,7 +361,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Signature of an occurrence: should be unique. Used to detect duplicates
     * based on what the of fields which makes an occurrence unique.
     *
-    * @ORM\Column(type="string", nullable=false, options={"comment":"Vérification des doublons"})
+    * @ORM\Column(type="string", nullable=false, options={"comment":"Vérification des doublons", "default": null})
     */
    private $signature = null;
 
@@ -402,7 +402,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Localité où se trouve l'obs.
     *
     * @Groups({"read", "write"})
-    * @ORM\Column(type="string", nullable=true, options={"comment":"Code INSEE de la localité où se trouve l'obs"})
+    * @ORM\Column(type="integer", nullable=true, options={"comment":"Code INSEE de la localité où se trouve l'obs"})
     */
    private $localityInseeCode = null;
 

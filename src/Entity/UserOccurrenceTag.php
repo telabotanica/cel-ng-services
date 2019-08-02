@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "denormalization_context"={"groups"={"write"}}
  * })
  * @ORM\Entity(repositoryClass="App\Repository\UserOccurrenceTagRepository")
- * @ORM\Table(name="user_occurrence_tag", indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="user_id__name", columns={"user_id", "name"})}, options={"comment":"Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur)."})
+ * @ORM\Table(name="user_occurrence_tag", indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur)."})
  */
 class UserOccurrenceTag implements OwnedEntitySimpleInterface {
 

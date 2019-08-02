@@ -156,9 +156,17 @@ class ProjectSettings
     * Valeur(s) par défaut du champ 'environment' (milieux) de toutes les obs du projet
     *
     * @Groups({"read"})
-    * @ORM\Column(type="string", nullable=true, options={"comment":"Valeur(s) par défaut du champ 'environment' (milieux) de toutes les obs du projet"})
+    * @ORM\Column(name="environments", type="string", nullable=true, options={"comment":"Valeur(s) par défaut du champ 'environment' (milieux) de toutes les obs du projet"})
     */
    private $environment = null;
+
+   /**
+    * .
+    *
+    * @Groups({"read"})
+    * @ORM\Column(type="string", length=15, nullable=true)
+    */
+   private $info = null;
 
    /**
     * Précision géographique à laquelle est publiée l'obs, permet de gérer le 
@@ -186,6 +194,9 @@ class ProjectSettings
      * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
      */
     private $project;
+
+
+
 
    /**
     * Gets triggered only on insert
@@ -284,6 +295,19 @@ class ProjectSettings
        $this->imageFont = $imageFont;
        return $this;
    }
+
+    public function getInfo(): ?string
+    {
+        return $this->info;
+    }
+
+    public function setInfo(string $info): self
+    {
+        $this->info = $info;
+
+        return $this;
+    }
+
    public function getDateCreated(): ?\DateTimeInterface
    {
        return $this->dateCreated;
@@ -332,14 +356,14 @@ class ProjectSettings
        return $this;
    }
 
-   public function getEnvironment()
+   public function getEnvironments()
    {
-       return $this->environment;
+       return $this->environments;
    }
 
-   public function setEnvironment($environment): self
+   public function setEnvironments($environments): self
    {
-       $this->environment = $environment;
+       $this->environments = $environments;
        return $this;
    }
 

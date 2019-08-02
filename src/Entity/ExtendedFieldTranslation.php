@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -58,7 +57,7 @@ class ExtendedFieldTranslation
 
    /**
     * @Groups({"read", "write"})
-    * @ORM\Column(name="default_value", type="string", length=255, nullable=true, options={"comment":"Valeur par défaut"})
+    * @ORM\Column(name="default_value", type="text", length=255, nullable=true, options={"comment":"Valeur par défaut"})
     */
    private $defaultValue = null;
 
@@ -75,6 +74,15 @@ class ExtendedFieldTranslation
     * @ORM\Column(name="language_iso_code", type="string", nullable=true, length=3, options={"comment":"Code iso de la langue"})
     */
    private $languageIsoCode = null;
+
+
+   /**
+    * .
+    *
+    * @Groups({"read"})
+    * @ORM\Column(type="string", length=15, nullable=true)
+    */
+   private $help = null;
 
    /**
      * The ExtendedField this translation is related to.
@@ -98,6 +106,18 @@ class ExtendedFieldTranslation
     public function setLabel(string $label): self
     {
         $this->label = $label;
+
+        return $this;
+    }
+
+    public function getHelp(): ?string
+    {
+        return $this->help;
+    }
+
+    public function setHelp(string $help): self
+    {
+        $this->help = $help;
 
         return $this;
     }

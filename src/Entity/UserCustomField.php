@@ -69,11 +69,11 @@ class UserCustomField
    private $defaultValue;
 
     /**
-     * The profile of the user who created this UserCustomField .
-     * @ORM\ManyToOne(targetEntity="UserProfileCel", inversedBy="userCustomFields")
-     * @ORM\JoinColumn(name="user_profile_id", referencedColumnName="id")
+     * The id of the user who created this UserCustomField .
+     *
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
-    private $userProfile;
+    private $userId;
 
     /**
      * The references to occurrences this ExtendedField has values for.
