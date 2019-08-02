@@ -9,7 +9,6 @@
         "api-platform/api-pack": "^1.1",
         "fresh/vich-uploader-serialization-bundle": "~2.1",
         "friendsofsymfony/elastica-bundle": "^5.0",
-        "lexik/jwt-authentication-bundle": "^2.5",
         "liip/imagine-bundle": "^2.0",
         "phpoffice/phpspreadsheet": "^1.5",
         "sensio/framework-extra-bundle": "^5.2",
