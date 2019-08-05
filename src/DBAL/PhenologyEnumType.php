@@ -17,21 +17,21 @@ class PhenologyEnumType extends Type {
     const PHENOLOGY_ENUM = 'phenologyenum';
     const ZERO_NINE = '00-09: germination, développement des bourgeons';
     const TEN_NINETEEN = '10-19: développement des feuilles';
-    const ELEVEN = '11: par ex, environ 10% des feuilles épanouies';
-    const FIFTEEN = '15: par ex, environ 50% des feuilles épanouies';
+    const ELEVEN = '11: environ 10% des feuilles épanouies';
+    const FIFTEEN = '15: environ 50% des feuilles épanouies';
     const TWENTY_TWENTYNINE = '20-29: formation de pousses latérales, tallage';
     const THIRTY_THIRTY_NINE = '30-39: développement des tiges, croissance des rosettes';
     const FORTY_FORTYNINE = '40-49: développement des organes de propagation végétative';
     const FIFTY_FIFTYNINE = '50-59: apparition de l\'inflorescence, épiaison';
     const SIXTY_SIXTYNINE = '60-69: floraison';
-    const SIXTYONE = '61: par ex, environ 10% des fleurs épanouies';
-    const SIXTYFIVE = '65: par ex, environ 50% des fleurs épanouies';
+    const SIXTYONE = '61: environ 10% des fleurs épanouies';
+    const SIXTYFIVE = '65: environ 50% des fleurs épanouies';
     const SEVENTY_SEVENTYNINE = '70-79: fructification';
     const HEIGHTY_HEIGHTYNINE = '80-89: maturité des fruits et des graines';
-    const HEIGHTYFIVE = '85: par ex, 50% des fruits matures';
+    const HEIGHTYFIVE = '85: environ 50% des fruits matures';
     const NINETY_NINETYNINE = '90-99: sénescence et dormance';
-    const NINETYONE = '91: par ex, environ 10% des feuilles jaunes';
-    const NINETYFIVE = '95: par ex, environ 50% des feuilles jaunes';
+    const NINETYONE = '91: environ 10% des feuilles sont tombées ou ont changé de couleur';
+    const NINETYFIVE = '95: environ 50% des feuilles sont tombées ou ont changé de couleur';
 
     /**
      * @inheritdoc
@@ -45,15 +45,16 @@ class PhenologyEnumType extends Type {
                "'20-29: formation de pousses latérales, tallage', " .
                "'30-39: développement des tiges, croissance des rosettes', " .
                "'40-49: développement des organes de propagation végétative', " .
-               "'floraison', " .
+               "'50-59: apparition de l'inflorescence, épiaison', " .
+               "'60-69: floraison', " .
                "'61: par ex, environ 10% des fleurs épanouies', " .
                "'65: par ex, environ 50% des fleurs épanouies', " .
                "'70-79: fructification', " .
                "'80-89: maturité des fruits et des graines', " .
                "'85: par ex, 50% des fruits matures', " .
                "'90-99: sénescence et dormance', " .
-               "'91: par ex, environ 10% des feuilles jaunes', " .
-               "'95: par ex, environ 50% des feuilles jaunes')";
+               "'91: environ 10% des feuilles sont tombées ou ont changé de couleur', " .
+               "'95: environ 50% des feuilles sont tombées ou ont changé de couleur')";
     }
 
     /**
