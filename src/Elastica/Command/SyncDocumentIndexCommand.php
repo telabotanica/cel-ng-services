@@ -7,30 +7,29 @@ use App\Utils\ElasticsearchClient;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+
+use FOS\ElasticaBundle\Index\IndexManager;
 
 /** 
  * Simple command which loads change notifications from change_log table and 
  * mirrors DB changes in ES indexes. change_log table is populated using
  * SQL triggers.
  */
-class SyncDocumentIndexCommand extends ContainerAwareCommand {
+class SyncDocumentIndexCommand  extends Command {
 
     private $changeLogs;
-    private $persister;
     private $entityManager;
-    private $container;
 
 
     public function __construct(ContainerInterface $container) {
-        $this->container = $container;
-        $this->entityManager = $this->container->get('Doctrine\ORM\EntityManagerInterface');
-        $this->persister = $this->container->get('FOS\ElasticaBundle\Persister\ObjectPersisterInterface');
+        $this->entityManager = $container->get('doctrine')->getManager();
         parent::__construct();
     }
 
@@ -46,12 +45,16 @@ class SyncDocumentIndexCommand extends ContainerAwareCommand {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
+        $output->writeln("Loading change logs...");
         $this->init();
+        $output->writeln("Change logs loaded.");
         foreach( $this->changeLogs as $changeLog) {
-            $this->executeAction($changeLog, $entity);       
+            $this->executeAction($changeLog, $entity);   
+            $output->writeln("Change log managed.");    
         }
+        $output->writeln("All changes have been mirrored.");
         $this->deleteChangeLogs();
-        $output->writeln("All changes have been mirrored and associated ChangeLog records have been deleted.");
+        $output->writeln("Associated ChangeLog records have been deleted.");
     }
 
     private function deleteChangeLogs() {   
@@ -63,21 +66,20 @@ class SyncDocumentIndexCommand extends ContainerAwareCommand {
 
     private function loadChangeLogs() {
         return $this->entityManager->getRepository('App:ChangeLog')->findAll();
-
     }
 
     private function executeAction($changeLog, $entity){
         switch ($changeLog->getActionType()) {
             case "create":
-                $entity = $this->getRepository($changeLog->getEntityName());
+                $entity = $this->getRepository($changeLog->getEntityName())->find($changeLog->getEntityId());
                 $this->createDocument($entity);
             break;
             case "update":
-                $entity = $this->getRepository($changeLog->getEntityName());
+                $entity = $this->getRepository($changeLog->getEntityName())->find($changeLog->getEntityId());
                 $this->updateDocument($entity);
             break;
             case "delete":
-                $this->deleteDocument($changeLog->getEntityId());
+                $this->deleteDocument($changeLog->getEntityId(), $changeLog->getEntityName());
             break;        
         }
 
@@ -85,18 +87,21 @@ class SyncDocumentIndexCommand extends ContainerAwareCommand {
     }
 
     private function getRepository($entityClassName) {
-        return $this->entityManager->getRepository('App:' . entityClassName);
+        return $this->entityManager->getRepository('App:' . ucfirst($entityClassName));
     }
 
 
 
-    private function deleteDocument(int $id) {
+    private function deleteDocument(int $id, string $resourceTypeName) {
         ElasticsearchClient::deleteById($id, $resourceTypeName);
     }
 
     private function updateDocument(object $entity) {
         // Just loads the entity, updates its new dateUpdated and  persists it. It will trigger indexinsertion
-        $this->persister->replaceOne($entity);
+
+        $entity->setDateUpdated(new \DateTime());
+        $this->entityManager->flush();        
+        //$this->persister->replaceOne($entity);
 
     }
 
