@@ -402,7 +402,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Localité où se trouve l'obs.
     *
     * @Groups({"read", "write"})
-    * @ORM\Column(type="integer", nullable=true, options={"comment":"Code INSEE de la localité où se trouve l'obs"})
+    * @ORM\Column(type="string", nullable=true, options={"comment":"Code INSEE de la localité où se trouve l'obs"})
     */
    private $localityInseeCode = null;
 
