@@ -141,7 +141,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Nom du fichier image.
      *
-     * @Groups({"photo_read"})
+     * @Groups({"photo_read", "read"})
      * @ORM\Column(name="original_name", type="string", nullable=false,  length=255, options={"comment":"Nom du fichier image"})
      */
     private $originalName = null;
@@ -273,7 +273,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
       * @ORM\ManyToOne(targetEntity="Occurrence", inversedBy="photos")
       * @ORM\JoinColumn(name="occurrence_id", referencedColumnName="id")
       * @ApiSubresource(maxDepth=1)
-      * @Groups({"photo_read", "write"}) 
+      * @Groups({"photo_read", "read", "write"}) 
       */
      private $occurrence;
 

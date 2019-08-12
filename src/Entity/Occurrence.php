@@ -122,7 +122,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
    /**
-    * @Groups({"read"})
+    * @Groups({"read", "photo_read"})
     * @ORM\Id
     * @ORM\Column(type="integer")
     * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -173,7 +173,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
    /**
     * Date de l'obs.
     *
-    * @Groups({"read", "write"})
+    * @Groups({"read", "write", "photo_read"})
     * @ORM\Column(name="date_observed", type="datetime", nullable=true, options={"comment":"Date d'observation"})
     */
    private $dateObserved = null;
@@ -209,7 +209,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Nom saisi par l'utilisateur (nom scientifique ou autre terme qualifiant
     * l'individu observé).
     * 
-    * @Groups({"read", "write"})
+    * @Groups({"read", "write", "photo_read"})
     * @ORM\Column(name="user_sci_name", type="string", nullable=true, options={"comment":"Nom saisi par l'utilisateur (nom scientifique ou autre terme qualifiant  l'individu observé)"})
     */
    private $userSciName = null;
@@ -218,7 +218,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Numéro du nom saisi par l'utilisateur, dans le cas où celui-ci est lié 
     * à un référentiel.
     * 
-    * @Groups({"read", "write"})
+    * @Groups({"read", "write", "photo_read"})
     * @ORM\Column(name="user_sci_name_id", type="integer", nullable=true, options={"comment":"Numéro du nom (ou numéro nomenclatural ou nn) saisi par l'utilisateur, dans le cas où celui-ci est lié à un référentiel"})
     */
    private $userSciNameId = null;
@@ -361,7 +361,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Signature of an occurrence: should be unique. Used to detect duplicates
     * based on what the of fields which makes an occurrence unique.
     *
-    * @ORM\Column(type="string", nullable=false, options={"comment":"Vérification des doublons", "default": null})
+    * @ORM\Column(type="text", nullable=false, options={"comment":"Vérification des doublons", "default": null})
     */
    private $signature = null;
 
