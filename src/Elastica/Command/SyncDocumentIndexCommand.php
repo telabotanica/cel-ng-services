@@ -49,8 +49,8 @@ class SyncDocumentIndexCommand  extends Command {
         $this->init();
         $output->writeln("Change logs loaded.");
         foreach( $this->changeLogs as $changeLog) {
-            $this->executeAction($changeLog, $entity);   
-            $output->writeln("Change log managed.");    
+            $this->executeAction($changeLog);   
+            $output->writeln("Change log mirrored in ES index.");    
         }
         $output->writeln("All changes have been mirrored.");
         $this->deleteChangeLogs();
@@ -68,7 +68,7 @@ class SyncDocumentIndexCommand  extends Command {
         return $this->entityManager->getRepository('App:ChangeLog')->findAll();
     }
 
-    private function executeAction($changeLog, $entity){
+    private function executeAction($changeLog){
         switch ($changeLog->getActionType()) {
             case "create":
                 $entity = $this->getRepository($changeLog->getEntityName())->find($changeLog->getEntityId());
