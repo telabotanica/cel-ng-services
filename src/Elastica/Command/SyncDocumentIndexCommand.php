@@ -49,8 +49,13 @@ class SyncDocumentIndexCommand  extends Command {
         $this->init();
         $output->writeln("Change logs loaded.");
         foreach( $this->changeLogs as $changeLog) {
-            $this->executeAction($changeLog);   
-            $output->writeln("Change log mirrored in ES index.");    
+            if ( in_array($changeLog->getEntityName()) ) {
+                $this->executeAction($changeLog);   
+                $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
+            }
+            else {
+
+            }
         }
         $output->writeln("All changes have been mirrored.");
         $this->deleteChangeLogs();
@@ -72,14 +77,20 @@ class SyncDocumentIndexCommand  extends Command {
         switch ($changeLog->getActionType()) {
             case "create":
                 $entity = $this->getRepository($changeLog->getEntityName())->find($changeLog->getEntityId());
-                $this->createDocument($entity);
+                if ($entity !== null) {
+                    $this->createDocument($entity);
+                }
             break;
             case "update":
                 $entity = $this->getRepository($changeLog->getEntityName())->find($changeLog->getEntityId());
-                $this->updateDocument($entity);
+                if ($entity !== null) {
+                    $this->updateDocument($entity);
+                }
             break;
             case "delete":
-                $this->deleteDocument($changeLog->getEntityId(), $changeLog->getEntityName());
+                if ($entity !== null) {
+                    $this->deleteDocument($changeLog->getEntityId(), $changeLog->getEntityName());
+                }
             break;        
         }
 
@@ -97,17 +108,14 @@ class SyncDocumentIndexCommand  extends Command {
     }
 
     private function updateDocument(object $entity) {
-        // Just loads the entity, updates its new dateUpdated and  persists it. It will trigger index insertion
+        // Just loads the entity, updates its new dateUpdated and  persists it. It will trigger index insertion/update
         $entity->setDateUpdated(new \DateTime());
         $this->entityManager->flush();        
-        //$this->persister->replaceOne($entity);
-
     }
 
 
     private function createDocument(object $entity) {
         $this->updateDocument($entity);
-
     }
 
-}
+}   
