@@ -97,8 +97,7 @@ class SyncDocumentIndexCommand  extends Command {
     }
 
     private function updateDocument(object $entity) {
-        // Just loads the entity, updates its new dateUpdated and  persists it. It will trigger indexinsertion
-
+        // Just loads the entity, updates its new dateUpdated and  persists it. It will trigger index insertion
         $entity->setDateUpdated(new \DateTime());
         $this->entityManager->flush();        
         //$this->persister->replaceOne($entity);
