@@ -3,6 +3,7 @@
 namespace App\Elastica\Command;
 
 use App\Utils\ElasticsearchClient;
+use App\Elastica\Command\UnknownEntityNameException;
 
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 
@@ -26,6 +27,7 @@ class SyncDocumentIndexCommand  extends Command {
 
     private $changeLogs;
     private $entityManager;
+    private const ALLOWED_ENTITY_NAMES = ['occurrence', 'photo'];
 
 
     public function __construct(ContainerInterface $container) {
@@ -49,13 +51,14 @@ class SyncDocumentIndexCommand  extends Command {
         $this->init();
         $output->writeln("Change logs loaded.");
         foreach( $this->changeLogs as $changeLog) {
-           // if ( in_array($changeLog->getEntityName()) ) {
+            if ( in_array($changeLog->getEntityName(), SyncDocumentIndexCommand::ALLOWED_ENTITY_NAMES) ) {
                 $this->executeAction($changeLog);   
                 $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
-           // }
-           // else {
-
-           // }
+            }
+            else {
+                $ex = new UnknownEntityNameException('Unknwown entity name: ' . $changeLog->getEntityName());
+                throw $ex;
+            }
         }
         $output->writeln("All changes have been mirrored.");
         $this->deleteChangeLogs();
