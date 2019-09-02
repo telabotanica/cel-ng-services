@@ -49,13 +49,13 @@ class SyncDocumentIndexCommand  extends Command {
         $this->init();
         $output->writeln("Change logs loaded.");
         foreach( $this->changeLogs as $changeLog) {
-            if ( in_array($changeLog->getEntityName()) ) {
+           // if ( in_array($changeLog->getEntityName()) ) {
                 $this->executeAction($changeLog);   
                 $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
-            }
-            else {
+           // }
+           // else {
 
-            }
+           // }
         }
         $output->writeln("All changes have been mirrored.");
         $this->deleteChangeLogs();
