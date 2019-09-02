@@ -93,9 +93,7 @@ class SyncDocumentIndexCommand  extends Command {
                 }
             break;
             case "delete":
-                if ($entity !== null) {
                     $this->deleteDocument($changeLog->getEntityId(), $changeLog->getEntityName());
-                }
             break;        
         }
 
