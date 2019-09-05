@@ -24,7 +24,7 @@ use FOS\ElasticaBundle\Persister\ObjectPersister;
  */
 class SyncDocumentIndexCommand  extends Command {
 
-    private $changeLogs;
+    private $changeLogsAsIterable;
     private $entityManager;
     private $occurrencePersister;
     private $photoPersister;
@@ -45,37 +45,46 @@ class SyncDocumentIndexCommand  extends Command {
     }
 
     private function init() {
-        $this->changeLogs = $this->loadChangeLogs();
+        $this->changeLogsAsIterable = $this->loadChangeLogsAsIterable();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $output->writeln("Loading change logs...");
         $this->init();
         $output->writeln("Change logs loaded.");
-        foreach( $this->changeLogs as $changeLog) {
+
+        $counter = 0;
+
+        foreach( $this->changeLogsAsIterable as $row) {
+
+            $changeLog = $row[0];
+
             if ( in_array($changeLog->getEntityName(), SyncDocumentIndexCommand::ALLOWED_ENTITY_NAMES) ) {
                 $this->executeAction($changeLog);   
                 $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
+                $this->entityManager->remove($changeLog);
+                // Should not be required, removing should detach
+                //$this->entityManager->detach($changeLog);
+                $counter++;
+                if ( $counter%50 === 0 ) {
+                    $this->entityManager->flush();
+                } 
             }
             else {
                 $ex = new UnknownEntityNameException('Unknwown entity name: ' . $changeLog->getEntityName());
                 throw $ex;
             }
         }
-        $output->writeln("All changes have been mirrored.");
-        $this->deleteChangeLogs();
-        $output->writeln("Associated ChangeLog records have been deleted.");
-    }
-
-    private function deleteChangeLogs() {   
-        foreach( $this->changeLogs as $changeLog) {
-            $this->entityManager->remove($changeLog);     
-        }
         $this->entityManager->flush();
+        $output->writeln("All changes have been mirrored.");
+
     }
 
-    private function loadChangeLogs() {
-        return $this->entityManager->getRepository('App:ChangeLog')->findAll();
+
+    private function loadChangeLogsAsIterable() {
+        // return $this->entityManager->getRepository('App:ChangeLog')->findAll();
+        $q = $this->entityManager->createQuery('select u from App\Entity\ChangeLog u');
+        return $q->iterate();
     }
 
     private function executeAction($changeLog){
