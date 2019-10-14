@@ -4,23 +4,28 @@ namespace App\Controller;
 
 use App\Entity\PhotoTag;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
-use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Dotenv\Dotenv;
 
 /** 
  * Simple proxy to the export widget API.
  */
-// @todo do tags mots_cles + prj, privé, certitude + ids
 class ExportOccurrenceAction {
 /*
 https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilisateur=delphine%40tela-botanica.org&pays=FR%2CFX%2CGF%2CPF%2CTF&zone_geo=Montpellier&departement=34&mots_cles=defiPhoto&programme=missions-flore&taxon=viola&annee=2019&mois=08&jour=22&validation_identiplante=1&standard=1&date_debut=19%2F06%2F2019&debut=0&limite=20000&format=csv&colonnes=standardexport,avance,etendu,baseflor,auteur,standard
 */
+    const EXPORT_PREFIX = 'ExportCel_';
+    const EXPORT_EXTENSION = ".csv";
 
     // the <code>Security</code> service to retrieve the current user:
     protected $security;
     protected $entityManager;
+
+    private $tmpFolder;
 
     // Mapping between CEL2 filter params and the occurrence export Web service
     // ones - only params that justs needs to be directly translated to the 
@@ -37,14 +42,7 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
         'certainty'      => 'certitude',
         'isPublic' => 'transmission',
     );
-    private const HEADERS = array(
-        "Content-Disposition:attachment;filename=cel_export.csv",
-        "Content-Type:text/csv; charset=UTF-8",
-        "isIdentiplanteValidated" => 'validation_identiplante',
-        "Cache-Control:no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
-        "Keep-Alive:timeout=30",
-        "Pragma:no-cache"
-    );
+
 
     private const PARAM_VALUE_MAPPING = array(
         'true'   => 1,
@@ -72,6 +70,7 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
 
         $this->security = $security;
         $this->entityManager = $entityManager;
+        $this->tmpFolder = getenv('TMP_FOLDER');
     }
 
 
@@ -81,25 +80,33 @@ https://api.tela-botanica.org/service:cel:CelWidgetExport/export?courriel_utilis
         set_time_limit(0);
         $url = $this->buildUrl($request);
 
+        $exportFileName = ExportOccurrenceAction::EXPORT_PREFIX . time();
+        $exportFileName .= ExportOccurrenceAction::EXPORT_EXTENSION;
+        $exportFilePath = $this->tmpFolder . '/' . $exportFileName;
+
         try {
-            $fp = fopen($url, 'rb');
-            
-            foreach(ExportOccurrenceAction::HEADERS as $header) {
-                // Why the hell do we get a silent 500 error when executing this...?
-                // header($header);
-            }
-            header("Content-Disposition:attachment;filename=cel_export.csv");
-            header("Content-Type:text/csv; charset=UTF-8");
-            header("Cache-Control:no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-            header("Keep-Alive:timeout=30");
-            header("Pragma:no-cache");
-            fpassthru($fp);
-        } catch (\Throwable $t) {
+
+            file_put_contents($exportFilePath, fopen($url, 'r'));
+            // Now send the generated file:
+            $response = new Response(file_get_contents($exportFilePath));
+            $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+            $response->headers->set(
+                'Content-Disposition', 
+                'attachment;filename="' . $exportFileName . '"');
+            $response->headers->set(
+                'Content-length', 
+                filesize($exportFilePath));
+
+            return $response;
+
+        } catch (\Exception $t) {
+
             // Translate the error message raised by the proxied service: 
-            $jsonResp = array('errorMessage' => $t.getMessage());
+            $jsonResp = array('errorMessage' => $t->getMessage());
             // Return a  500 with an informative msg as JSON:
             return new Response(json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, []);
         }   
+
         // Restore the timeout to its default, 30 secs, value:
         set_time_limit(30);
         exit;

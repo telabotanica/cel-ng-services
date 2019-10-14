@@ -399,18 +399,15 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    }
 
     public function getDateShotMonth(): ?float {
-
-       return $this->dateShot->format('m');
+       return (null !== $this->dateShot) ? $this->dateShot->format('m') : null;
    }
 
     public function getDateShotYear(): ?float {
-
-       return $this->dateShot->format('Y');
+       return (null !== $this->dateShot) ? $this->dateShot->format('Y') : null;
    }
 
     public function getDateShotDay(): ?float {
-
-       return $this->dateShot->format('d');
+       return (null !== $this->dateShot) ? $this->dateShot->format('d') : null;
    }
 
 
@@ -520,6 +517,31 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
        return $this->contentUrl;
    }
+
+    /**
+     * Returns an array containg the paths to all the images (all sizes) for 
+     * this photo.
+     */
+    public function getContentUrls(): ?array {
+
+        $paths = [$this->contentUrl];
+        $sizes = ['S', 'CRL', 'L', 'XL', 'X2L'];
+
+       foreach ($sizes as $size) {  
+            $paths[] = $this->getContentUrlForSize($size);
+        } 
+
+       return $paths;
+   }
+
+    private function getContentUrlForSize($size) {
+
+            $path = $this->contentUrl;
+            $crtPath = str_replace('_O', '_' . $size, $path);
+            $crtPath = str_replace('/O', '/' . $size, $crtPath);
+
+       return $crtPath;
+    }
 
     public function getMimeType(): ?string {
 

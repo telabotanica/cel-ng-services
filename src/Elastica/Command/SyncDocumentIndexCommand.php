@@ -53,7 +53,8 @@ class SyncDocumentIndexCommand  extends Command {
         $this->init();
         $output->writeln("Change logs loaded.");
 
-        $counter = 0;
+	$counter = 0;
+	$variator = 1;
 
         foreach( $this->changeLogsAsIterable as $row) {
 
@@ -61,14 +62,21 @@ class SyncDocumentIndexCommand  extends Command {
 
             if ( in_array($changeLog->getEntityName(), SyncDocumentIndexCommand::ALLOWED_ENTITY_NAMES) ) {
                 $this->executeAction($changeLog);   
-                $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
-                $this->entityManager->remove($changeLog);
+                //$output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
+                //$this->entityManager->remove($changeLog);
                 // Should not be required, removing should detach
                 //$this->entityManager->detach($changeLog);
                 $counter++;
-                if ( $counter%50 === 0 ) {
-                    $this->entityManager->flush();
-                } 
+		if ( $counter%10000 === 0 ) {
+			$s = microtime(true);
+			$this->entityManager->flush();
+			$e = microtime(true);
+			$output->writeln("Flushed $counter rows in " . ($e - $s));
+			$this->entityManager->clear();
+			$counter = 0;
+
+                    $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
+		}
             }
             else {
                 $ex = new UnknownEntityNameException('Unknwown entity name: ' . $changeLog->getEntityName());
@@ -76,6 +84,7 @@ class SyncDocumentIndexCommand  extends Command {
             }
         }
         $this->entityManager->flush();
+	$this->entityManager->clear();
         $output->writeln("All changes have been mirrored.");
 
     }

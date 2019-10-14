@@ -7,6 +7,7 @@ use App\Security\User\UnloggedAccessException;
 
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
+use Elastica\Query\MatchPhrase;
 use Elastica\Query\Match;
 
 /*
@@ -44,7 +45,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         $getttterName = 'get' . ucfirst($fieldName);
 
         if ( (null !== $occSearch->$getttterName()) && ('' !== $occSearch->$getttterName()) ) {
-            $query = new Match();
+            $query = new MatchPhrase();
             $query->setField($fieldName, $occSearch->$getttterName());
             $fFilter->addMust($query);
         }
@@ -71,7 +72,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
     }
 
     protected function addShouldQuery($fFilter, $strQuery, $fieldName) {
-        $query = new Match();
+        $query = new MatchPhrase();
         $query->setField($fieldName, $strQuery);
         $fFilter->addShould($query);
 

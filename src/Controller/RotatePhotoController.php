@@ -54,6 +54,7 @@ class RotatePhotoController extends AbstractController {
         $id = $request->query->get('photoId');
         // @refactor: create a transient ImageRotation entity + auto hydrate using symfoy forms instead
         $photo = null;
+
         $photoRepo = $this->doctrine->getRepository('App\Entity\Photo');
         $photo = $photoRepo->find($id);
         $degrees = $request->query->get('degrees') ? $request->query->get('degrees') : 90;
@@ -65,31 +66,54 @@ class RotatePhotoController extends AbstractController {
 
             return new Response(json_encode($jsonResp), Response::HTTP_OK, []);
         } catch (\Throwable $t) {
-var_dump($t);
-            $jsonResp = array('errorMessage' => $t.getMessage());
+
+            $jsonResp = array('errorMessage' => 'Impossible to rotate the images associated to thei photo. An error occurred...');
             return new Response(json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, []);
+
         }   
         exit;
     }
 
     private function rotatePhoto($photo, $degrees) {
-        $source = $this->loadImage($photo);
+
         $mimetype = $photo->getMimeType();
-        // Rotate the image:
-        $rotate = imagerotate($source, $degrees, 0);
-        $this->saveImage($rotate, $mimetype, $photo->getContentUrl());
+
+        $imgs = $this->loadImages($photo);
+
+       foreach ($imgs as $path => $img) {  
+//var_dump($imgs);
+            // Rotate the image:
+            $rotate = imagerotate($img, $degrees, 0);
+            $this->saveImage($rotate, $mimetype, $path);
+
+        } 
+
     }
 
-    private function loadImage($photo) {
-        // Load the image
-        if ( $photo->getMimeType() == 'image/jpeg' ) {
-            return imagecreatefromjpeg($photo->getContentUrl());
-        }
-        else if ( $photo->getMimeType() == 'image/png' ) {
-            return imagecreatefrompng($photo->getContentUrl());
-        }
-        throw new \Exception('The image is neither a jpeg nor a png.');        
+    private function loadImages($photo) {
+
+        $paths = $photo->getContentUrls();
+
+        $imgs = [];
+
+       foreach ($paths as $path) { 
+            if ( file_exists($path) ) {
+                // Load the image
+                if ( $photo->getMimeType() == 'image/jpeg' ) {
+                    $imgs[$path] = imagecreatefromjpeg($path);
+                }
+                else if ( $photo->getMimeType() == 'image/png' ) {
+                    $imgs[$path] = imagecreatefrompng($path);
+                }
+                else {
+                    throw new \Exception('The image is neither a jpeg nor a png.');
+                }
+            }
+        } 
+        
+        return $imgs;
     }
+
 
 
     private function extractMimeType($photo) {
