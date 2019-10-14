@@ -15,27 +15,13 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
         parent::__construct($registry, UserOccurrenceTag::class);
     }
 
+
     /**
      * @return UserOccurrenceTag[] Returns an array of UserOccurrenceTag 
      * entities with the given user id.
      */
     public function findByUserId($userId) {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.userId = :val2')
-            ->setParameter('val2', $userId)
-            ->orderBy('p.id', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * @return UserOccurrenceTag[] Returns an array of UserOccurrenceTag 
-     * entities with the given name.
-     */
-    public function findByNameAndUserId($name, $userId) {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.name = :val1')
-            ->setParameter('val1', $name)
             ->andWhere('p.userId = :val2')
             ->setParameter('val2', $userId)
             ->orderBy('p.id', 'ASC')
@@ -54,7 +40,6 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
             ->getResult();
     }
 
-
     public function getTagTree($userId) {
         $tree = [];
         $rootTags = $this->findByPathAndUserId('/', $userId);
@@ -69,16 +54,14 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
     }
 
     public function findChildren($tagName, $userId) {
-        return $this->getEntityManager()->createQuery("SELECT o FROM App:UserOccurrenceTag o WHERE o.userId =  :userId AND o.path = :parentName")
+        return $this->getEntityManager()->createQuery("SELECT o FROM App:UserOccurrenceTag o WHERE o.userId =  :userId AND o.path LIKE :parentName")
             ->setParameter('parentName', '%'.$tagName)
             ->setParameter('userId', $userId)
             ->getResult();
     }
 
-
     private function generateTagTree($entity, &$arr = [], $userId) {
         $name = $entity->getName();
-//echo(var_dump($name));
         $children = $this->findChildren($entity->getName(), $userId);
         $arr += [$entity->getName() => null];
 
@@ -91,6 +74,7 @@ class UserOccurrenceTagRepository extends ServiceEntityRepository {
 
         return $arr;
     }
+
 
 
 }
