@@ -2,6 +2,7 @@
 namespace App\Entity;
 
 use App\Entity\OwnedEntitySimpleInterface;
+use App\Entity\TagInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,6 +20,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * Mot-clé utilisateur des observations.
  *
+ * @package App\Entity
+ *
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
  *     "formats"={"jsonld", "json"},
@@ -27,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\UserOccurrenceTagRepository")
  * @ORM\Table(name="user_occurrence_tag", indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur)."})
  */
-class UserOccurrenceTag implements OwnedEntitySimpleInterface {
+class UserOccurrenceTag implements OwnedEntitySimpleInterface, TagInterface {
 
    /**
     * @Groups({"read"})
@@ -99,7 +102,7 @@ class UserOccurrenceTag implements OwnedEntitySimpleInterface {
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): TagInterface
     {
         $this->name = $name;
 
@@ -111,7 +114,7 @@ class UserOccurrenceTag implements OwnedEntitySimpleInterface {
         return $this->path;
     }
 
-    public function setPath(?string $path): self
+    public function setPath(?string $path): TagInterface
     {
         $this->path = $path;
 

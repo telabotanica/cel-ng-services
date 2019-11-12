@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\OwnedEntitySimpleInterface;
+use App\Entity\TagInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -24,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\PhotoTagRepository")
  * @ORM\Table(name="photo_tag",indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Mot-clé photo"})
  */
-class PhotoTag implements OwnedEntitySimpleInterface {
+class PhotoTag implements OwnedEntitySimpleInterface, TagInterface {
 
     /**
      * @Groups({"read"})
@@ -84,7 +85,7 @@ class PhotoTag implements OwnedEntitySimpleInterface {
         return $this->name;
     }
 
-    public function setName(string $name): self {
+    public function setName(string $name): TagInterface {
         $this->name = $name;
 
         return $this;
@@ -94,7 +95,7 @@ class PhotoTag implements OwnedEntitySimpleInterface {
         return $this->path;
     }
 
-    public function setPath(string $path): self {
+    public function setPath(string $path): TagInterface {
         $this->path = $path;
 
         return $this;
