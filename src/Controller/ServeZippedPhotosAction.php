@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Form\OccurrenceType;
 use App\Utils\FromArrayOccurrenceCreator;
+use App\Repository\PhotoRepository;
+
+use ZipArchive;
  
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Vich\UploaderBundle\Storage\StorageInterface;
@@ -68,7 +71,6 @@ final class ServeZippedPhotosAction {
      * @return Response Returns an HTTP <code>Response</code> reflecting
      *         the action result.
      */
-    // @refactor: reduce this method length by adding a generateZip() method
     public function __invoke(Request $request): Response {
 
         $zip = new \ZipArchive;
@@ -82,41 +84,46 @@ final class ServeZippedPhotosAction {
             \ZipArchive::CREATE)) {
 
             $em = $this->doctrine->getManager();
-		    $occRepo = $em->getRepository('App\Entity\Photo');
-
+		    $photoRepo = $em->getRepository('App\Entity\Photo');
             // @todo Do a DQL 'in' query instead:
             $ids = $request->query->get('id');
-            $photos = $occRepo->findById($ids);
-
-            // First generate the archive file:                 
-            foreach ($ids as $id) {
-                $photos = $occRepo->findById($id);
-                if (sizeof($photos)>0) {
-                    $photo = $photos[0];
-                    $zip->addFile($photo->getContentUrl(), basename($photo->getContentUrl()));
-                }
-            }
-
+            $photos = $photoRepo->findById($ids);
+            // First populate the archive file:                 
+            $this->populateZip($zip, $photoRepo, $ids); 
             $zip->close();
 
-            // Now send the generated file:
-            $response = new Response(file_get_contents($zipFilePath));
-            $response->headers->set('Content-Type', 'application/zip');
-            $response->headers->set(
-                'Content-Disposition', 
-                'attachment;filename="' . $zipName . '"');
-            $response->headers->set(
-                'Content-length', 
-                filesize($zipFilePath));
-
-            return $response;
-
+            // Then, send the generated file:
+            return $this->buildResponse($zipFilePath, $zipName);
         }
         else {
             $response = new Response();
             $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
             return $response;
         }
+    }
+
+
+    private function populateZip(ZipArchive $zip, PhotoRepository $repo, array $ids) {
+        foreach ($ids as $id) {
+            $photos = $repo->findById($id);
+            if (sizeof($photos)>0) {
+                $photo = $photos[0];
+                $zip->addFile($photo->getContentUrl(), basename($photo->getContentUrl()));
+            }
+        }
+    }
+
+    private function buildResponse(string $zipFilePath, string $zipName): Response {
+        $response = new Response(file_get_contents($zipFilePath));
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->headers->set(
+            'Content-Disposition', 
+            'attachment;filename="' . $zipName . '"');
+        $response->headers->set(
+            'Content-length', 
+            filesize($zipFilePath));
+
+        return $response;
     }
 
 }
