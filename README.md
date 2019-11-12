@@ -89,3 +89,13 @@ php bin/console server:stop
 
 You can then follow the symfony manual depending on the server you want to deploy on: https://symfony.com/doc/current/deployment.html
 
+## Deleting generated temporary files
+
+In production, a cleanup script must be executed periodically (crontabed) to delete useless generated temporary files (PDF tags, proxied responses from external Web services, photo archives...). The path where they are stored is given by the "TMP_FOLDER" entry of the .env file. An example of such a script is given below (deletes files older than two days) :
+
+```
+find /path/to/tmp/folder/ -type f -mtime +2 -exec rm {} \;
+
+```
+
+
