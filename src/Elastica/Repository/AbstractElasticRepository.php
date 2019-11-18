@@ -14,9 +14,8 @@ use FOS\ElasticaBundle\Repository;
  *
  * @package App\Elastica\Repository
  */
-// @refactor: use generics if it's possible to pass them in conf files
 abstract class AbstractElasticRepository extends Repository 
-                                         implements ElasticRepositoryInterface{
+                                         implements ElasticRepositoryInterface {
 
     const DEFAULT_PER_PAGE = 10;
     

@@ -62,7 +62,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
             if (sizeof($valueArray)>0) {
                 $orBoolQuery = new BoolQuery();
                 foreach($valueArray as $value) {
-                    $orBoolQuery = $this->addShouldQuery($orBoolQuery, $value, $fieldName);
+                    $orBoolQuery = $this->addShouldMatchPhraseQuery($orBoolQuery, $value, $fieldName);
                 }           
                 $fFilter = $fFilter->addMust($orBoolQuery);
             }
@@ -71,8 +71,16 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         return $fFilter;
     }
 
-    protected function addShouldQuery($fFilter, $strQuery, $fieldName) {
+    protected function addShouldMatchPhraseQuery($fFilter, $strQuery, $fieldName) {
         $query = new MatchPhrase();
+        $query->setField($fieldName, $strQuery);
+        $fFilter->addShould($query);
+
+        return $fFilter;
+    }
+
+    protected function addShouldMatchQuery($fFilter, $strQuery, $fieldName) {
+        $query = new Match();
         $query->setField($fieldName, $strQuery);
         $fFilter->addShould($query);
 
@@ -82,7 +90,8 @@ class BaseQueryBuilder implements QueryBuilderInteface {
     /**
      * Returns the elastica <code>Query</code> built from provided 
      * CEL <code>Query</code> and enhanced with the access control
-     * filters for given <code>TelaBotanicaUser</code>.
+     * filters for given <code>TelaBotanicaUser</code>
+     * @refactor: put nullable parameter second.
      */
     public function build(?TelaBotanicaUser $user, QueryInterface $occSearch) : Query {
         $esQuery = new Query();
@@ -133,7 +142,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
         $ftFilter = new BoolQuery();
 
         foreach ($this->freeTextSearchFields as $fieldName){
-            $ftFilter =  $this->addShouldQuery($ftFilter, $freeTextQuery, $fieldName);
+            $ftFilter =  $this->addShouldMatchPhraseQuery($ftFilter, $freeTextQuery, $fieldName);
         }
 
         return $ftFilter;
@@ -161,7 +170,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
 
     /**
      */ 
-    protected function buildAccessControlQuery($user) {
+    protected function buildAccessControlQuery(TelaBotanicaUser $user) {
 
         $acQuery = null;
         if ( $user === null ) {
@@ -179,13 +188,14 @@ class BaseQueryBuilder implements QueryBuilderInteface {
                 $acQuery = new Match();
                 $acQuery->setField("userId", $user->getId());
             }
-            // Not even logged in user: limit to only public occurrences
+            // Not even logged in user: limit to public occurrences. 
+            // This should never happen in CEL2 as the API is registered only)
             else {
                 $acQuery = new Match();
                 $acQuery->setField("isPublic", true);
             }
         }
-        // Tela-botanica admin: no restrictions!
+        // Tela-botanica admin: no other filter added...public function build(?TelaBotanicaUser $user, QueryInterface $occSearch) : Query
 
         return $acQuery;
     }
