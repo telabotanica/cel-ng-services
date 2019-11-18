@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Elastica\Command;
+namespace App\Command;
 
 use App\Entity\ChangeLog;
 use App\Utils\ElasticsearchClient;
-use App\Elastica\Command\UnknownEntityNameException;
+use App\Command\UnknownEntityNameException;
 
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 
