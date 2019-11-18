@@ -16,13 +16,11 @@
         "ext-mbstring": "*",
         "ext-mysqli": "*",
         "ext-zip": "*",
-        "algolia/search-bundle": "3.4",
         "api-platform/core": "^2.1",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.4.5",
-        "fresh/vich-uploader-serialization-bundle": "~2.1",
         "friendsofsymfony/elastica-bundle": "^5.0",
         "liip/imagine-bundle": "^2.0",
         "nelmio/cors-bundle": "^1.5",
@@ -48,8 +46,9 @@
         "symfony/twig-bundle": "^3.0 || ^4.0",
         "symfony/validator": "^3.0 || ^4.0",
         "symfony/var-dumper": "4.3.*",
-        "symfony/web-server-bundle": "4.3.*",
         "symfony/yaml": "4.3.*",
+        "symfony/security-guard": "4.2.1",
+        "symfony/yaml": "^4.1",
         "tecnickcom/tcpdf": "^6.2",
         "vich/uploader-bundle": "^1.8"
     },
@@ -62,7 +61,9 @@
         "symfony/debug-pack": "^1.0",
         "symfony/http-client": "4.3.*",
         "symfony/maker-bundle": "^1.5",
-        "symfony/phpunit-bridge": "^5.2"
+        "symfony/phpunit-bridge": "^5.2",
+        "symfony/dotenv": "^4.1",
+        "symfony/maker-bundle": "^1.5"
     },
     "config": {
         "preferred-install": {
