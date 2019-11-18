@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Elastica\Command;
+namespace App\Command;
 
 class UnknownEntityNameException extends \Exception {
 
