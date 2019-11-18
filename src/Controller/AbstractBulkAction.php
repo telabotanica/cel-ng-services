@@ -28,9 +28,7 @@ use App\Entity\Occurrence;
  * @See Https://Tools.Ietf.Org/Html/Rfc6902
  * @See Http://Jsonpatch.Com/
  */
-// @refactor use generics
-abstract class AbstractBulkAction
-{
+abstract class AbstractBulkAction {
 
     protected $doctrine;
     protected $repo;
