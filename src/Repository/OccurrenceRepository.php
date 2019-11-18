@@ -34,4 +34,27 @@ class OccurrenceRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * Returns true if an Occurrence with the same signature i.e.
+     * same locality/geometry/userId/observedDate/serSciName already exists.
+     * Else returns false.
+     *
+     * @return bool Returns true if an Occurrence with the same signature i.e.
+     * locality/geometry/userId/observedDate/userSciName already exists.
+     */
+    public function hasDuplicate($occ) : bool {
+
+
+        $result = $this->createQueryBuilder('p')
+            ->andWhere('p.signature = :val')
+            ->setParameter('val', $occ->getSignature())
+            ->orderBy('p.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+
+        return ( sizeof($result) > 0 );
+    }
+
+
 }
