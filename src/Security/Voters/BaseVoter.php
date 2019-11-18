@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Security\Authorization;
+namespace App\Security\Voters;
 
 use App\Entity\UserProfileCel;
 use App\Security\User\TelaBotanicaUser;
+use App\Security\Voters\AbstractVoter;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -13,10 +14,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  *
  * <ul>
  *   <li><code>UserProfileCel</code></li> 
- *   <li><code>UserCustomField</code></li>
  *   <li><code>PhotoTag</code></li>
  *   <li><code>UserOccurrenceTag</code></li>
- *   <li><code>UserCustomFieldOccurrence</code></li>
  * </ul>
  *
  * resources/entities. 
@@ -24,7 +23,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * Only the owner or a TelaBotanica admin can create/read/update/delete 
  * instances.
  *
- * @package App\Security\Authorization
+ * @package App\Security\Voters
  */
 class BaseVoter extends AbstractVoter {
 
@@ -33,11 +32,9 @@ class BaseVoter extends AbstractVoter {
      */
     protected function supportsEntity($subject): bool {
 
-        if ( !( $subject instanceof UserProfileCel ) ||  
-            !( $subject instanceof UserCustomField ) || 
+        if ( !( $subject instanceof UserProfileCel ) ||   
             !( $subject instanceof PhotoTag ) || 
-            !( $subject instanceof UserOccurrenceTag ) ||
-            !( $subject instanceof UserCustomFieldOccurrence ) ) {
+            !( $subject instanceof UserOccurrenceTag ) ) {
 
             return false;
         }

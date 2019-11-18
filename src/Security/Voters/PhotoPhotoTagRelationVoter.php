@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Security\Authorization;
+namespace App\Security\Voters;
 
-use App\Entity\ExtendedFieldOccurrence;
+use App\Entity\PhotoPhotoTagRelation;
 use App\Security\User\TelaBotanicaUser;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
- * <code>AbstractVoter</code> for <code>ExtendedFieldOccurrence</code> 
+ * <code>AbstractVoter</code> for <code>PhotoPhotoTagRelation</code> 
  * resources/entities.
  *
- * @package App\Security\Authorization
+ * @package App\Security\Voters
  */
-class ExtendedFieldOccurrenceVoter extends AbstractVoter {
+class PhotoPhotoTagRelationVoter extends AbstractVoter {
 
     /**
      * @inheritdoc
      */
     protected function supportsEntity($subject): bool {
 
-        if (!$subject instanceof ExtendedFieldOccurrence) {
+        if (!$subject instanceof PhotoPhotoTagRelation) {
             return false;
         }
 
@@ -35,11 +35,11 @@ class ExtendedFieldOccurrenceVoter extends AbstractVoter {
         $attribute, $subject, TokenInterface $token) {
 
         $user = $token->getUser();
-        $inst = $subject;
 
-        // Only the owner of the associated occurrence can view/update/delete 
-        // this resource:        
-        return ( $user->getId() === $inst->getOccurrence()->getUserId() );
+        // Only the owner can view/update/delete this resource:        
+        return ( 
+            ( $user->getId() === $subject->getPhoto()->getUserId() ) && 
+            ( $user->getId() === $subject->getPhotoTag()->getUserId() ) );
     }
 
 

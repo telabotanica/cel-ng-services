@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security\Authorization;
+namespace App\Security\Voters;
 
 use App\Entity\OccurrenceUserOccurrenceTagRelation;
 use App\Security\User\TelaBotanicaUser;
@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * <code>AbstractVoter</code> for 
  * <code>OccurrenceUserOccurrenceTagRelation</code> resources/entities.
  *
- * @package App\Security\Authorization
+ * @package App\Security\Voters
  */
 class OccurrenceUserOccurrenceTagRelationVoter extends AbstractVoter
 {
@@ -36,12 +36,11 @@ class OccurrenceUserOccurrenceTagRelationVoter extends AbstractVoter
         $attribute, $subject, TokenInterface $token) {
 
         $user = $token->getUser();
-        $inst = $subject;
 
         // Only the owner can view/update/delete this resource:        
         return ( 
-            ( $user->getId() === $inst->getOccurrence()->getUserId() ) && 
-            ( $user->getId() === $inst->getUserOccurrenceTag()->getUserId() ) );
+            ( $user->getId() === $subject->getOccurrence()->getUserId() ) && 
+            ( $user->getId() === $subject->getUserOccurrenceTag()->getUserId() ) );
     }
 
 

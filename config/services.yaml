@@ -78,47 +78,31 @@ services:
 
     # Security: voter (ACL) for occurrence entities/resources 
     security.acccess.occurrence_voter :
-        class:  App\Security\Authorization\OccurrenceVoter
-        public: false
-        tags:
-            - { name: security.voter }
-
-    # Security: voter (ACL) for photo entities/resources 
-    security.acccess.photo_voter :
-        class:  App\Security\Authorization\PhotoVoter
-        public: false
-        tags:
-            - { name: security.voter }
-
-    # Security: voter (ACL) for ExtendedFieldOccurrence entities/resources 
-    security.acccess.extended_field_occurrence_voter :
-        class:  App\Security\Authorization\ExtendedFieldOccurrenceVoter
+        class:  App\Security\Voters\ResourceVoter
         public: false
         tags:
             - { name: security.voter }
 
     # Security: voter (ACL) for OccurrenceUserOccurrenceTagRelation entities/resources 
     security.acccess.occurrence_user_occurrence_tag_relation_voter :
-        class:  App\Security\Authorization\OccurrenceUserOccurrenceTagRelationVoter
+        class:  App\Security\Voters\OccurrenceUserOccurrenceTagRelationVoter
         public: false
         tags:
             - { name: security.voter }
 
     # Security: voter (ACL) for PhotoPhotoTagRelation entities/resources 
     security.acccess.photo_photo_tag_relation_voter :
-        class:  App\Security\Authorization\PhotoPhotoTagRelationVoter
+        class:  App\Security\Voters\PhotoPhotoTagRelationVoter
         public: false
         tags:
             - { name: security.voter }
 
-    # Security: voter (ACL) for UserProfileCel/UserCustomField/PhotoTag/UserOccurrenceTag/
-    # UserCustomFieldOccurrence entities/resources 
+    # Security: voter (ACL) for UserProfileCel/PhotoTag/UserOccurrenceTag/
     security.access.base_voter :
-        class:  App\Security\Authorization\BaseVoter
+        class:  App\Security\Voters\BaseVoter
         public: false
         tags:
             - { name: security.voter }
-
 
     # ########################################################################
     # DOCTRINE ENTITY EVENT LISTENERS
@@ -179,14 +163,6 @@ services:
         class: App\EventListener\XcountResponseListener
         tags:
            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
-
-    # ########################################################################
-    # VALIDATORS
-    # ########################################################################
-
-    app.validator.listener.no.duplicate.constraint.validator:
-        class: App\Validator\NoDuplicateConstraintValidator
-        arguments: ["@doctrine.orm.entity_manager"]
 
     # ########################################################################
     # VICH UPLOAD - PHOTO NAMER/PHOTO DIRECTORY_NAMER

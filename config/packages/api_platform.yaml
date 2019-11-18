@@ -20,3 +20,4 @@ api_platform:
                 type: header
     exception_to_status:
         App\Security\User\UnloggedAccessException: 403
+        Symfony\Component\Security\Core\Exception\AuthenticationException: 403

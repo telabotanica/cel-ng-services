@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security\Authorization;
+namespace App\Security\Voters;
 
 use App\Entity\OwnedEntitySimpleInterface;
 use App\Security\User\TelaBotanicaUser;
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * This class provides basic behavior : only the owner or a TelaBotanica 
  * admin can create/read/update/delete the entity/resource instances.
  *
- * @package App\Security\Authorization
+ * @package App\Security\Voters
  */
 abstract class AbstractVoter extends Voter {
 
@@ -44,7 +44,6 @@ abstract class AbstractVoter extends Voter {
         $attribute, $subject, TokenInterface $token) {
 
         $user = $token->getUser();
-        $entitity = $subject;
 
         if ($user->isTelaBotanicaAdmin()) {
             return true;
@@ -52,11 +51,11 @@ abstract class AbstractVoter extends Voter {
 
         switch ($attribute) {
             case self::VIEW:
-                return $this->canView($entitity, $user);
+                return $this->canView($subject, $user);
             case self::EDIT:
-                return $this->canEdit($entitity, $user);
+                return $this->canEdit($subject, $user);
             case self::DELETE:
-                return $this->canDelete($entitity, $user);
+                return $this->canDelete($subject, $user);
         }
 
         throw new \LogicException('This code should not be reached!');
