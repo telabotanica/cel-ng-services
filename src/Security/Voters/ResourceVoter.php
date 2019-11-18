@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Security\Authorization;
+namespace App\Security\Voters;
 
 use App\Entity\Occurrence;
+use App\Entity\Photo;
 use App\Entity\OwnedEntitySimpleInterface;
 use App\Security\User\TelaBotanicaUser;
 
@@ -10,18 +11,20 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
- * <code>AbstractVoter</code> for <code>Occurrence</code> resources/entities.
+ * <code>AbstractVoter</code> for <code>Occurrence</code> and 
+ * <code>Photo</code> resources/entities.
  *
- * @package App\Security\Authorization
+ * @package App\Security\Voters
  */
-class OccurrenceVoter extends AbstractVoter {
+class ResourceVoter extends AbstractVoter {
 
     /**
      * @inheritdoc
      */
     protected function supportsEntity($subject): bool {
 
-        if (!$subject instanceof Occurrence) {
+        if (!$subject instanceof Occurrence ||
+            !$subject instanceof Photo) {
             return false;
         }
 
@@ -35,17 +38,15 @@ class OccurrenceVoter extends AbstractVoter {
         $attribute, $subject, TokenInterface $token) {
 
         $user = $token->getUser();
-        $occ = $subject;
 
         if ($user->isTelaBotanicaAdmin()) {
             return true;
         }
-	    if (null !== $occ->getProject()) {
-            $prjId = $occ->getProject()->getId();
-		    if ($user->getAdministeredProjectId() == $occ->getProject()->getId()) {
-		        return $occ->getIsPublic();
+	    if (null !== $subject->getProject()) {
+            $prjId = $subject->getProject()->getId();
+		    if ($user->getAdministeredProjectId() == $subject->getProject()->getId()) {
+		        return $subject->getIsPublic();
 		    }
-
 	    }
 
         return parent::voteOnAttribute($attribute, $subject, $token);

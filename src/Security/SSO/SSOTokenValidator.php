@@ -7,9 +7,7 @@ use App\Security\SSO\MisconfiguredSSOTokenValidatorException;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
- * Authentication and user management using Tela Botanica's SSO
- *
- * @todo : param vide constructeur
+ * Simple tela annuaire SSO validation Web service client.
  */
 class SSOTokenValidator {
 
@@ -32,9 +30,13 @@ class SSOTokenValidator {
 	}
 
 	/**
-	 * Verifies the authenticity of a token using the "annuaire" SSO service
-	 */
-	public function validateToken($token) {
+	 * Verifies the authenticity of provided token (i.e. validates) against the
+     * "annuaire" SSO service.
+     *
+     * Returns true if the token is valid (which will cause authentication 
+     *         success), else false.
+     */
+	public function validateToken(string $token) {
 		if ( empty($this->annuaireURL) ) {
 			throw new MisconfiguredSSOTokenValidatorException();
 		}

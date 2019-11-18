@@ -20,7 +20,6 @@ class SSOUserProvider implements UserProviderInterface {
     }
  
     public function loadUserByUsername($username) {
-        //return $this->fetchUser($username);
         return $this->getUser();
     }
 

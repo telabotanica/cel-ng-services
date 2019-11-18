@@ -11,9 +11,9 @@ use App\Security\User\TelaBotanicaUser;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Authentication and user management using Tela Botanica's SSO
+ * Instanciates a <code>TelaBotanicaUser</code> from an incoming HTTP request 
+ * (or more precisely from its "Authorization" header) or directly from a JWT token .
  *
- * @todo : param vide constructeur
  */
 class SSOUserExtractor {
 
@@ -34,48 +34,37 @@ class SSOUserExtractor {
 
     public function extractUser(Request $request) {
         $token = $this->extractTokenFromRequest($request);
-        if ( null === $token) {
-            throw new UnloggedAccessException('You must be logged into tela-botanica SSO system to access this part of the app.');
+        if (null === $token) {
+            return null;
         }
+
         return $this->extractUserFromToken($token);
     }
 
-    public function extractUserFromToken(string $token) {
+    private function extractUserFromToken(string $token) {
 
-        if (null == $token) {
+        if (null === $token) {
             return null;
         }
 
         $tokenDecoder = new SSOTokenDecoder();
-// die(var_dump($tokenDecoder)); 
+
         $userInfo = $tokenDecoder->getUserFromToken($token);
-        //$role = new Role();
         $roles = array();
         if (in_array( 
             SSOUserExtractor::ADMIN_PERMISSION,
             $userInfo[SSOUserExtractor::PERMISSIONS_TOKEN_PROPERTY])) {
-            /*
-            $role->setName(SSOAuthenticator::ADMIN_ROLE_NAME);
-            $role->setRole(SSOAuthenticator::ADMIN_ROLE);
-            */
             $roles[] = SSOUserExtractor::ADMIN_ROLE;
         }
         else {
-
-            /*
-            $role->setName(SSOAuthenticator::USER_ROLE_NAME);
-            $role->setRole(SSOAuthenticator::USER_ROLE);
-            */
             $roles[] = SSOUserExtractor::USER_ROLE;
         }
-//die(var_dump($userInfo)); 
         $user = new TelaBotanicaUser(
             intval($userInfo['id']), $userInfo['sub'], $userInfo['prenom'], 
             $userInfo['nom'], $userInfo['pseudo'], 
             $userInfo['pseudoUtilise'], $userInfo['avatar'], 
             $roles, null);
-//die(var_dump($user));  
-        // Returns the user, checkCredentials() is gonna be called
+
         return $user;
     }
 
@@ -101,20 +90,4 @@ class SSOUserExtractor {
         }
     }
 
-    /**
-     * Checks if the SSO JWT token is valid.
-     *
-     * Returns true if that's the case (which will cause authentication 
-     * success), else false.
-     */
-    public function validateToken(string $token): bool {
-
-        if (null === $token) {
-            return false;
-        }
-
-        $tokenValidator = new SSOTokenValidator();
-
-        return $tokenValidator->validateToken($token);
-    }
 }

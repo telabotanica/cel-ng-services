@@ -3,7 +3,9 @@
 namespace App\Security;
 
 use App\Security\SSO\SSOUserExtractor;
+use App\Security\SSO\SSOTokenValidator;
 use App\Security\User\TelaBotanicaUser;
+use App\Security\User\UnloggedAccessException;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,6 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
@@ -21,9 +24,11 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class SSOAuthenticator extends AbstractGuardAuthenticator {
 
     private $tokenUtils;
+    private $tokenValidator;
 
     public function __construct() {
         $this->tokenUtils = new SSOUserExtractor();
+        $this->tokenValidator = new SSOTokenValidator();
     }
 
     /**
@@ -77,8 +82,10 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
         if (null === $token) {
             return false;
         }
-
-        return $this->tokenUtils->validateToken($token);
+        if (null === $user) {
+            return false;
+        }
+        return $this->tokenValidator->validateToken($token);
     }
 
     public function onAuthenticationSuccess(
@@ -90,14 +97,8 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
 
     public function onAuthenticationFailure(
         Request $request, AuthenticationException $ex) {
-
-        $data = array(
-            'message' => strtr($ex->getMessageKey(), $ex->getMessageData())
-            // WHEN TRANSLATING, USE THIS:
-            // $this->translator->trans($ex->getMessageKey(), $ex->getMessageData())
-        );
-
-        return new JsonResponse($data, Response::HTTP_FORBIDDEN);
+            // let the exception bubble up!
+            throw $ex;
     }
 
     /**

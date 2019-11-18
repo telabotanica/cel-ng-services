@@ -35,7 +35,7 @@ class SSOTokenDecoder {
 	 * this token's authenticity against the "annuaire" SSO service and if
 	 * successful, returns the decoded user information.
 	 */
-	public function getUserFromToken($token) {
+	public function getUserFromToken(string $token) {
 		// unknown user, by default
 		$user = $this->getUnknownUser();
 		$valid = false;
