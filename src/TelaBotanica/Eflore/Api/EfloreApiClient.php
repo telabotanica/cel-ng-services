@@ -2,10 +2,7 @@
 
 namespace App\TelaBotanica\Eflore\Api;
 
-use App\DBAL\TaxoRepoEnumType;
-
 use App\Exception\UnsupportedEfloreTaxoRepoException;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Client service for eflore Web service API. Currently, only offers methods 
@@ -76,9 +73,9 @@ class EfloreApiClient {
             $rawTaxon = json_decode($result, true);
 
             $taxon = new EfloreTaxon();
-            $taxon->setAcceptedSciName($result['nom_complet']);
-            $taxon->setAcceptedSciNameId($result['nom_retenu.id']);
-            $taxon->setFamily($result['famille']);
+            $taxon->setAcceptedSciName($rawTaxon['nom_complet']);
+            $taxon->setAcceptedSciNameId($rawTaxon['nom_retenu.id']);
+            $taxon->setFamily($rawTaxon['famille']);
 
             return $taxon;
         } else {
