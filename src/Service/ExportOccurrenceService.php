@@ -96,8 +96,16 @@ class ExportOccurrenceService {
         try {
 
             file_put_contents($exportFilePath, fopen($url, 'r'));
+            $curl_request = curl_init($url);
+            curl_setopt($curl_request, CURLOPT_HEADER, 'Authorization: ' . $user->getToken());
+            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_request, CURLOPT_TIMEOUT, 5);
+            curl_setopt($curl_request, CURLOPT_CONNECTTIMEOUT, 5);
+            $result = curl_exec($curl_request); // execute the request    
+            curl_close($curl_request);
+
             // Now send the generated file:
-            $response = new Response(file_get_contents($exportFilePath));
+            $response = new Response($result);
             $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
             $response->headers->set(
                 'Content-Disposition', 

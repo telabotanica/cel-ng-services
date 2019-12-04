@@ -73,7 +73,7 @@ class SSOUserExtractor {
             intval($userInfo['id']), $userInfo['sub'], $userInfo['prenom'], 
             $userInfo['nom'], $userInfo['pseudo'], 
             $userInfo['pseudoUtilise'], $userInfo['avatar'], 
-            $roles, null);
+            $roles, null, $token);
 //die(var_dump($user));  
         // Returns the user, checkCredentials() is gonna be called
         return $user;
