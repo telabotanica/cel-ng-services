@@ -58,13 +58,13 @@ class OccurrenceEventListener {
             null !== $entity->getUserSciNameId()  ){
 
             $efClient = new EfloreApiClient();
-            $userSciNameId = $entity->getUserSciNameId();
-            $taxoRepoName = $entity->getTaxoRepo();
-            $familyName = $efClient->getFamilyName(
-                $userSciNameId, $taxoRepoName);
-            if ( null !== $familyName ) {
-                $entity->setFamily($familyName);
-            }
+            $taxon = $efClient->getTaxonInfo(
+                $entity->getUserSciNameId(),
+                $entity->getTaxoRepo()
+            );
+            $entity->setFamily($taxon->getFamily());
+            $entity->setAcceptedSciName($taxon->getAcceptedSciName());
+            $entity->setAcceptedSciNameId($taxon->getAcceptedSciNameId());
         }
     }
 
