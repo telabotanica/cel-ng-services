@@ -27,7 +27,7 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
 
     public function __construct(
         $id, $email, $surname, $lastName, $pseudo, $usePseudo, $avatar, 
-        array $roles, $administeredProjectIdi, $token) {
+        array $roles, $administeredProjectId, $token) {
 
         $this->id = $id;
         $this->email = $email;
