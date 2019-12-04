@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 class SSOUserExtractor {
 
     // Name of the HTTP header containing the auth token:
-    const TOKEN_HEADER_NAME             = "authorization";
+    const TOKEN_HEADER_NAME             = "Authorization";
     // Name of "permissions" property in the auth token:
     const PERMISSIONS_TOKEN_PROPERTY    = 'permissions';
     // Permission for "admin" (in the auth token):
@@ -82,23 +82,7 @@ class SSOUserExtractor {
 
 
     public function extractTokenFromRequest(Request $request) {
-        $headers = $request->headers;
-        if (null == $headers->get(SSOUserExtractor::TOKEN_HEADER_NAME)) {
-            return null;
-        }
-        else {
-            // We should get a header of value like "Bearer XXXXXXXXXXXX"
-            // Let's explode it:
-            $bits = explode(" ", $headers->get(SSOUserExtractor::TOKEN_HEADER_NAME));
-            // The second part of the header value is the token value
-            if (sizeof($bits) == 2) {           
-                return  $bits[1];
-            }
-            // Malformed header value: return empty credientials:
-            else {
-                return null;
-            }
-        }
+        return $request->headers->get(SSOUserExtractor::TOKEN_HEADER_NAME);
     }
 
     /**
