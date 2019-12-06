@@ -84,40 +84,27 @@ class ExportOccurrenceService {
         set_time_limit(0);
         $url = $this->buildUrl($params);
 
-
         $token = $this->tokenStorage->getToken();
         $user =  $token->getUser();
 
-        $exportFileName .= ExportOccurrenceService::EXPORT_EXTENSION;
-        $exportFilePath = $this->tmpFolder . '/' . $exportFileName;
-
         try {
-
-            file_put_contents($exportFilePath, fopen($url, 'r'));
             $curl_request = curl_init($url);
-            curl_setopt($curl_request, CURLOPT_HEADER, 'Authorization: ' . $user->getToken());
+            curl_setopt($curl_request, CURLOPT_HTTPHEADER, [
+		    'Authorization: ' . $user->getToken()
+	    ]);
             curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl_request, CURLOPT_TIMEOUT, 5);
-            curl_setopt($curl_request, CURLOPT_CONNECTTIMEOUT, 5);
-            $result = curl_exec($curl_request); // execute the request    
+            // execute the request
+            $result = curl_exec($curl_request);
             curl_close($curl_request);
 
             // Now send the generated file:
             $response = new Response($result);
             $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
-            $response->headers->set(
-                'Content-Disposition', 
-                'attachment;filename="' . $exportFileName . '"');
-            $response->headers->set(
-                'Content-length', 
-                filesize($exportFilePath));
 
             return $response;
-
-        // Catch exceptions and throw a custom one to allow a better debug:
-        } catch (\Exception $t) {            
+        } catch (\Exception $t) {
             throw new ExportServiceInvokationException(
-                ExportOccurrenceService::EXCEPTION_MESSAGE_PREFIX . 
+                ExportOccurrenceService::EXCEPTION_MESSAGE_PREFIX .
                 $t->getMessage(),
                 0,
                 $t);
