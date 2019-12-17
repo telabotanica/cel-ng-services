@@ -4,7 +4,7 @@
 namespace App\Serializer;
 
 /**
- * Classe permettant de générer des PDFs.
+ * Classe permettant de générer des PDFs. Forkée depuis CEL1.
  *
  * @internal   Mininum PHP version : 5.2
  * @category   CEL
