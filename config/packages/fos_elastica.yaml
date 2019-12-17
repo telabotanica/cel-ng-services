@@ -7,7 +7,7 @@ fos_elastica:
         default: { host: '%env(FOS_ELASTICA_CLIENTS_DEFAULT_HOST)%', port: '%env(FOS_ELASTICA_CLIENTS_DEFAULT_PORT)%' }
     indexes:
         occurrences: 
-            index_name: cel2_occurrences
+            index_name: cel2_occurrences_dev
             settings:
                 index:
                     analysis:
@@ -15,7 +15,7 @@ fos_elastica:
                             occ_analyzer:
                                 type: custom
                                 tokenizer: keyword
-                                filter: ["asciifolding", "lowercase", "french_stem"]
+                                filter: ["french_stem"]
                         normalizer:
                             occ_normalizer:
                                 type: custom
@@ -152,7 +152,7 @@ fos_elastica:
                             ignore_missing: true
 
         photos: 
-            index_name: cel2_photos
+            index_name: cel2_photos_dev
             settings:
                 index:
                     analysis:
@@ -160,7 +160,7 @@ fos_elastica:
                             photo_analyzer:
                                 type: custom
                                 tokenizer: keyword
-                                filter: ["asciifolding", "lowercase", "french_stem"]
+                                filter: ["french_stem"]
                         normalizer:
                             photo_normalizer:
                                 type: custom
