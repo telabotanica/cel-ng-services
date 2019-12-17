@@ -1,7 +1,7 @@
 security:
     providers:
         sso:
-            id: App\Security\SSOUserProvider
+            id: App\Security\SSO\SSOUserProvider
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -11,5 +11,5 @@ security:
             logout: ~
             guard:
                 authenticators:
-                    - App\Security\SSOAuthenticator
+                    - App\Security\SSO\SSOAuthenticator
 
