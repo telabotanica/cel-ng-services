@@ -3,11 +3,11 @@
 namespace App\Elastica\Query;
 
 /**
- * Represents a search query for CEL Photo resource type. 
- *
+ * Represents a set of filtering parameters (search query) for CEL Photo 
+ * resource type. 
  */
-class PhotoQuery extends OccurrenceQuery
-{
+class PhotoFilterSet extends OccurrenceFilterSet {
+
     private $dateShotDay;
     private $dateShotMonth;
     private $dateShotYear;

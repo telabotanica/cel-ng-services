@@ -2,8 +2,11 @@
 
 namespace App\Elastica\Query;
 
-
-class OccurrenceQuery extends Query {
+/**
+ * Represents a set of filtering parameters (search query) for CEL Occurrence 
+ * resource type. 
+ */
+class OccurrenceFilterSet extends CelFilterSet {
 
     private $dateObservedDay;
     private $dateObservedMonth;
@@ -43,7 +46,7 @@ class OccurrenceQuery extends Query {
     }
 
     // @todo enable and tests
-    public function containsFilter() {
+    public function containsFilter(): bool {
 
         return true;
 /*
