@@ -3,15 +3,14 @@
 namespace App\Elastica\Query;
 
 /**
- * Base implementation of <code>QueryInterface</code>. Handles sort/pagination
- * and free text queries.
+ * Base implementation of <code>CelFilterSetInterface</code>. Handles 
+ * sort/pagination and free text queries.
  *
  * @package App\Elastica\Query
  */
 
 // @todo make enum for sortDirection : DESC ASC
-//@todo rename to BaseFilterSet + make interface FilterSet?
-class Query implements QueryInterface {
+class CelFilterSet implements CelFilterSetInterface {
  
     const PERPAGE_PARAM_NAME        = 'perPage';   
     const PAGE_PARAM_NAME           = 'page';   
@@ -32,20 +31,25 @@ class Query implements QueryInterface {
     }
 
     protected function fillWithParameters($request) {
-        $this->freeTextQuery = $request->query->get(Query::FREETEXTQUERY_PARAM_NAME);
-        $this->page = $request->query->get(Query::PAGE_PARAM_NAME);
-        $this->perPage = $request->query->get(Query::PERPAGE_PARAM_NAME);
-        $this->sortBy = $request->query->get(Query::SORTBY_PARAM_NAME);
-        $this->sortDirection = $request->query->get(Query::SORTDIRECTION_PARAM_NAME);
+        $this->freeTextQuery = $request->query->get(
+            CelFilterSet::FREETEXTQUERY_PARAM_NAME);
+        $this->page = $request->query->get(
+            CelFilterSet::PAGE_PARAM_NAME);
+        $this->perPage = $request->query->get(
+            CelFilterSet::PERPAGE_PARAM_NAME);
+        $this->sortBy = $request->query->get(
+            CelFilterSet::SORTBY_PARAM_NAME);
+        $this->sortDirection = $request->query->get(
+            CelFilterSet::SORTDIRECTION_PARAM_NAME);
     }
 
 
     // @todo enable and tests
-    public function containsFilter() {
+    public function containsFilter(): bool {
         return false;
     }
 
-    public function isPaginated() {
+    public function isPaginated(): bool {
 		return (
             $this->page !== null && 
             $this->perPage !== null &&
@@ -55,7 +59,7 @@ class Query implements QueryInterface {
             $this->perPage !== ''  );
 	}
 
-    public function isSorted() {
+    public function isSorted(): bool {
 
 		return (
             $this->sortBy !== null && 
@@ -66,43 +70,43 @@ class Query implements QueryInterface {
             $this->sortDirection !== '' );
 	}
 
-	public function getFreeTextQuery() {
+	public function getFreeTextQuery(): ?string {
 		return $this->freeTextQuery;
 	}
 
-	public function setFreeTextQuery($freeTextQuery) {
+	public function setFreeTextQuery(string $freeTextQuery) {
 		$this->freeTextQuery = $freeTextQuery;
 	}
 
-	public function getPage() {
+	public function getPage(): int {
 		return $this->page;
 	}
 
-	public function setPage($page) {
+	public function setPage(int $page) {
 		$this->page = $page;
 	}
 
-	public function getPerPage() {
+	public function getPerPage(): int {
 		return $this->perPage;
 	}
 
-	public function setPerPage($perPage) {
+	public function setPerPage(int $perPage) {
 		$this->perPage = $perPage;
 	}
 
-	public function getSortBy() {
+	public function getSortBy(): string {
 		return $this->sortBy;
 	}
 
-	public function setSortBy($sortBy) {
+	public function setSortBy(string $sortBy) {
 		$this->sortBy = $sortBy;
 	}
 
-	public function getSortDirection() {
+	public function getSortDirection(): string {
 		return $this->sortDirection;
 	}
 
-	public function setSortDirection($sortDirection) {
+	public function setSortDirection(string $sortDirection) {
 		$this->sortDirection = $sortDirection;
 	}
 
