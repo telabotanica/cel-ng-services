@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security;
+namespace App\Security\SSO;
 
 use App\Security\SSO\SSOUserExtractor;
 use App\Security\SSO\SSOTokenValidator;

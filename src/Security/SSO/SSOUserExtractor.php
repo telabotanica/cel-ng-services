@@ -3,7 +3,8 @@
 namespace App\Security\SSO;
 
 use App\Security\User\UnloggedAccessException;
-
+use App\Security\SSO\BadAuthorizationHeaderFormatException;
+use App\Security\SSO\NoAuthHeaderException;
 use App\Security\SSO\SSOTokenValidator;
 use App\Security\SSO\SSOTokenDecoder;
 use App\Security\User\TelaBotanicaUser;
@@ -31,6 +32,13 @@ class SSOUserExtractor {
     const USER_ROLE                     = 'ROLE_USER';
     // App "user" role name:
     const USER_ROLE_NAME                = 'User';
+    // Message for the exception thrown when the auth header value is 
+    // not valid:
+    const BAD_HEADER_FORMAT_MSG         = 'The "Authorization" header value ' .
+        'is not valid';
+    // Message for the exception thrown when no auth header is available:
+    const NO_AUTH_HEADER_MSG            = 'The "Authorization" header ' .
+        'is not set';
 
     public function extractUser(Request $request) {
         $token = $this->extractTokenFromRequest($request);
@@ -73,7 +81,9 @@ class SSOUserExtractor {
     public function extractTokenFromRequest(Request $request) {
         $headers = $request->headers;
         if (null == $headers->get(SSOUserExtractor::TOKEN_HEADER_NAME)) {
-            return null;
+            // No auth header => throw an exc:
+            throw new NoAuthHeaderException(
+                SSOUserExtractor::NO_AUTH_HEADER_MSG);
         }
         else {
             // We should get a header of value like "Bearer XXXXXXXXXXXX"
@@ -83,9 +93,10 @@ class SSOUserExtractor {
             if (sizeof($bits) == 2) {           
                 return  $bits[1];
             }
-            // Malformed header value: return empty credientials:
+            // Malformed header value => throw an exc:
             else {
-                return null;
+                throw new BadAuthorizationHeaderFormatException(
+                    SSOUserExtractor::BAD_HEADER_FORMAT_MSG);
             }
         }
     }
