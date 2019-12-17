@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Controller;
+namespace App\Service;
 
-use App\Entity\Photo;
 use App\Entity\PhotoTag;
 use App\Repository\PhotoRepository;
 
@@ -16,15 +15,15 @@ use Symfony\Component\Security\Core\Security;
 /** 
  * Rotates the image behind a <code>Photo</code>.
  */
-class RotatePhotoController extends AbstractController {
+class PhotoRotator {
  
     // Symfony services
     private $doctrine;
     // the <code>Security</code> service to retrieve the current user:
     protected $security;
 
-    const ERROR_MSG = "Impossible to rotate the images associated "
-        . "to the photo.  An error occurred...";
+    const DUPLICATE_NAME_MSG = "A photo with the same name is already present "
+        . "in the user gallery. This is not allowed.";
 
     /**
      * Returns a new <code>RotatePhotoController</code> instance 
@@ -39,70 +38,32 @@ class RotatePhotoController extends AbstractController {
      *         with (injected) services passed as parameters.
      */
     public function __construct(
-        PhotoRotator $photoRotator) {
-        $this->photoRotator = $photoRotator;
+        RegistryInterface $doctrine, 
+        Security $security) {
+        $this->security = $security;
+        $this->doctrine = $doctrine;
     }
 
 
-    /**
-     *
-     * @Route("/api/photo_rotations", name="api_rotate_photo")
-     */
-    public function invoke(Request $request) {
 
-        $photoId = $request->query->get('photoId');
-        $degrees = $request->query->get('degrees') ? 
-            $request->query->get('degrees') : 90;
+    public function rotatePhotoById(int $photoId, int $degrees) {
 
-        try {
-            $this->photoRotator->rotatePhotoById($photoId, $degrees);
-            // Let's return a RESTish payload for this imageRotation "resource":
-            $jsonResp = array(
-                'id' => time(), 
-                'photoId' => $photoId, 
-                'status' => "done", 
-                'degrees' => $degrees);
+        $photo = null;
 
-            return new Response(json_encode($jsonResp), Response::HTTP_OK, []);
-        } catch (\Throwable $t) {
-
-            $jsonResp = array(
-                'errorMessage' => RotatePhotoController::ERROR_MSG);
-            return new Response(
-                json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, []);
-
-        }   
-        exit;
-    }
-
-    private function rotatePhoto(Photo $photo, $degrees) {
+        $photoRepo = $this->doctrine->getRepository('App\Entity\Photo');
+        $photo = $photoRepo->find($photoId);
 
         $mimetype = $photo->getMimeType();
 
         $imgs = $this->loadImages($photo);
 
-       foreach ($imgs as $path => $img) {
-           // Save original image
-           if (!file_exists($path.'.orig')) {
-               $this->saveImage($img, $mimetype, $path.'.orig');
-           }
+       foreach ($imgs as $path => $img) {  
             // Rotate the image:
             $rotate = imagerotate($img, $degrees, 0);
             $this->saveImage($rotate, $mimetype, $path);
-        }
 
-        // Call to mini-regen service to generate new thumbnails
-        $miniregenServiceUrl = sprintf(getenv('URL_MINIREGEN'), $photo->getId());
-        $ch = curl_init($miniregenServiceUrl);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        } 
 
-        curl_exec($ch);
-
-        if (curl_errno($ch)) {
-            throw new \Exception ('curl erreur: ' . curl_errno($ch));
-        }
-        curl_close($ch);
     }
 
     private function loadImages($photo) {
@@ -155,4 +116,5 @@ class RotatePhotoController extends AbstractController {
         }
         throw new \Exception('The image is neither a jpeg nor a png.');        
     }
+
 }
