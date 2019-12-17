@@ -3,29 +3,21 @@
 namespace App\Controller;
 
 use App\Entity\Occurrence;
-use App\Controller\AbstractBulkAction;
+use App\Service\OccurrenceBulkService;
 
 /**
  * Occurrence resource endpoint for bulk operations (JSON-PATCH). Currently,  
- * 'add', 'remove', 'replace' and 'copy' (clone) atomic operations are 
+ * 'remove', 'replace' and 'copy' (clone) atomic operations are 
  * allowed. 
  *
  * @package App\Controller
  */
 class OccurrenceBulkAction extends AbstractBulkAction {
 
-    /**
-     * @inheritdoc
-     */
-    protected function initForm($entity) {
-        $this->form = $this->formFactory->create(Occurrence::class, $entity);
-    }
+    public function __construct(
+        OccurrenceBulkService $abService) {
 
-    /**
-     * @inheritdoc
-     */
-    protected function initRepo() {
-        $this->repo = $this->doctrine->getRepository('App\Entity\Occurrence');
+        $this->abService = $abService;
     }
 
 }

@@ -3,31 +3,22 @@
 namespace App\Controller;
 
 use App\Entity\Photo;
-use App\Controller\AbstractBulkAction;
+use App\Service\PhotoBulkService;
 
 /**
- * Custom endpoint action on Photo resources for bulk actions (JSON-PATCH). 
- * Currently, 'add', 'remove', 'replace' and 'copy' (clone) atomic operations 
- * are allowed. 
+ * Occurrence resource endpoint for bulk operations (JSON-PATCH). Currently,  
+ * 'remove', 'replace' and 'copy' (clone) atomic operations are 
+ * allowed. 
  *
  * @package App\Controller
  */
 class PhotoBulkAction extends AbstractBulkAction {
 
-    /**
-     * @inheritdoc
-     */
-    protected function initForm($entity) {
-        $this->form = $this->formFactory->create(Photo::class, $entity);
+    public function __construct(
+        PhotoBulkService $abService) {
+
+        $this->abService = $abService;
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function initRepo() {
-        $this->repo = $this->doctrine->getRepository('App\Entity\Photo');
-    }
-  
 }
-
 
