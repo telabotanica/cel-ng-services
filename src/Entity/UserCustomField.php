@@ -14,10 +14,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Modèle pour les champs de saisi personnalisés gérés par l'utilisateur.
  *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"read"}},
- *     "denormalization_context"={"groups"={"write"}}
- * })
  * @ORM\Entity
  * @ORM\Table(name="user_custom_field", options={"comment":"Champs personnalisés de l'utilisateur"})
  */

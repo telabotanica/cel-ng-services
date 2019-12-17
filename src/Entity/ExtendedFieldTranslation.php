@@ -9,20 +9,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Traduction des champs étendus des projets.
+ * Translation associated to <code>ExtendedField</code> instances.
  *
  * @ORM\Entity
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"read"}},
- *     "denormalization_context"={"groups"={"write"}}
- * })
  * @ORM\Table(name="extendedfield_translation", uniqueConstraints={@ORM\UniqueConstraint(name="index_fild_project_language", columns={"extended_field_id", "project", "language_iso_code"})}, options={"comment":"Contient le label et les valeurs par défaut d'un champ supplémentaire."})
  */
 class ExtendedFieldTranslation
 {
 
    /**
-     * @Groups({"read"})
+    * @Groups({"read"})
     * @ORM\Id
     * @ORM\GeneratedValue(strategy="IDENTITY")
     * @ORM\Column(type="integer")

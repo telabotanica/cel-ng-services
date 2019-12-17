@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="project_settings", uniqueConstraints={@ORM\UniqueConstraint(name="id_project_lang", columns={"project", "language"})}, options={"comment":"Info pour configurer le widget de saisie - la clé primaire est le nom du projet + la langue"})
  *
  * The API is read-only. Changes are made mannually by tela devs using CLI or directly in DB.
+ *
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
  *     "formats"={"jsonld", "json"},
