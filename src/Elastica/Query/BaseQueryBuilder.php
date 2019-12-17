@@ -4,6 +4,7 @@ namespace App\Elastica\Query;
 
 use App\Security\User\TelaBotanicaUser;
 use App\Security\User\UnloggedAccessException;
+use App\Security\Elastica\AccessControlQueryBuilder;
 
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
@@ -93,7 +94,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
      * filters for given <code>TelaBotanicaUser</code>
      * @refactor: put nullable parameter second.
      */
-    public function build(?TelaBotanicaUser $user, QueryInterface $occSearch) : Query {
+    public function build(?TelaBotanicaUser $user, CelFilterSetInterface $filterSet) : Query {
         $esQuery = new Query();
         $globalQuery = new BoolQuery();
         $acQuery = $this->buildAccessControlQuery($user);
@@ -103,17 +104,17 @@ class BaseQueryBuilder implements QueryBuilderInteface {
             $globalQuery->addMust($acQuery);
         }
 
-        if ($occSearch->containsFilter()) {
-            $filterQuery = $this->buildFilterQuery($occSearch);
+        if ($filterSet->containsFilter()) {
+            $filterQuery = $this->buildFilterQuery($filterSet);
             if ( null !== $filterQuery) {   
                 $globalQuery->addMust($filterQuery);
             }
         }
 
         // handle the free text query : addShould filters  
-        $freeTextStrQuery = $occSearch->getFreeTextQuery();
+        $freeTextStrQuery = $filterSet->getFreeTextQuery();
         if ( (null !== $freeTextStrQuery) && ('' !== $freeTextStrQuery) ) {
-            $ftQuery = $this->buildFreeTextQuery($occSearch, $freeTextStrQuery);
+            $ftQuery = $this->buildFreeTextQuery($filterSet, $freeTextStrQuery);
             if ( null !== $ftQuery) {   
                 $globalQuery->addMust($ftQuery);
             }
@@ -123,12 +124,12 @@ class BaseQueryBuilder implements QueryBuilderInteface {
 
         // @refactor: put these in conf
         // No sort parameters provided, add default ones:
-        if ( ! $occSearch->isSorted() ) {
-            $occSearch->setSortDirection(BaseQueryBuilder::DEFAULT_SORT_DIRECTION);
-            $occSearch->setSortBy(BaseQueryBuilder::DEFAULT_SORT_BY);
+        if ( ! $filterSet->isSorted() ) {
+            $filterSet->setSortDirection(BaseQueryBuilder::DEFAULT_SORT_DIRECTION);
+            $filterSet->setSortBy(BaseQueryBuilder::DEFAULT_SORT_BY);
         }
 
-        $esQuery = $this->customizeWithSortParameters($esQuery, $occSearch);
+        $esQuery = $this->customizeWithSortParameters($esQuery, $filterSet);
         // Pretty handy to debug:
         //die(json_encode(["query" =>$esQuery->getQuery()->toArray()]));
 
@@ -169,35 +170,26 @@ class BaseQueryBuilder implements QueryBuilderInteface {
 
 
     /**
+     * Returns the elastica access control <code>Match</code> query for a given user
+     * based on her/his access level.
+     *
+     * @internal delegates to App\Security\Elastica\AccessControlQueryBuilder
+     * @param TelaBotanicaUser $user The user to generate the access controle
+     *        query for.
+     * @return the elastica access control <code>Match</code> query for
+     *          given <code>TelaBotanicaUser</code> based on her/his access level.
      */ 
-    protected function buildAccessControlQuery(TelaBotanicaUser $user) {
+    protected function buildAccessControlQuery(TelaBotanicaUser $user): Match {
 
-        $acQuery = null;
         if ( $user === null ) {
             throw new UnloggedAccessException('You must be logged into tela-botanica SSO system to access this part of the app.');
         } 
-        else if (!$user->isTelaBotanicaAdmin()) {
-            // Project admins: limit to occurrence belonging to the project
-            if ($user->isProjectAdmin()) {
-                $acQuery = new Match();
-                $acQuery->setField("projectId", $user->getAdministeredProjectId());
-            }
-            // Simple users: limit to her/his occurrences
-            else if (!is_null($user)){
 
-                $acQuery = new Match();
-                $acQuery->setField("userId", $user->getId());
-            }
-            // Not even logged in user: limit to public occurrences. 
-            // This should never happen in CEL2 as the API is registered only)
-            else {
-                $acQuery = new Match();
-                $acQuery->setField("isPublic", true);
-            }
+        else {
+            $acQueryBuilder = new AccessControlQueryBuilder();
+            return $acQueryBuilder->build($user);
         }
-        // Tela-botanica admin: no other filter added...public function build(?TelaBotanicaUser $user, QueryInterface $occSearch) : Query
 
-        return $acQuery;
     }
 
     protected function customizeWithSortParameters($esQuery, $occSearch) {

@@ -22,7 +22,7 @@ interface QueryBuilderInteface {
      * @return an elastica query from a CEL <code>Query</code> and currently 
      *         logged in user's access rights.
      */
-    public function build(TelaBotanicaUser $user, QueryInterface $query): Query;
+    public function build(TelaBotanicaUser $user, CelFilterSetInterface $filterSet): Query;
 
 }
 

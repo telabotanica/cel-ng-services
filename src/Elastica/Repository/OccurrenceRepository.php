@@ -2,12 +2,12 @@
 
 namespace App\Elastica\Repository;
 
-use App\Elastica\Query\Query;
+use App\Elastica\Query\CelFilterSet;
 use App\Elastica\Query\BaseQueryBuilder;
-use App\Elastica\Query\OccurrenceQuery;
+use App\Elastica\Query\OccurrenceFilterSet;
 use App\Elastica\Query\OccurrenceQueryBuilder;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Implementation of <code>AbstractElasticRepository</code> dedicated to 
@@ -21,8 +21,8 @@ class OccurrenceRepository extends AbstractElasticRepository {
     /**
      * @inheritdoc
      */
-    protected function requestToFindQuery($request): Query {
-        return new OccurrenceQuery($request);
+    protected function requestToFindQuery(Request $request): CelFilterSet {
+        return new OccurrenceFilterSet($request);
     }
 
     /**

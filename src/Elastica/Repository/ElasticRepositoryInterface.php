@@ -5,6 +5,8 @@ namespace App\Elastica\Repository;
 use FOS\ElasticaBundle\Repository;
 use App\Entity\Photo;
 
+use Symfony\Component\HttpFoundation\Request;
+
 /**
  * Finds and counts resource instances matching the HTTP request parameters
  * and accessible by current user.
@@ -26,7 +28,7 @@ interface ElasticRepositoryInterface {
      * @return array Returns an array of resource instances
      *         matching provided HTTP request parameters.
      */
-    public function findWithRequest($request, $user);
+    public function findWithRequest(Request $request, $user);
 
     /**
      * Returns the total number of resource instances matching 
@@ -39,6 +41,6 @@ interface ElasticRepositoryInterface {
      * @return the total number of resource instances matching 
      *         provided HTTP request parameters.
      */
-    public function countWithRequest($request, $user);  
+    public function countWithRequest(Request $request, $user);  
 
 }
