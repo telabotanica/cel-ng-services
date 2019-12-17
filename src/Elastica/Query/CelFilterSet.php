@@ -2,6 +2,8 @@
 
 namespace App\Elastica\Query;
 
+use Symfony\Component\HttpFoundation\Request;
+
 /**
  * Base implementation of <code>CelFilterSetInterface</code>. Handles 
  * sort/pagination and free text queries.
@@ -30,7 +32,14 @@ class CelFilterSet implements CelFilterSetInterface {
         $this->fillWithParameters($request);
     }
 
-    protected function fillWithParameters($request) {
+    /**
+     * Populates the <code>CelFilterSet</code> member variables with the
+     * query parameter values from given HTTP <code>Request</code>.
+     *
+     * @param Request $request The HTTP <code>Request</code> containing the 
+     *        query parameter.
+     */
+    protected function fillWithParameters(Request $request) {
         $this->freeTextQuery = $request->query->get(
             CelFilterSet::FREETEXTQUERY_PARAM_NAME);
         $this->page = $request->query->get(
@@ -49,6 +58,9 @@ class CelFilterSet implements CelFilterSetInterface {
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function isPaginated(): bool {
 		return (
             $this->page !== null && 
@@ -59,6 +71,9 @@ class CelFilterSet implements CelFilterSetInterface {
             $this->perPage !== ''  );
 	}
 
+    /**
+     * @inheritdoc
+     */
     public function isSorted(): bool {
 
 		return (

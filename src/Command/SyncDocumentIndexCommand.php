@@ -23,22 +23,27 @@ use FOS\ElasticaBundle\Persister\ObjectPersister;
  * mirrors DB changes in ES indexes. change_log table is populated using
  * SQL triggers.
  */
-class SyncDocumentIndexCommand  extends Command {
-
+class SyncDocumentIndexCommand extends Command
+{
     private $changeLogsAsIterable;
     private $em;
     private $occurrencePersister;
     private $photoPersister;
     private const ALLOWED_ENTITY_NAMES = ['occurrence', 'photo'];
-
+    private const OCC_PERSISTER_ALIAS = 'fos_elastica.object_persister.' . 
+        'occurrences.occurrence';
+    private const PHOTO_PERSISTER_ALIAS = 'fos_elastica.object_persister.' . 
+        'photos.photo';
 
     public function __construct(
         ContainerInterface $container,
         EntityManagerInterface $entityManager
     ) {
         $this->em = $entityManager;
-        $this->occurrencePersister = $container->get('fos_elastica.object_persister.occurrences.occurrence');
-        $this->photoPersister = $container->get('fos_elastica.object_persister.photos.photo');
+        $this->occurrencePersister = $container->get(
+            SyncDocumentIndexCommand::OCC_PERSISTER_ALIAS);
+        $this->photoPersister = $container->get(
+            SyncDocumentIndexCommand::PHOTO_PERSISTER_ALIAS);
         parent::__construct();
     }
 
@@ -97,7 +102,7 @@ class SyncDocumentIndexCommand  extends Command {
 
                 continue;
             }
-            //$output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());
+
             $this->em->remove($changeLog);
             // Should not be required, removing should detach
             //$this->entityManager->detach($changeLog);

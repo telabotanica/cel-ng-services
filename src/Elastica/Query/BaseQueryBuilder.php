@@ -89,10 +89,7 @@ class BaseQueryBuilder implements QueryBuilderInteface {
     }
 
     /**
-     * Returns the elastica <code>Query</code> built from provided 
-     * CEL <code>Query</code> and enhanced with the access control
-     * filters for given <code>TelaBotanicaUser</code>
-     * @refactor: put nullable parameter second.
+     * @inheritdoc
      */
     public function build(?TelaBotanicaUser $user, CelFilterSetInterface $filterSet) : Query {
         $esQuery = new Query();

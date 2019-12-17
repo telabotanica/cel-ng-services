@@ -11,27 +11,19 @@ use Vich\UploaderBundle\Mapping\PropertyMapping;
 class TelaImageNamer implements NamerInterface {
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function name($object, PropertyMapping $mapping): string {
         return ( null !== $object->getId() ) ? 
             TelaNamer::buildTelaPhotoApiFileName($entity) : 
             $mapping->getFile($object)->getClientOriginalName();
-
- /*
-        if ( null !== $object->getId() ) {
-            return TelaNamer::buildFileName($entity);
-        }
-        else {
-            return $mapping->getFile($object)->getClientOriginalName();
-        }
-*/
     }
 
     /**
      * Returns the file name for the photo in tela's photo API, id-based format.
      *         e.g. "000_000_252_O.png"
-     * @return the file name for the photo in tela's photo API, id-based format.
+     *
+     * @return string The file name for the photo in tela's photo API, id-based format.
      */
     public static function buildTelaPhotoApiFileName($entity): string {
         // stretch the id to a 9 digits string:
@@ -50,8 +42,9 @@ class TelaImageNamer implements NamerInterface {
     /**
      * Returns the file name for the photo URL in tela's photo API, id-based 
      *         format e.g. "000000252O.png"
+     *
      * @return the name for the photo URL in tela's photo API, id-based 
-    *          format.
+     *         format.
      */
     public static function buildTelaPhotoApiUrlFileName($entity): string {
         // stretch the id to a 9 digits string:

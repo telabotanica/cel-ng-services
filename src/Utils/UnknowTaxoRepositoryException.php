@@ -4,7 +4,12 @@ namespace App\Utils;
 
 use \Exception;
 
-
+/**
+ * Thrown when an taxo repo has been provided during import.
+ *
+ * @package App\Utils
+ */
+// @refactor put this in root Exception package and extend BaseException.
 class UnknowTaxoRepositoryException extends Exception {
 
 	public function __construct() {

@@ -16,7 +16,8 @@ class TimestampedEntityEventListener {
 
 
     /**
-     * Populates the dateCreated property of <code>Occurrence</code> instances 
+     * Populates the dateCreated property of 
+     * <code>TimestampedEntityInterface</code> instances 
      * before they are persisted.
      *
      * @param LifecycleEventArgs $args The Lifecycle Event emitted.
@@ -33,7 +34,8 @@ class TimestampedEntityEventListener {
     }
 
     /**
-     * Populates the dateUpdated properties of <code>Occurrence</code> 
+     * Populates the dateUpdated properties of 
+     * <code>TimestampedEntityInterface</code> 
      * instances before they are persisted/updated.
      *
      * @param LifecycleEventArgs $args The Lifecycle Event emitted.

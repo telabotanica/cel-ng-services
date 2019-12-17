@@ -8,29 +8,33 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Normalizes Occurrence instances into a GeoJSON array format.
  */
-final class JsonPatchOccurrenceNormalizer implements NormalizerInterface, DenormalizerInterface
-{
+final class JsonPatchOccurrenceNormalizer implements NormalizerInterface, DenormalizerInterface {
     private $normalizer;
     protected const format = 'jsonpatch';
 
-    public function __construct(NormalizerInterface $normalizer)
-    {
+    public function __construct(NormalizerInterface $normalizer) {
         $this->normalizer = $normalizer;
     }
 
-    public function denormalize($data, $class, $format = null, array $context = [])
-    {
+    /**
+     * @inheritdoc
+     */
+    public function denormalize($data, $class, $format = null, array $context = []) {
         //return $this->normalizer->denormalize($data, $class, $format, $context);
 	    return $data;
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function supportsDenormalization($data, $type, $format = null) {
         return ($format == 'jsonpatch');
     }
 
-    public function normalize($object, $format = null, array $context = [])
-    {
+    /**
+     * @inheritdoc
+     */
+    public function normalize($object, $format = null, array $context = []) {
         $result = array();
 
         $result['geometry'] = json_decode($object->getGeometry());
@@ -44,10 +48,13 @@ final class JsonPatchOccurrenceNormalizer implements NormalizerInterface, Denorm
         return $result;
     }
 
-    public function supportsNormalization($data, $format = null)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function supportsNormalization($data, $format = null) {
         return ($format == 'jsonpatch');
     }
+
 }
 
 

@@ -27,7 +27,6 @@ class OwnedEntityEventListener {
         $this->tokenStorage = $tokenStorage;
     }
 
-    // @perf @todo: optimize this... find another workaround...
     public function prePersist(LifecycleEventArgs $args) {
 
         $entity = $args->getEntity();

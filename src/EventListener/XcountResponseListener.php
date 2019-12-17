@@ -32,6 +32,8 @@ class XcountResponseListener {
      * In case of collection GET request on occurrence or photo resource  
      * endpoints, adds an 'X-count' HTTP header to the response for pagination 
      * purpose.
+     * 
+     * @var FilterResponseEvent $event the Event which has just been raised.
      */
     public function onKernelResponse(FilterResponseEvent $event) {   
 

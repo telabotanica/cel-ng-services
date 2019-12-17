@@ -31,12 +31,18 @@ return $results->getNbResults();
 // https://stackoverflow.com/questions/27146787/count-query-with-php-elastica-and-symfony2-foselasticabundle/31162189
 */
 //@refactor if not int throw ElasticsearchCountException
-//@refactor: use public static const var for 'occurrence' and 'photo' + use them in ImportOccurrenceAction + syncdoc command
+//@refactor: avoid magic strings! use public static const variables 
+//           for 'occurrence' and 'photo' + use them in ImportOccurrenceAction 
+//           + syncdoc command
 class ElasticsearchClient {
     
     /**
      * Returns the total number of hits for given <code>Query</code> and type
      * name of the resource/entity in ES.
+     *
+     * @param Query $esQuery The Query to get thecount of.
+     * @param string $resourceTypeName The name of the resource type 
+     *        (occurrence or photo).
      */
     public static function count(
         Query $esQuery, string $resourceTypeName): int {
@@ -64,8 +70,12 @@ class ElasticsearchClient {
 
 
     /**
-     * Returns the total number of hits for given <code>Query</code> and type
-     * name of the resource/entity in ES.
+     * Deletes the ES document associated with given id and of given 
+     * resource type.
+     *
+     * @param int $id The ID of the document/entity to be deleted.
+     * @param string $resourceTypeName The name of the resource type 
+     *        (occurrence or photo).
      */
     public static function deleteById(
         int $id, string $resourceTypeName): string {
@@ -86,8 +96,12 @@ class ElasticsearchClient {
 
 
     /**
-     * Returns the total number of hits for given <code>Query</code> and type
-     * name of the resource/entity in ES.
+     * Deletes the ES documents associated with given ids and of given 
+     * resource type.
+     *
+     * @param array $ids The IDs of the documents/entities to be deleted.
+     * @param string $resourceTypeName The name of the resource type 
+     *        (occurrence or photo).
      */
     public static function deleteByIds(
         array $ids, string $resourceTypeName): array {

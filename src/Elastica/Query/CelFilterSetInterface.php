@@ -14,7 +14,19 @@ namespace App\Elastica\Query;
 interface CelFilterSetInterface {
 
     public function containsFilter(): bool;
+
+    /**
+     * Returns true of the filter query is paginated. Else, returns false.
+     *
+     * @return true of the filter query is paginated. Else, returns false.
+     */
     public function isPaginated(): bool;
+
+    /**
+     * Returns true of the filter query is sorted. Else, returns false.
+     *
+     * @return true of the filter query is sorted. Else, returns false.
+     */
     public function isSorted(): bool;
 	public function getFreeTextQuery(): ?string;
 	public function setFreeTextQuery(string $freeTextQuery);

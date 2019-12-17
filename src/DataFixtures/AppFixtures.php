@@ -27,7 +27,6 @@ use App\DBAL\InputSourceEnumType;
  * </ul>
  *
  */
-
 class AppFixtures extends Fixture {
 
     private function loadDaUserProfile(ObjectManager $manager, int $userId) {

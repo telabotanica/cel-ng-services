@@ -2,31 +2,15 @@
 
 namespace App\Entity;
 
-use App\Exception\InvalidImageException;
-use App\Utils\ExifExtractionUtils;
-use App\Controller\CreatePhotoAction;
-use App\Controller\PhotoBulkAction;
-use App\Controller\ServeZippedPhotosAction;
-use App\Filter\Photo\IsPublicFilter;
-use App\Filter\Photo\CertaintyFilter;
-use App\Filter\Photo\DateObservedYearFilter;
-use App\Filter\Photo\DateObservedMonthFilter;
-use App\Filter\Photo\CountryFilter;
-use App\Filter\Photo\ProjectIdFilter;
-use App\Filter\Photo\CountyFilter;
-use App\Filter\Photo\DateObservedDayFilter;
-use App\Filter\Photo\LocalityFilter;
-use App\Filter\Photo\FamilyFilter;
-use App\Filter\Photo\UserSciNameFilter;
-use App\Entity\OwnedEntityFullInterface;
-use App\Entity\OwnedEntitySimpleInterface;
-use App\Entity\TimestampedEntityInterface;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Represents a notification that an entity changed outside of Doctrine.
+ *
+ * @internal Only used by <code>SyncDocumentIndexCommand</code>.
+ *
  * @ORM\Entity()
  * @ORM\Table(name="change_log")
  */

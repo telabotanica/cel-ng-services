@@ -3,7 +3,7 @@
 namespace App\Exception;
 
 /**
- * Thrown when a file is not a valid image.
+ * Base Exception class.
  */
 class Cel2BaseException extends \Exception {
 

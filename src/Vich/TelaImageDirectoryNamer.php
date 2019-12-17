@@ -11,7 +11,7 @@ use Vich\UploaderBundle\Mapping\PropertyMapping;
 class TelaImageDirectoryNamer implements DirectoryNamerInterface {
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function directoryName($object, PropertyMapping $mapping): string {
         return ( null !== $object->getId() ) ? 
@@ -19,11 +19,15 @@ class TelaImageDirectoryNamer implements DirectoryNamerInterface {
             getEnv("TMP_FOLDER") . '/';
     }
 
+    /**
+     * Returns the folder name associated with given entity.
+     * 
+     * @return string The folder name associated with given entity.
+     */
     public static function buildTelaPhotoApiFolderName($entity): string {
         $obsStrId = str_pad(strval($entity->getId()), 9, "0", STR_PAD_LEFT);
         return getEnv('BASE_TELA_PHOTO_API_DIR') . substr($obsStrId, 0, 3) . \DIRECTORY_SEPARATOR . substr($obsStrId, 3, 3) .  \DIRECTORY_SEPARATOR . 'O'  ;
     }
-
 
 }
 

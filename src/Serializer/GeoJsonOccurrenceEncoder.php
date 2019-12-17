@@ -6,10 +6,12 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use stdClass;
 
-class GeoJsonOccurrenceEncoder implements EncoderInterface, DecoderInterface
-{
-    public function encode($data, $format, array $context = array())
-    {
+class GeoJsonOccurrenceEncoder implements EncoderInterface, DecoderInterface {
+
+    /**
+     * @inheritdoc
+     */
+    public function encode($data, $format, array $context = array()) {
         // Let's wrap rhe features in an envelope:
         $envelopedData = new stdClass();
         $envelopedData->type = "FeatureCollection";
@@ -17,18 +19,24 @@ class GeoJsonOccurrenceEncoder implements EncoderInterface, DecoderInterface
         return json_encode($envelopedData);
     }
 
-    public function supportsEncoding($format)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function supportsEncoding($format) {
         return 'geojson' === $format;
     }
 
-    public function decode($data, $format, array $context = array())
-    {
+    /**
+     * @inheritdoc
+     */
+    public function decode($data, $format, array $context = array()) {
         return json_decode($data);
     }
 
-    public function supportsDecoding($format)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function supportsDecoding($format) {
         return 'geojson' === $format;
     }
 }
