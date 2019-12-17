@@ -7,14 +7,14 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class NoDuplicateConstraintValidator extends ConstraintValidator
 {
 
     private $em;
 
-    public function __construct(EntityManager $em) { 
+    public function __construct(EntityManagerInterface $em) { 
         $this->em = $em;
     }
 
