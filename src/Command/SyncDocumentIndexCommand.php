@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Entity\ChangeLog;
-use App\Utils\ElasticsearchClient;
+use App\Elastica\Client\ElasticsearchClient;
 use App\Command\UnknownEntityNameException;
 
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
