@@ -2,11 +2,11 @@
 
 namespace App\Elastica\Repository;
 
-use App\Elastica\Query\Query;
+use App\Elastica\Query\CelFilterSet;
 use App\Elastica\Query\BaseQueryBuilder;
-use App\Elastica\Query\PhotoQuery;
 use App\Elastica\Query\PhotoQueryBuilder;
 
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Implementation of <code>AbstractElasticRepository</code> dedicated to 
@@ -14,14 +14,13 @@ use App\Elastica\Query\PhotoQueryBuilder;
  *
  * @package App\Elastica\Repository
  */
-class PhotoRepository extends AbstractElasticRepository
-{
+class PhotoRepository extends AbstractElasticRepository {
 
     /**
      * @inheritdoc
      */
-    protected function requestToFindQuery($request): Query {
-        return new PhotoQuery($request);
+    protected function requestToFindQuery(Request $request): CelFilterSet {
+        return new PhotoFilterSet($request);
     }
 
     /**
