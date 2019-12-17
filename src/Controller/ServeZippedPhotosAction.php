@@ -2,10 +2,7 @@
 
 namespace App\Controller;
 
-use App\Form\OccurrenceType;
-use App\Utils\FromArrayOccurrenceCreator;
-use App\Repository\PhotoRepository;
-
+use App\Service\PhotoArchiveGenerator;
 use ZipArchive;
  
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -27,9 +24,7 @@ use Symfony\Component\Dotenv\Dotenv;
  */
 final class ServeZippedPhotosAction {
 
-    private $doctrine;
-    private $storage;
-    private $tokenStorage;
+    private $photoArchiveGenerator;
     private $tmpFolder;
 
     const ENTITY_FILE_PROPERTY_NAME = 'file';
@@ -40,25 +35,17 @@ final class ServeZippedPhotosAction {
      * Returns a new <code>ServeZippedPhotosAction</code> instance 
      * initialized with (injected) services passed as parameters.
      *
-     * @param TokenStorageInterface $tokenStorage The injected 
-     *        <code>TokenStorageInterface</code> service.
-     * @param StorageInterface $storage The injected 
-     *        <code>StorageInterface</code> service.
-     * @param RegistryInterface $doctrine The injected 
-     *        <code>RegistryInterface</code> service.
+     * @param PhotoArchiveGenerator $photoArchiveGenerator The service 
+     *        responsible for generating the photos.
      * 
      * @return ServeZippedPhotosAction Returns a new  
      *         <code>ServeZippedPhotosAction</code> instance initialized 
      *         with (injected) services passed as parameters.
      */
     public function __construct(
-        StorageInterface $storage, 
-        RegistryInterface $doctrine,
-        TokenStorageInterface $tokenStorage) {
+        PhotoArchiveGenerator $photoArchiveGenerator) {
 
-    	$this->tokenStorage = $tokenStorage;
-        $this->doctrine = $doctrine;
-        $this->storage = $storage;
+    	$this->photoArchiveGenerator = $photoArchiveGenerator;
         $this->tmpFolder = getenv('TMP_FOLDER');
     }
 
@@ -73,45 +60,16 @@ final class ServeZippedPhotosAction {
      */
     public function __invoke(Request $request): Response {
 
-        $zip = new \ZipArchive;
         $zipName = ServeZippedPhotosAction::ZIP_FILE_PREFIX . time();
         $zipName .= ServeZippedPhotosAction::ZIP_EXTENSION;
         $zipFilePath = $this->tmpFolder . '/' . $zipName;
+        $ids = $request->query->get('id');
+        $this->photoArchiveGenerator->generate($ids, $zipFilePath);
 
-        // @todo trycatch 500
-        if ($zip->open(
-            $zipFilePath,  
-            \ZipArchive::CREATE)) {
-
-            $em = $this->doctrine->getManager();
-		    $photoRepo = $em->getRepository('App\Entity\Photo');
-            // @todo Do a DQL 'in' query instead:
-            $ids = $request->query->get('id');
-            $photos = $photoRepo->findById($ids);
-            // First populate the archive file:                 
-            $this->populateZip($zip, $photoRepo, $ids); 
-            $zip->close();
-
-            // Then, send the generated file:
-            return $this->buildResponse($zipFilePath, $zipName);
-        }
-        else {
-            $response = new Response();
-            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-            return $response;
-        }
+        // Then, send the generated file:
+        return $this->buildResponse($zipFilePath, $zipName);
     }
 
-
-    private function populateZip(ZipArchive $zip, PhotoRepository $repo, array $ids) {
-        foreach ($ids as $id) {
-            $photos = $repo->findById($id);
-            if (sizeof($photos)>0) {
-                $photo = $photos[0];
-                $zip->addFile($photo->getContentUrl(), basename($photo->getContentUrl()));
-            }
-        }
-    }
 
     private function buildResponse(string $zipFilePath, string $zipName): Response {
         $response = new Response(file_get_contents($zipFilePath));
@@ -127,5 +85,6 @@ final class ServeZippedPhotosAction {
     }
 
 }
+
 
 
