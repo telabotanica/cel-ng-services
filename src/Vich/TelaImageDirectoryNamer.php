@@ -8,14 +8,12 @@ use Vich\UploaderBundle\Mapping\PropertyMapping;
 /**
  * Namer class. Called during the prePersist/preUpdate doctrine events.
  */
-class TelaDirectoryNamer implements DirectoryNamerInterface {
+class TelaImageDirectoryNamer implements DirectoryNamerInterface {
 
     /**
      * {@inheritdoc}
      */
     public function directoryName($object, PropertyMapping $mapping): string {
-
-
         return ( null !== $object->getId() ) ? 
             TelaDirectoryNamer::buildTelaPhotoApiFolderName($object) : 
             getEnv("TMP_FOLDER") . '/';

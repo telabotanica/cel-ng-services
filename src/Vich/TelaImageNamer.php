@@ -8,7 +8,7 @@ use Vich\UploaderBundle\Mapping\PropertyMapping;
 /**
  * Namer class.  * Namer class. Seems to be called during the preUpdate doctrine events.
  */
-class TelaNamer implements NamerInterface {
+class TelaImageNamer implements NamerInterface {
 
     /**
      * {@inheritdoc}
