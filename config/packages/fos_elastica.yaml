@@ -15,7 +15,7 @@ fos_elastica:
                             occ_analyzer:
                                 type: custom
                                 tokenizer: keyword
-                                filter: ["asciifolding", "lowercase", "french_stem"]
+                                filter: ["french_stem"]
                         normalizer:
                             occ_normalizer:
                                 type: custom
@@ -160,7 +160,7 @@ fos_elastica:
                             photo_analyzer:
                                 type: custom
                                 tokenizer: keyword
-                                filter: ["asciifolding", "lowercase", "french_stem"]
+                                filter: ["french_stem"]
                         normalizer:
                             photo_normalizer:
                                 type: custom
