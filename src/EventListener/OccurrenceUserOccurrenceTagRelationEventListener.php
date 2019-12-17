@@ -27,7 +27,8 @@ class OccurrenceUserOccurrenceTagRelationEventListener {
     }
 
     /**
-     * Persists (ES-wise) the associated Occurrence so its tags are
+     * Persists (ES-wise) the associated 
+     * <code>OccurrenceUserOccurrenceTagRelation</code> so its tags are
      * synced in ES index.
      *
      * @param LifecycleEventArgs $args The Lifecycle Event emitted.
@@ -45,7 +46,8 @@ class OccurrenceUserOccurrenceTagRelationEventListener {
     }
 
     /**
-     * Persists (ES-wise) the associated Occurrence so its tags are
+     * Persists (ES-wise) the associated 
+     * <code>OccurrenceUserOccurrenceTagRelation</code> so its tags are
      * synced in ES index.
      *
      * @param LifecycleEventArgs $args The Lifecycle Event emitted.

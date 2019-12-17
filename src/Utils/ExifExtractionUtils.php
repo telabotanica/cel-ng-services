@@ -17,7 +17,7 @@ class ExifExtractionUtils {
         $this->exifIfdzero = @exif_read_data($imgPath, 'IFD0');
     }   
 
-   private function toDecimal($deg, $min, $sec, $ref) {
+    private function toDecimal($deg, $min, $sec, $ref) {
    
       $float = function($v) {
           return (count($v = explode('/', $v)) > 1) ? $v[0] / $v[1] : $v[0];

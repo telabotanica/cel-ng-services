@@ -9,8 +9,14 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-class NoDuplicateConstraintValidator extends ConstraintValidator
-{
+/**
+ * Constraint validator dealing with <code>NoDuplicateConstraint</code>
+ * instances.
+ *
+ * @Annotation
+ * @package App\Validator
+ */
+class NoDuplicateConstraintValidator extends ConstraintValidator {
 
     private $em;
 
@@ -18,8 +24,10 @@ class NoDuplicateConstraintValidator extends ConstraintValidator
         $this->em = $em;
     }
 
-    public function validate($occ, Constraint $constraint)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function validate($occ, Constraint $constraint) {
         if (!$constraint instanceof NoDuplicateConstraint) {
             throw new UnexpectedTypeException($constraint, NoDuplicateConstraint::class);
         }
@@ -32,4 +40,5 @@ class NoDuplicateConstraintValidator extends ConstraintValidator
         }
 
     }
+
 }

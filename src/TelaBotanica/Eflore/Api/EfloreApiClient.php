@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 class EfloreApiClient {
 
     // The base URL for eflore Web service API:
+    // @refactor: It should never change but it could be nicer to set it 
+    // in the .env. As all services URL are set there, this can be misleading
+    // for newcomers...
     const BASE_URL = 'http://api.tela-botanica.org/service:eflore:0.1/';
     const RESOURCE_NAME = 'taxons';
     const SERVICE_URL_POSTFIX = '/relations/superieurs';

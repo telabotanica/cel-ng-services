@@ -12,8 +12,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * Normalizes an Occurrence instance into an array to be serialized into GeoJSON
  * format. Unfortunately, the geoJSON collection envelope is not handled. 
  */
-final class GeoJsonOccurrenceNormalizer implements NormalizerInterface, DenormalizerInterface
-{
+final class GeoJsonOccurrenceNormalizer implements NormalizerInterface, DenormalizerInterface {
     private $normalizer;
     private $format = "geojson";
 
@@ -21,10 +20,16 @@ final class GeoJsonOccurrenceNormalizer implements NormalizerInterface, Denormal
         $this->normalizer = $normalizer;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function denormalize($data, $class, $format = null, array $context = []) {
         return $this->normalizer->denormalize($data, $class, $format, $context);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function supportsDenormalization($data, $type, $format = null) {
         return ( ($data instanceof Occurrence) && ($format == $this->format) );
     }

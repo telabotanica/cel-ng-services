@@ -42,6 +42,11 @@ abstract class AbstractElasticRepository extends Repository
      */
     abstract protected function getBuilder(): BaseQueryBuilder;
 
+    /**
+     * Returns the name of the entity this repository deals with.
+     * 
+     * @return string The name of the entity this repository deals with.
+     */
     abstract protected function getEntityName(): string;
 
     /**
@@ -68,8 +73,6 @@ abstract class AbstractElasticRepository extends Repository
         return $this->find($esQuery, 10000);
     }
 
-
-
     /**
      * @inheritdoc
      */
@@ -82,7 +85,5 @@ abstract class AbstractElasticRepository extends Repository
         return ElasticsearchClient::count($esQuery, $this->getEntityName());
 
     }
-
-
 
 }

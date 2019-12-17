@@ -23,13 +23,30 @@ abstract class AbstractVoter extends Voter {
     const EDIT      = 'edit';
     const DELETE    = 'delete';
 
+    /**
+     * @inheritdoc
+     */
     protected function supports($attribute, $subject) {
         return ( $this->supportsEntity($subject) && 
             $this->supportsAttribute($attribute) );
     }
 
+    /**
+     * Returns true if the entity passed as parameter is supported. Else, 
+     * returns false.
+     *
+     * @return bool true if the entity passed as parameter is supported. Else, 
+     * returns false.
+     */
     abstract protected function supportsEntity($subject): bool;
 
+    /**
+     * Returns true if the attribute passed as parameter is supported. Else, 
+     * returns false.
+     *
+     * @return bool true if the attribute passed as parameter is supported. Else, 
+     * returns false.
+     */
     protected function supportsAttribute($attribute): bool {
         $supportedAtts = array(self::VIEW, self::EDIT, self::DELETE);
         // if the attribute isn't one we support, return false
@@ -40,6 +57,9 @@ abstract class AbstractVoter extends Voter {
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function voteOnAttribute(
         $attribute, $subject, TokenInterface $token) {
 
