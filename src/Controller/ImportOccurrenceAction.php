@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Form\OccurrenceType;
 use App\Utils\ArrayToOccurrenceTransformer;
-use App\Utils\ElasticsearchClient;
+use App\Elastica\Client\ElasticsearchClient;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;

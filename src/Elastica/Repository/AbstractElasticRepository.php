@@ -2,12 +2,14 @@
 
 namespace App\Elastica\Repository;
 
-use App\Elastica\Query\Query;
+use App\Elastica\Query\CelFilterSet;
 use App\Elastica\Query\BaseQueryBuilder;
 use App\Entity\Photo;
-use App\Utils\ElasticsearchClient;
+use App\Elastica\Client\ElasticsearchClient;
 
 use FOS\ElasticaBundle\Repository;
+
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Base abstract class for <code>ElasticRepository</code> interface.
@@ -15,7 +17,7 @@ use FOS\ElasticaBundle\Repository;
  * @package App\Elastica\Repository
  */
 abstract class AbstractElasticRepository extends Repository 
-                                         implements ElasticRepositoryInterface {
+                                         implements ElasticRepositoryInterface{
 
     const DEFAULT_PER_PAGE = 10;
     
@@ -29,7 +31,7 @@ abstract class AbstractElasticRepository extends Repository
      * @return Query Returns a <code>Query</code> built from the 
      *         provided HTTP request parameters.
      */
-    abstract protected function requestToFindQuery($request): Query;
+    abstract protected function requestToFindQuery(Request $request): CelFilterSet;
     
     /**
      * Returns a <code>BaseQueryBuilder</code> for building (elastica)
@@ -71,7 +73,7 @@ abstract class AbstractElasticRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function countWithRequest($request, $user)   {
+    public function countWithRequest(Request $request, $user)   {
 
         $query = $this->requestToFindQuery($request);
         $queryBuilder = $this->getBuilder();
