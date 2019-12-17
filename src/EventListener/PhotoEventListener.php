@@ -3,8 +3,8 @@
 namespace App\EventListener;
 
 use App\Entity\Photo;
-use App\Vich\TelaDirectoryNamer;
-use App\Vich\TelaNamer;
+use App\Vich\TelaImageDirectoryNamer;
+use App\Vich\TelaImageNamer;
 use App\TelaBotanica\Eflore\Api\EfloreApiClient;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -89,9 +89,9 @@ class PhotoEventListener {
         }
 
       $srcPhotoName  = $entity->getOriginalName();
-      $targetPhotoName = TelaNamer::buildTelaPhotoApiFileName($entity);
-      $targetUrlPhotoName = TelaNamer::buildTelaPhotoApiUrlFileName($entity);
-      $targetFolder = TelaDirectoryNamer::buildTelaPhotoApiFolderName($entity);
+      $targetPhotoName = TelaImageNamer::buildTelaPhotoApiFileName($entity);
+      $targetUrlPhotoName = TelaImageNamer::buildTelaPhotoApiUrlFileName($entity);
+      $targetFolder = TelaImageDirectoryNamer::buildTelaPhotoApiFolderName($entity);
       $srcFolder = getEnv("TMP_FOLDER");
 
       // Moving the file from temp to tela photo API base folder:
