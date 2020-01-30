@@ -176,10 +176,12 @@ class BaseQueryBuilder implements QueryBuilderInteface {
      * @return the elastica access control <code>Match</code> query for
      *          given <code>TelaBotanicaUser</code> based on her/his access level.
      */ 
-    protected function buildAccessControlQuery(TelaBotanicaUser $user): Match {
+    protected function buildAccessControlQuery(?TelaBotanicaUser $user): Match {
 
         if ( $user === null ) {
-            throw new UnloggedAccessException('You must be logged into tela-botanica SSO system to access this part of the app.');
+            throw new UnloggedAccessException(
+                'You must be logged into tela-botanica SSO system to access this part of the app.'
+            );
         } 
 
         else {
