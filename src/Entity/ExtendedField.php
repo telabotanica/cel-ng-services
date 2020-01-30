@@ -77,7 +77,7 @@ class ExtendedField {
     /**
      * 
      *
-     * @ORM\Column(name="miax_value", type="decimal", nullable=true, length=10)
+     * @ORM\Column(name="max_value", type="decimal", nullable=true, length=10)
      */
     private $maxValue = false;
 

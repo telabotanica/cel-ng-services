@@ -768,6 +768,20 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $this->acceptedSciNameId;
     }
 
+    public function setAcceptedSciName($acceptedSciName): self
+    {
+        $this->acceptedSciName = $acceptedSciName;
+
+        return $this;
+    }
+
+    public function setAcceptedSciNameId($acceptedSciNameId): self
+    {
+        $this->acceptedSciNameId = $acceptedSciNameId;
+
+        return $this;
+    }
+
     public function getValidSciName(): ?string {
         return $this->validSciName;
     }

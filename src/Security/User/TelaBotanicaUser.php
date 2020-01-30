@@ -27,7 +27,7 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
 
     public function __construct(
         $id, $email, $surname, $lastName, $pseudo, $usePseudo, $avatar, 
-        array $roles, $administeredProjectId) {
+        array $roles, $administeredProjectId, $token) {
 
         $this->id = $id;
         $this->email = $email;
@@ -37,7 +37,8 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
         $this->usePseudo = $usePseudo;
         $this->avatar = $avatar;
         $this->administeredProjectId = $administeredProjectId;
-        $this->roles = $roles;
+	$this->roles = $roles;
+	$this->token = $token;
     }
 
     public function setId($idd) {
@@ -103,6 +104,10 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
 
     public function getPseudo() {
         return $this->pseudo;
+    }
+
+    public function getToken() {
+        return $this->token;
     }
 
     public function eraseCredentials() {

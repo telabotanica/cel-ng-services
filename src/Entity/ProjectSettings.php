@@ -157,7 +157,7 @@ class ProjectSettings
     * Valeur(s) par défaut du champ 'environment' (milieux) de toutes les obs du projet
     *
     * @Groups({"read"})
-    * @ORM\Column(name="environments", type="string", nullable=true, options={"comment":"Valeur(s) par défaut du champ 'environment' (milieux) de toutes les obs du projet"})
+    * @ORM\Column(name="environment", type="string", nullable=true, options={"comment":"Valeur(s) par défaut du champ 'environment' (milieux) de toutes les obs du projet"})
     */
    private $environment = null;
 

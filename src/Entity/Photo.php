@@ -44,7 +44,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     "normalization_context"={"groups"={"photo_read"}},
  *     "denormalization_context"={"groups"={"write"}},
  *     "formats"={"jsonld", "json", "jsonpatch"={"application/json-patch+json"}},
- *     "filters"={IsPublicFilter::class, CertaintyFilter::class, DateShotYearFilter::Class, DateShotMonthFilter::Class, DateShotDayFilter::Class, DateObservedYearFilter::class, DateObservedMonthFilter::class, DateObservedDayFilter::class, UserSciNameFilter::class, CountryFilter::class, CountyFilter::Class, FamilyFilter::Class, ProjectIdFilter::Class}},
+ *     "filters"={IsPublicFilter::class, CertaintyFilter::class, DateShotYearFilter::Class, DateShotMonthFilter::Class, DateShotDayFilter::Class, DateObservedYearFilter::class, DateObservedMonthFilter::class, DateObservedDayFilter::class, UserSciNameFilter::class, CountryFilter::class, CountyFilter::Class, FamilyFilter::Class, ProjectIdFilter::Class, TagFilter::Class}},
  *      itemOperations={
  *          "get"={"method"="GET", "access_control"="is_granted('view', object)"},
  *          "patch"={"method"="PATCH", "access_control"="is_granted('edit', object)"},
