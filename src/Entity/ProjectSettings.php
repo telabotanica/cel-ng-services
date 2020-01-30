@@ -357,14 +357,14 @@ class ProjectSettings
        return $this;
    }
 
-   public function getEnvironments()
+   public function getEnvironment()
    {
-       return $this->environments;
+       return $this->environment;
    }
 
-   public function setEnvironments($environments): self
+   public function setEnvironment($environment): self
    {
-       $this->environments = $environments;
+       $this->environment = $environment;
        return $this;
    }
 
