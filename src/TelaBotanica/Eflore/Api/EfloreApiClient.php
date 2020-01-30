@@ -4,16 +4,16 @@ namespace App\TelaBotanica\Eflore\Api;
 
 use App\Exception\UnsupportedEfloreTaxoRepoException;
 
+use Symfony\Component\Dotenv\Dotenv;
+
 /**
- * Client service for eflore Web service API. Currently, only offers methods 
+ * Client for eflore Web service API. Currently, only offers methods
  * to retrieve ancestor name for a given taxon.
  *
  * @package App\TelaBotanica\Eflore\Api
  */
 class EfloreApiClient {
 
-    // The base URL for eflore Web service API:
-    const BASE_URL = 'https://api.tela-botanica.org/service:eflore:0.1/';
     const RESOURCE_NAME = 'taxons';
     // The allowed repository names (also called 'projets' but it can be 
     // misleading):
@@ -31,7 +31,7 @@ class EfloreApiClient {
     private function buildGetInfoTaxonUrl(
         int $taxonId, string $taxoRepo): string {
 
-        $url = EfloreApiClient::BASE_URL;
+        $url = getenv('EFLORE_BASE_URL');
         $url .= $taxoRepo;
         $url .= '/';
         $url .= EfloreApiClient::RESOURCE_NAME;
