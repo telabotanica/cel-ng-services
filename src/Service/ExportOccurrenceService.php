@@ -84,7 +84,6 @@ class ExportOccurrenceService {
         set_time_limit(0);
         $url = $this->buildUrl($params);
 
-
         $token = $this->tokenStorage->getToken();
         $user =  $token->getUser();
 
@@ -92,41 +91,40 @@ class ExportOccurrenceService {
         $exportFileName .= ExportOccurrenceService::EXPORT_EXTENSION;
         $exportFilePath = $this->tmpFolder . '/' . $exportFileName;
 
-        try {
-
-            file_put_contents($exportFilePath, fopen($url, 'r'));
-            $curl_request = curl_init($url);
-            curl_setopt($curl_request, CURLOPT_HEADER, 'Authorization: ' . $user->getToken());
-            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl_request, CURLOPT_TIMEOUT, 5);
-            curl_setopt($curl_request, CURLOPT_CONNECTTIMEOUT, 5);
-            $result = curl_exec($curl_request); // execute the request    
-            curl_close($curl_request);
-
-            // Now send the generated file:
-            $response = new Response($result);
-            $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
-            $response->headers->set(
-                'Content-Disposition', 
-                'attachment;filename="' . $exportFileName . '"');
-            $response->headers->set(
-                'Content-length', 
-                filesize($exportFilePath));
-
-            return $response;
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_HEADER, 'Authorization: ' . $user->getToken());
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        $result = curl_exec($ch); // execute the request
 
         // Catch exceptions and throw a custom one to allow a better debug:
-        } catch (\Exception $t) {            
+        if ($errno = curl_errno($ch)) {
+            $errorMessage = curl_strerror($errno);
+
             throw new ExportServiceInvokationException(
                 ExportOccurrenceService::EXCEPTION_MESSAGE_PREFIX . 
-                $t->getMessage(),
-                0,
-                $t);
-        }  finally {
-            // Restore the timeout to its default, 30 secs, value:
-            set_time_limit(30);
+                "cURL error ({$errno}):\n {$errorMessage}",
+                0
+            );
         }
- 
+
+        curl_close($ch);
+
+        // Now send the generated file:
+        $response = new Response($result);
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set(
+            'Content-Disposition',
+            'attachment;filename="' . $exportFileName . '"');
+        $response->headers->set(
+            'Content-length',
+            filesize($exportFilePath));
+
+        // Restore the timeout to its default, 30 secs, value:
+        set_time_limit(30);
+
+        return $response;
     }
 
     private function buildParamString($params) {
