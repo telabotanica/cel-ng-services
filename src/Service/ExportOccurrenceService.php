@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\PhotoTag;
-use App\Excpetion\ExportServiceInvokationException;
+use App\Exception\ExportServiceInvokationException;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
