@@ -5,6 +5,7 @@ namespace App\Elastica\Repository;
 use App\Elastica\Query\CelFilterSet;
 use App\Elastica\Query\BaseQueryBuilder;
 use App\Elastica\Query\PhotoQueryBuilder;
+use App\Elastica\Query\PhotoFilterSet;
 
 use Symfony\Component\HttpFoundation\Request;
 
