@@ -88,6 +88,7 @@ class ExportOccurrenceService {
         $token = $this->tokenStorage->getToken();
         $user =  $token->getUser();
 
+        $exportFileName = ExportOccurrenceService::EXPORT_PREFIX . time();
         $exportFileName .= ExportOccurrenceService::EXPORT_EXTENSION;
         $exportFilePath = $this->tmpFolder . '/' . $exportFileName;
 
