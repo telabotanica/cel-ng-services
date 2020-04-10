@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Photo;
 use App\Entity\PhotoTag;
 use App\Repository\PhotoRepository;
 
@@ -74,14 +75,13 @@ class RotatePhotoController extends AbstractController {
         exit;
     }
 
-    private function rotatePhoto($photo, $degrees) {
+    private function rotatePhoto(Photo $photo, $degrees) {
 
         $mimetype = $photo->getMimeType();
 
         $imgs = $this->loadImages($photo);
 
-       foreach ($imgs as $path => $img) {  
-//var_dump($imgs);
+       foreach ($imgs as $path => $img) {
            // Save original image
            if (!file_exists($path.'.orig')) {
                $this->saveImage($img, $mimetype, $path.'.orig');
@@ -89,9 +89,19 @@ class RotatePhotoController extends AbstractController {
             // Rotate the image:
             $rotate = imagerotate($img, $degrees, 0);
             $this->saveImage($rotate, $mimetype, $path);
+        }
 
-        } 
+        // Call to mini-regen service to generate new thumbnails
+        $miniregenServiceUrl = sprintf(getenv('URL_MINIREGEN'), $photo->getId());
+        $ch = curl_init($miniregenServiceUrl);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
+        curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            throw new \Exception ('curl erreur: ' . curl_errno($ch));
+        }
+        curl_close($ch);
     }
 
     private function loadImages($photo) {
