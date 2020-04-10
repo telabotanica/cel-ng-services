@@ -82,6 +82,10 @@ class RotatePhotoController extends AbstractController {
 
        foreach ($imgs as $path => $img) {  
 //var_dump($imgs);
+           // Save original image
+           if (!file_exists($path.'.orig')) {
+               $this->saveImage($img, $mimetype, $path.'.orig');
+           }
             // Rotate the image:
             $rotate = imagerotate($img, $degrees, 0);
             $this->saveImage($rotate, $mimetype, $path);
