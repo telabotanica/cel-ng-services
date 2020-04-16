@@ -95,6 +95,7 @@ class RotatePhotoController extends AbstractController {
         $miniregenServiceUrl = sprintf(getenv('URL_MINIREGEN'), $photo->getId());
         $ch = curl_init($miniregenServiceUrl);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
         curl_exec($ch);
 
