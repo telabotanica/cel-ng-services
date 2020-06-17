@@ -94,6 +94,19 @@ class OccurrenceEventListener {
         }
 
         $this->doCommon($entity);
+
+        if ( null !== $entity->getTaxoRepo() && 
+            null !== $entity->getUserSciNameId()  ){
+
+            $efClient = new EfloreApiClient();
+            $taxon = $efClient->getTaxonInfo(
+                $entity->getUserSciNameId(),
+                $entity->getTaxoRepo()
+            );
+            $entity->setFamily($taxon->getFamily());
+            $entity->setAcceptedSciName($taxon->getAcceptedSciName());
+            $entity->setAcceptedSciNameId($taxon->getAcceptedSciNameId());
+        }
     }
 
     public function preRemove(LifecycleEventArgs $args) {
