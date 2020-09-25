@@ -2,6 +2,7 @@
 
 namespace App\Elastica\Command;
 
+use App\Entity\ChangeLog;
 use App\Utils\ElasticsearchClient;
 use App\Elastica\Command\UnknownEntityNameException;
 
@@ -58,12 +59,25 @@ class SyncDocumentIndexCommand  extends Command {
 
         foreach( $this->changeLogsAsIterable as $row) {
 
+            /**
+             * @var ChangeLog $changeLog
+             */
             $changeLog = $row[0];
 
             if ( in_array($changeLog->getEntityName(), SyncDocumentIndexCommand::ALLOWED_ENTITY_NAMES) ) {
-                $this->executeAction($changeLog);   
-                //$output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
-                //$this->entityManager->remove($changeLog);
+                try {
+                    $this->executeAction($changeLog);
+                } catch (\Exception $e) {
+                    $changeLog->setActionType('error');
+                    $this->entityManager->flush();
+
+                    $subject = sprintf('CEL-services : Erreur de synchro ES, obs %d', $changeLog->getEntityId());
+                    mail('webmestre@tela-botanica.org', $subject, $subject);
+
+                    continue;
+                }
+                //$output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());
+                $this->entityManager->remove($changeLog);
                 // Should not be required, removing should detach
                 //$this->entityManager->detach($changeLog);
                 $counter++;
@@ -92,7 +106,7 @@ class SyncDocumentIndexCommand  extends Command {
 
     private function loadChangeLogsAsIterable() {
         // return $this->entityManager->getRepository('App:ChangeLog')->findAll();
-        $q = $this->entityManager->createQuery('select u from App\Entity\ChangeLog u');
+        $q = $this->entityManager->createQuery("select u from App\Entity\ChangeLog u where u.actionType != 'error'");
         return $q->iterate();
     }
 
@@ -112,7 +126,9 @@ class SyncDocumentIndexCommand  extends Command {
             break;
             case "delete":
                     $this->deleteDocument($changeLog->getEntityId(), $changeLog->getEntityName());
-            break;        
+            break;
+            default:
+                break;
         }
 
 
