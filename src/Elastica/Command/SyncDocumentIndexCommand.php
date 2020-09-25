@@ -106,7 +106,7 @@ class SyncDocumentIndexCommand  extends Command {
 
     private function loadChangeLogsAsIterable() {
         // return $this->entityManager->getRepository('App:ChangeLog')->findAll();
-        $q = $this->entityManager->createQuery("select u from App\Entity\ChangeLog u where u.action_type <> 'error'");
+        $q = $this->entityManager->createQuery("select u from App\Entity\ChangeLog u where u.action_type != 'error'");
         return $q->iterate();
     }
 
