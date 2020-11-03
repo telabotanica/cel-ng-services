@@ -62,7 +62,20 @@ class PhotoRotator {
             $rotate = imagerotate($img, $degrees, 0);
             $this->saveImage($rotate, $mimetype, $path);
 
-        } 
+        }
+
+        // Call to mini-regen service to generate new thumbnails
+        $miniregenServiceUrl = sprintf(getenv('URL_MINIREGEN'), $photo->getId());
+        $ch = curl_init($miniregenServiceUrl);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            throw new \Exception ('curl erreur: ' . curl_errno($ch));
+        }
+        curl_close($ch);
 
     }
 

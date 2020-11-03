@@ -23,7 +23,8 @@ class EfloreApiClient {
         'eflore', 'fournier', 'insee-d', 'iso-3166-1', 'iso-639-1', 'nvjfl', 
         'cel', 'lion1906', 'liste-rouge', 'wikipedia', 'osm', 'prometheus', 
         'bibliobota', 'photoflora', 'baseflor', 'baseveg', 'sptb', 'isfan', 
-        'nva', 'moissonnage', 'nasa-srtm', 'coord-transfo', 'lbf');
+        'nva', 'moissonnage', 'nasa-srtm', 'coord-transfo', 'lbf', 'taxref',
+        'taxreflich');
     // Constants for rank names as used in the Web services:
     const RANK_FAMILY = 'Famille';
     const RANK_ORDER  = 'Ordre';

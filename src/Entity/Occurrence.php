@@ -150,7 +150,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
    /**
     * Pseudo de l'utilisateur ayant saisi l'obs. Nom/Prénom si non renseigné.
     *
-    * @ORM\Column(name="user_pseudo", type="string", nullable=true, options={"comment":"Pseudo de l'utilisateur ayant saisi l'obs. Nom/Prénom si non renseigné."})
+    * @ORM\Column(name="user_pseudo", type="string", length=100, nullable=true, options={"comment":"Pseudo de l'utilisateur ayant saisi l'obs. Nom/Prénom si non renseigné."})
     */
    private $userPseudo = null;
 
@@ -158,7 +158,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Observateur.
     *
     * @Groups({"read", "write"})
-    * @ORM\Column(type="string", nullable=false, options={"comment":"Observateur", "default": null})
+    * @ORM\Column(type="string", length=100, nullable=false, options={"comment":"Observateur", "default": null})
     */
    private $observer = null;
 
@@ -166,7 +166,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Structure dans le cadre de laquelle l'obs a été faite.
     *
     * @Groups({"read", "write"})
-    * @ORM\Column(name="observer_institution", type="string", nullable=true, options={"comment":"Structure dans le cadre de laquelle l'obs a été faite"})
+    * @ORM\Column(name="observer_institution", type="string", length=100, nullable=true, options={"comment":"Structure dans le cadre de laquelle l'obs a été faite"})
     */
    private $observerInstitution = null;
 
@@ -253,7 +253,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Famille du taxon auquel appartient l'observation.
     *
     * @Groups({"read"})
-    * @ORM\Column(name="family", type="string", nullable=true, options={"comment":"Famille du taxon auquel appartient l'observation"})
+    * @ORM\Column(name="family", length=50, type="string", nullable=true, options={"comment":"Famille du taxon auquel appartient l'observation"})
     */
    private $family = null;
 
@@ -530,7 +530,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Champ complété automatiquement par osm - code pays.
     *
     * @Groups({"read", "write"})
-    * @ORM\Column(name="identification_author", type="string", nullable=true, options={"comment":"Nom de la personne ayant identifié l'espèce observée (si différente de l'observateur)"})
+    * @ORM\Column(name="identification_author", length=100, type="string", nullable=true, options={"comment":"Nom de la personne ayant identifié l'espèce observée (si différente de l'observateur)"})
     */
    private $identificationAuthor = null;
 
@@ -538,7 +538,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      * Référentiel taxonomique
      * 
      * @Groups({"read", "write"})
-     * @ORM\Column(name="taxo_repo", type="string", nullable=true, options={"default": false, "comment":"Référentiel taxonomique"})
+     * @ORM\Column(name="taxo_repo", length=20, type="string", nullable=true, options={"default": false, "comment":"Référentiel taxonomique"})
      */
     private $taxoRepo;
 

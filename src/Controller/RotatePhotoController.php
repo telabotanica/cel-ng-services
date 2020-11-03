@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Photo;
 use App\Entity\PhotoTag;
 use App\Repository\PhotoRepository;
 use App\Service\PhotoRotator;
