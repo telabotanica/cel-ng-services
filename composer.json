@@ -30,9 +30,11 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "easycorp/easy-deploy-bundle": "^1.0",
+        "symfony/debug-bundle": "^4.1",
         "symfony/debug-pack": "^1.0",
         "symfony/dotenv": "^4.1",
-        "symfony/maker-bundle": "^1.5"
+        "symfony/maker-bundle": "^1.5",
+        "symfony/var-dumper": "^4.1"
     },
     "config": {
         "preferred-install": {
