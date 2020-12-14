@@ -2,6 +2,8 @@
 
 namespace App\Security\Voters;
 
+use App\Entity\PhotoTag;
+use App\Entity\UserOccurrenceTag;
 use App\Entity\UserProfileCel;
 use App\Security\User\TelaBotanicaUser;
 use App\Security\Voters\AbstractVoter;
@@ -33,7 +35,7 @@ class BaseVoter extends AbstractVoter {
     protected function supportsEntity($subject): bool {
 
         if ( !( $subject instanceof UserProfileCel ) ||   
-            !( $subject instanceof PhotoTag ) || 
+            !( $subject instanceof PhotoTag ) ||
             !( $subject instanceof UserOccurrenceTag ) ) {
 
             return false;

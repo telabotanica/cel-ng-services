@@ -2,6 +2,7 @@
 
 namespace App\Elastica\Repository;
 
+use App\Elastica\Client\ElasticsearchClient;
 use FOS\ElasticaBundle\Repository;
 use App\Entity\Photo;
 
@@ -41,6 +42,6 @@ interface ElasticRepositoryInterface {
      * @return the total number of resource instances matching 
      *         provided HTTP request parameters.
      */
-    public function countWithRequest(Request $request, $user);  
+    public function countWithRequest(Request $request, ElasticsearchClient $elasticsearchClient, $user);
 
 }

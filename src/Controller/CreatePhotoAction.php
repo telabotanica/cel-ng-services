@@ -7,7 +7,7 @@ use App\Form\PhotoType;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -38,8 +38,8 @@ final class CreatePhotoAction {
      * Returns a new <code>CreatePhotoAction</code> instance 
      * initialized with (injected) services passed as parameters.
      *
-     * @param RegistryInterface $doctrine The injected 
-     *        <code>RegistryInterface</code> service.
+     * @param EntityManagerInterface $doctrine The injected
+     *        <code>EntityManagerInterface</code> service.
      * @param FormFactoryInterface $formFactory The injected 
      *        <code>FormFactoryInterface</code> service.
      * @param Security $security The injected <code>Security</code> service.<
@@ -50,7 +50,7 @@ final class CreatePhotoAction {
      *         with (injected) services passed as parameters.
      */
     public function __construct(
-        RegistryInterface $doctrine, 
+        EntityManagerInterface $doctrine,
         Security $security, 
         FormFactoryInterface $formFactory, 
         ValidatorInterface $validator) {
@@ -82,7 +82,7 @@ final class CreatePhotoAction {
 
         if ( (sizeof($photoWithSameName)==0) ) {
 
-            $em = $this->doctrine->getManager();
+            $em = $this->doctrine;
             $em->persist($photo);
             $em->flush();
 

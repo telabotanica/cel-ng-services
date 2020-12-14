@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 
 /** 
@@ -31,8 +31,8 @@ class RotatePhotoController extends AbstractController {
      * Returns a new <code>RotatePhotoController</code> instance 
      * initialized with (injected) services passed as parameters.
      *
-     * @param RegistryInterface $doctrine The injected 
-     *        <code>RegistryInterface</code> service.
+     * @param EntityManagerInterface $doctrine The injected
+     *        <code>EntityManagerInterface</code> service.
      * @param Security $security The injected <code>Security</code> service.
      *
      * @return CreatePhotoAction Returns a new  

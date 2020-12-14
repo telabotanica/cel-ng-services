@@ -30,6 +30,7 @@ class ExportOccurrenceService {
     protected $entityManager;
 
     private $tmpFolder;
+    private $exportServiceUrl;
 
     // Mapping between CEL2 filter params and the occurrence export Web service
     // ones - only params that justs needs to be directly translated to the 
@@ -70,11 +71,15 @@ class ExportOccurrenceService {
      */
     public function __construct(
         TokenStorageInterface $tokenStorage, 
-        EntityManagerInterface $entityManager) {
+        EntityManagerInterface $entityManager,
+        string $tmpFolder,
+        string $exportServiceUrl
+    ) {
 
         $this->tokenStorage = $tokenStorage;
         $this->entityManager = $entityManager;
-        $this->tmpFolder = getenv('TMP_FOLDER');
+        $this->tmpFolder = $tmpFolder;
+        $this->exportServiceUrl = $exportServiceUrl;
     }
 
 
@@ -217,7 +222,7 @@ class ExportOccurrenceService {
         $this->addAccessControlParameter();
         $this->paramsAsString = $this->paramsAsString . ExportOccurrenceService::MANDATORY_URL_PARAMS;
 
-        return getenv('EXPORT_SERVICE_URL') . '?' . $this->paramsAsString; 
+        return $this->exportServiceUrl . '?' . $this->paramsAsString;
     }
 
 }

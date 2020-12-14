@@ -191,7 +191,7 @@ class ProjectSettings
    /**
      * Many WidgetConfiguration have One TelaBotanicaProject.
      * 
-     * @ORM\ManyToOne(targetEntity="TelaBotanicaProject", inversedBy="widgetConfigurations")
+     * @ORM\ManyToOne(targetEntity="TelaBotanicaProject", inversedBy="projectSettings")
      * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
      */
     private $project;

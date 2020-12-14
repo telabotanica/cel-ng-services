@@ -15,8 +15,8 @@ class SSOTokenDecoder {
 	/** The validator for the JWT tokens as used by SSO Web services */
 	protected $tokenValidator;
 
-	public function __construct() {
-        $this->tokenValidator = new SSOTokenValidator();
+	public function __construct(SSOTokenValidator $SSOTokenValidator) {
+        $this->tokenValidator = $SSOTokenValidator;
 	}
 
 	/**

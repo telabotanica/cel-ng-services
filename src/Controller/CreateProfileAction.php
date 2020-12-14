@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\UserProfileCel;
 
 use Symfony\Component\Security\Core\Security;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,11 +15,11 @@ class CreateProfileAction {
      * Returns a new <code>CreatePhotoAction</code> instance 
      * initialized with (injected) services passed as parameters.
      *
-     * @param RegistryInterface $doctrine The injected 
-     *        <code>RegistryInterface</code> service.
+     * @param EntityManagerInterface $doctrine The injected
+     *        <code>EntityManagerInterface</code> service.
      */
     public function __construct(
-        RegistryInterface $doctrine, 
+        EntityManagerInterface $doctrine,
         Security $security) {
 
         $this->security = $security;
@@ -40,9 +40,8 @@ class CreateProfileAction {
             if ( null !== $id ) {
                 if ( $userId == $id ) {    
                     $profile->setUserId($id);
-                    $em = $this->doctrine->getManager();
-                    $em->persist($profile);
-                    $em->flush();
+                    $this->doctrine->persist($profile);
+                    $this->doctrine->flush();
     
                     return $profile;
                 }

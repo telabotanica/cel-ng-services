@@ -2,6 +2,8 @@
 
 namespace App\Elastica\Client;
 
+use App\Entity\Occurrence;
+use App\Entity\Photo;
 use Elastica\Query;
 
 use Symfony\Component\Dotenv\Dotenv;
@@ -35,7 +37,20 @@ return $results->getNbResults();
 //           for 'occurrence' and 'photo' + use them in ImportOccurrenceAction 
 //           + syncdoc command
 class ElasticsearchClient {
-    
+
+    private $elasticsearchUrl;
+
+    private $occurrencesIndexName;
+
+    private $photosIndexName;
+
+    public function __construct($elasticsearchUrl, $occurrencesIndexName, $photosIndexName)
+    {
+        $this->elasticsearchUrl = $elasticsearchUrl;
+        $this->occurrencesIndexName = $occurrencesIndexName;
+        $this->photosIndexName = $photosIndexName;
+    }
+
     /**
      * Returns the total number of hits for given <code>Query</code> and type
      * name of the resource/entity in ES.
@@ -44,11 +59,11 @@ class ElasticsearchClient {
      * @param string $resourceTypeName The name of the resource type 
      *        (occurrence or photo).
      */
-    public static function count(
+    public function count(
         Query $esQuery, string $resourceTypeName): int {
         $queryAsArray = $esQuery->getQuery()->toArray();
         $strQuery = json_encode(["query" => $queryAsArray]);
-        $ch = curl_init(ElasticsearchClient::buildCountUrl($resourceTypeName));
+        $ch = curl_init($this->buildCountUrl($resourceTypeName));
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $strQuery);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -77,10 +92,10 @@ class ElasticsearchClient {
      * @param string $resourceTypeName The name of the resource type 
      *        (occurrence or photo).
      */
-    public static function deleteById(
+    public function deleteById(
         int $id, string $resourceTypeName): string {
 
-        $ch = curl_init(ElasticsearchClient::buildDeleteByIdUrl($resourceTypeName, $id));
+        $ch = curl_init($this->buildDeleteByIdUrl($resourceTypeName, $id));
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -103,44 +118,48 @@ class ElasticsearchClient {
      * @param string $resourceTypeName The name of the resource type 
      *        (occurrence or photo).
      */
-    public static function deleteByIds(
+    public function deleteByIds(
         array $ids, string $resourceTypeName): array {
 
         $responses = array();
         foreach ($ids as $id){
-            $responses[] = ElasticsearchClient::deleteById($id, $resourceTypeName);
+            $responses[] = $this->deleteById($id, $resourceTypeName);
         }
 
         return $responses;
     }
 
-    private static function buildCountUrl(string $resourceTypeName): string {
-        $url = ElasticsearchClient::buildBaseUrl($resourceTypeName);
+    private function buildCountUrl(string $resourceTypeName): string {
+        $url = $this->buildBaseUrl($resourceTypeName);
         $url .= '/_count';
 
         return $url;
     }
  
 
-    private static function buildDeleteByIdUrl(string $resourceTypeName, int $id): string {
-        $url = ElasticsearchClient::buildBaseUrl($resourceTypeName);
-        $url .= '/';
-        $url .= $id;
+    private function buildDeleteByIdUrl(string $resourceTypeName, int $id): string {
+        $url = $this->buildBaseUrl($resourceTypeName);
+        $url .= '/'.$id;
 
         return $url;
     }
 
-    private static function buildBaseUrl(string $resourceTypeName): string {
-        $url = null;
-        // @refactor use class constants here (and in OccRepo + PhotoRepo as well
-        if ($resourceTypeName == 'occurrence')  {
-            $url = getenv('ELASTICSEARCH_OCC_INDEX_URL');
+    private function buildBaseUrl(string $resourceTypeName): string {
+        $url = $this->elasticsearchUrl;
+
+        switch ($resourceTypeName) {
+            case Occurrence::RESOURCE_NAME:
+                $url .= $this->occurrencesIndexName;
+                break;
+            case Photo::RESOURCE_NAME:
+                $url .= $this->photosIndexName;
+                break;
+            default:
+                throw new \LogicException(sprintf('you shoud not land here, resource "%s" not supported', $resourceTypeName));
+                break;
         }
-        if ($resourceTypeName == 'photo')  {
-            $url = getenv('ELASTICSEARCH_PHOTO_INDEX_URL');
-        }      
-        // @refactor Else we should raise a custom exception  
-        $url .= $resourceTypeName;
+
+        $url .= '/'.$resourceTypeName;
 
         return $url;
     }

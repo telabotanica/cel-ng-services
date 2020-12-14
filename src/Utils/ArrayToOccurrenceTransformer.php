@@ -12,7 +12,7 @@ use App\DBAL\TaxoRepoEnumType;
 use DateTime;
 use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Transforms (deserializes) data arrays into a <code>Occurrence</code> 
@@ -64,7 +64,7 @@ class ArrayToOccurrenceTransformer {
             TaxoRepoEnumType::LBF, 
             TaxoRepoEnumType::OTHERUNKNOWN);
 
-    public function __construct(RegistryInterface $doctrine)
+    public function __construct(EntityManagerInterface $doctrine)
     {
         $this->doctrine = $doctrine;
      }
@@ -84,13 +84,13 @@ class ArrayToOccurrenceTransformer {
      * @param array $csvLine An array containing the data of a CSV line
      * @param TelaBotanicaUser $user The current user..
      *
-     * @return array The ancestor descriptions for the taxon with ID = $taxonId
+     * @return Occurrence The ancestor descriptions for the taxon with ID = $taxonId
      *         in the $taxoRepo repository. Returns null if it cannot be 
      *         retrieved.
      */
 	public function transform(array $csvLine, TelaBotanicaUser $user) {
 		$resultMsgs = array();
-		$em = $this->doctrine->getManager();     
+		$em = $this->doctrine;
 
 	    if ( $this->lineCount == 0 ) {
 		     for( $i = 0; $i<sizeof($csvLine); $i++ ) {
@@ -104,7 +104,7 @@ class ArrayToOccurrenceTransformer {
 
 		    $occ = new Occurrence();
 		    $occ = $this->populateWithUserInfo($occ, $user);
-		    $occ = $this->populate($occ, $user, $csvLine);
+		    $occ = $this->populate($occ, $csvLine);
 
 		    // Handle the photos.
 		    // Attach the photos with original names (separated by commas) in 
@@ -129,9 +129,9 @@ class ArrayToOccurrenceTransformer {
 	}
 
     //@refactor put this in the repo
-    private function populateWithPhotos($occ, $user, $photoOriginalNames) {
+    private function populateWithPhotos(Occurrence $occ, TelaBotanicaUser $user, $photoOriginalNames) {
 
-        $em = $this->doctrine->getManager();
+        $em = $this->doctrine;
         $photoRepo = $em->getRepository('App\Entity\Photo');
 
         foreach($photoOriginalNames as $imageName) {
@@ -148,9 +148,9 @@ class ArrayToOccurrenceTransformer {
     }
 
     //@refactor put this in the repo
-    private function populateWithUserTags($occ, $user, $tagNames) {
+    private function populateWithUserTags(Occurrence $occ, TelaBotanicaUser $user, $tagNames) {
 
-        $em = $this->doctrine->getManager();
+        $em = $this->doctrine;
         $userOccurrenceTagRepo = $em->getRepository(
             'App\Entity\UserOccurrenceTag');
 
@@ -187,14 +187,14 @@ class ArrayToOccurrenceTransformer {
     }
 
     //@refactor put this in the repo
-    private function populateWithUserInfo($occ, $user) {
+    private function populateWithUserInfo(Occurrence $occ, TelaBotanicaUser $user) {
 		$occ->setUserId($user->getId());
 		$occ->setUserEmail($user->getEmail());
 		$occ->setUserPseudo($user->getUsername());
         return $occ;
     }
 
-    private function populate($occ, $user, $csvLine) {
+    private function populate(Occurrence $occ, $csvLine) {
 
         $lat  = $csvLine[$this->headerIndexArray['Latitude']];
         $long = $csvLine[$this->headerIndexArray['Longitude']];

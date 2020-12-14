@@ -40,6 +40,13 @@ class SSOUserExtractor {
     const NO_AUTH_HEADER_MSG            = 'The "Authorization" header ' .
         'is not set';
 
+    private $tokenDecoder;
+
+    public function __construct(SSOTokenDecoder $SSOTokenDecoder)
+    {
+        $this->tokenDecoder = $SSOTokenDecoder;
+    }
+
     public function extractUser(Request $request) {
         $token = $this->extractTokenFromRequest($request);
         if (null === $token) {
@@ -55,13 +62,11 @@ class SSOUserExtractor {
             return null;
         }
 
-        $tokenDecoder = new SSOTokenDecoder();
-
-        $userInfo = $tokenDecoder->getUserFromToken($token);
+        $userInfo = $this->tokenDecoder->getUserFromToken($token);
         $roles = array();
         if (in_array( 
             SSOUserExtractor::ADMIN_PERMISSION,
-            $userInfo[SSOUserExtractor::PERMISSIONS_TOKEN_PROPERTY])) {
+            $userInfo[SSOUserExtractor::PERMISSIONS_TOKEN_PROPERTY] ?? [])) {
             $roles[] = SSOUserExtractor::ADMIN_ROLE;
         }
         else {
@@ -70,7 +75,7 @@ class SSOUserExtractor {
         $user = new TelaBotanicaUser(
             intval($userInfo['id']), $userInfo['sub'], $userInfo['prenom'], 
             $userInfo['nom'], $userInfo['pseudo'], 
-            $userInfo['pseudoUtilise'], $userInfo['avatar'], 
+            $userInfo['pseudoUtilise'], $userInfo['avatar'] ?? '',
             $roles, null, $token);
 
         return $user;

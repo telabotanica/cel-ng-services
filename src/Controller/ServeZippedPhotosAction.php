@@ -8,7 +8,7 @@ use ZipArchive;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,10 +43,10 @@ final class ServeZippedPhotosAction {
      *         with (injected) services passed as parameters.
      */
     public function __construct(
-        PhotoArchiveGenerator $photoArchiveGenerator) {
+        PhotoArchiveGenerator $photoArchiveGenerator, string $tmpFolder) {
 
     	$this->photoArchiveGenerator = $photoArchiveGenerator;
-        $this->tmpFolder = getenv('TMP_FOLDER');
+        $this->tmpFolder = $tmpFolder;
     }
 
     /**

@@ -11,7 +11,7 @@ use App\DBAL\CertaintyEnumType;
 use DateTime;
 use FOS\ElasticaBundle\Transformer\ModelToElasticaTransformerInterface;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Extracts latitude and longitude from/validates the GeoJSON 'geometry' 

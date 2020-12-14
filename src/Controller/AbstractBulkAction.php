@@ -7,7 +7,7 @@ use App\Service\AbstractBulkService;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

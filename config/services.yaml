@@ -1,28 +1,61 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'fr'
+    sso.annuaire.url: '%env(string:SSO_ANNUAIRE_URL)%'
+    ignore.ssl.issues: '%env(string:IGNORE_SSL_ISSUES)%'
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-        public: false       # Allows optimizing the container by removing unused services; this also means
-                            # fetching services directly from the container via $container->get() won't work.
-                            # The best practice is to be explicit about your dependencies anyway.
+        bind:
+            $tmpFolder: '%env(string:TMP_FOLDER)%'
+            $baseTelaPhotoApiUrl: '%env(string:BASE_TELA_PHOTO_API_URL)%'
+            $plantnetApiUrl: '%env(string:PLANTNET_API_URL)%'
+            $plantnetApiKey: '%env(string:PLANTNET_API_KEY)%'
+            $appPrefixPath: '%env(string:APP_PREFIX_PATH)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: '../src/*'
-        exclude: '../src/{Entity,Migrations,Tests,Kernel.php}'
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
-        resource: '../src/Controller'
+        resource: '../src/Controller/'
         tags: ['controller.service_arguments']
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    # ########################################################################
+    # ARGUMENTS INJECTION
+    # ########################################################################
+
+    App\Elastica\Client\ElasticsearchClient:
+        $elasticsearchUrl: '%env(string:ELASTICSEARCH_URL)%'
+        $occurrencesIndexName: '%env(string:FOS_ELASTICA_INDEXES_OCCURRENCES_INDEX_NAME)%'
+        $photosIndexName: '%env(string:FOS_ELASTICA_INDEXES_PHOTOS_INDEX_NAME)%'
+
+    App\Service\ExportOccurrenceService:
+        $exportServiceUrl: '%env(string:EXPORT_SERVICE_URL)%'
+
+    App\Service\PhotoRotator:
+        $urlMiniregen: '%env(string:URL_MINIREGEN)%'
+
+    App\TelaBotanica\Eflore\Api\EfloreApiClient:
+        $efloreBaseUrl: '%env(string:EFLORE_BASE_URL)%'
 
     # ########################################################################
     # ENTITY (DE)SERIALIZATION
@@ -71,38 +104,6 @@ services:
     # Photo resource type.
     app.search.photo_to_elastica_transformer :
         class: App\Elastica\Transformer\PhotoToElasticaTransformer
-
-    # ########################################################################
-    # SECURITY VOTERS (ACL)
-    # ########################################################################
-
-    # Security: voter (ACL) for occurrence entities/resources 
-    security.acccess.occurrence_voter :
-        class:  App\Security\Voters\ResourceVoter
-        public: false
-        tags:
-            - { name: security.voter }
-
-    # Security: voter (ACL) for OccurrenceUserOccurrenceTagRelation entities/resources 
-    security.acccess.occurrence_user_occurrence_tag_relation_voter :
-        class:  App\Security\Voters\OccurrenceUserOccurrenceTagRelationVoter
-        public: false
-        tags:
-            - { name: security.voter }
-
-    # Security: voter (ACL) for PhotoPhotoTagRelation entities/resources 
-    security.acccess.photo_photo_tag_relation_voter :
-        class:  App\Security\Voters\PhotoPhotoTagRelationVoter
-        public: false
-        tags:
-            - { name: security.voter }
-
-    # Security: voter (ACL) for UserProfileCel/PhotoTag/UserOccurrenceTag/
-    security.access.base_voter :
-        class:  App\Security\Voters\BaseVoter
-        public: false
-        tags:
-            - { name: security.voter }
 
     # ########################################################################
     # DOCTRINE ENTITY EVENT LISTENERS
@@ -173,7 +174,8 @@ services:
     # COMMANDS
     # ########################################################################
 
-    App\Elastica\Command\SyncDocumentIndexCommand:
+    App\Command\SyncDocumentIndexCommand:
         tags:
             - { name: 'console.command', command: 'cel:sync-es' }
+
 

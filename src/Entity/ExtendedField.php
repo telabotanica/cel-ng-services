@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class ExtendedField {
 
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -54,8 +53,7 @@ class ExtendedField {
      * Champ invisible de l'utilisateur mais nécessaire au projet.
      *
      * @Assert\NotNull
-     * @ORM\Column(name="is_visible", type="boolean", nullable=false, options={"comment":"Champ invisible de l'utilisateur mais nécessaire au projet
-     "})
+     * @ORM\Column(name="is_visible", type="boolean", nullable=false, options={"comment":"Champ invisible de l'utilisateur mais nécessaire au projet"})
      */
     private $isVisible = false;
 
@@ -116,6 +114,8 @@ class ExtendedField {
      * @ORM\OneToMany(targetEntity="ExtendedFieldTranslation", mappedBy="extendedField", cascade={"remove"})
      */
     private $extendedFieldTranslations;
+
+    private $extendedFieldValues;
 
     public function __construct() {
         $this->extendedFieldValues = new ArrayCollection();
@@ -202,7 +202,7 @@ class ExtendedField {
     }
 
     public function setProjectName(?string $project): self {
-        $this->projectName = $projectName;
+        $this->projectName = $project;
 
         return $this;
     }

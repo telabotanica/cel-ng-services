@@ -29,10 +29,17 @@ class EfloreApiClient {
     const RANK_FAMILY = 'Famille';
     const RANK_ORDER  = 'Ordre';
 
+    private $efloreBaseUrl;
+
+    public function __construct(string $efloreBaseUrl)
+    {
+        $this->efloreBaseUrl = $efloreBaseUrl;
+    }
+
     private function buildGetInfoTaxonUrl(
         int $taxonId, string $taxoRepo): string {
 
-        $url = getenv('EFLORE_BASE_URL');
+        $url = $this->efloreBaseUrl;
         $url .= $taxoRepo;
         $url .= '/';
         $url .= EfloreApiClient::RESOURCE_NAME;

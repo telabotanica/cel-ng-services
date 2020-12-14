@@ -46,10 +46,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     "formats"={"jsonld", "json", "jsonpatch"={"application/json-patch+json"}},
  *     "filters"={IsPublicFilter::class, CertaintyFilter::class, DateShotYearFilter::Class, DateShotMonthFilter::Class, DateShotDayFilter::Class, DateObservedYearFilter::class, DateObservedMonthFilter::class, DateObservedDayFilter::class, UserSciNameFilter::class, CountryFilter::class, CountyFilter::Class, FamilyFilter::Class, ProjectIdFilter::Class, TagFilter::Class}},
  *      itemOperations={
- *          "get"={"method"="GET", "access_control"="is_granted('view', object)"},
- *          "patch"={"method"="PATCH", "access_control"="is_granted('edit', object)"},
- *          "put"={"method"="PUT", "access_control"="is_granted('edit', object)"},
- *          "delete"={"method"="DELETE", "access_control"="is_granted('delete', object)"}
+ *          "get"={"method"="GET", "security"="is_granted('view', object)"},
+ *          "patch"={"method"="PATCH", "security"="is_granted('edit', object)"},
+ *          "put"={"method"="PUT", "security_post_denormalize"="is_granted('edit', object)"},
+ *          "delete"={"method"="DELETE", "security"="is_granted('delete', object)"}
  *      },
  *      collectionOperations={    
  *        "get",
@@ -277,6 +277,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
       */
      private $occurrence;
 
+    public const RESOURCE_NAME = 'photo';
 
     public function fillPropertiesWithImageExif() {
       if  ( !exif_imagetype( $this->file->getRealPath() ) ) {

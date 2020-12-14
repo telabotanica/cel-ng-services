@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 use App\Entity\Occurrence;
 use App\Entity\UserProfileCel;
@@ -20,8 +20,8 @@ use App\DBAL\InputSourceEnumType;
  *
  * <ul>
  *  <li>One <code>TelabotanicaProject</code> instances</li> 
- *  <li>Three code>UserProfileCel</code> instances (one tela-botanica
- * admin, one project admin and one luser) </li>
+ *  <li>Three <code>UserProfileCel</code> instances (one tela-botanica
+ * admin, one project admin and one user) </li>
  *  <li>A hierarchy of four <code>UserOccurrenceTag</code> </li> 
  *  <li>A bunch of 40 <code>Occurrence</code> instances linked to above</li> 
  * </ul>
@@ -126,9 +126,9 @@ class AppFixtures extends Fixture {
             }
             else {
                 $occ->setGeometry('{"type" : "Point","coordinates" : [' . $this->generateRandomWsgCoordinate() . ', ' . $this->generateRandomWsgCoordinate() .']}');
-$occ->setGeometry('{"type" : "Point","coordinates" : [' . $this->generateRandomWsgCoordinate() . ', ' . $this->generateRandomWsgCoordinate() .']}');
-//$occ->setGeometry('{"type" : "Point","coordinates" : [-77.03653, 38.897676]}');
-echo $occ->getGeometry();
+                $occ->setGeometry('{"type" : "Point","coordinates" : [' . $this->generateRandomWsgCoordinate() . ', ' . $this->generateRandomWsgCoordinate() .']}');
+                //$occ->setGeometry('{"type" : "Point","coordinates" : [-77.03653, 38.897676]}');
+                echo $occ->getGeometry();
                 $occ->setUserSciName('Capsicum frutescens var. ' . $this->generateRandomString());
                 $occ->setUserSciNameId(12806);
                 $occ->setValidSciName('Capsicum frutescens');
@@ -169,24 +169,5 @@ echo $occ->getGeometry();
         }
 
         $manager->flush();
-        // The event listener sets the user info in Occurrence to current user
-        // i.e. -1 (as security service is not available when the fixture is 
-        // loaded). So we set the user_id again with pure SQL as a workaround
-        $manager->getConnection()->exec(
-            "UPDATE occurrence SET user_id=22 WHERE observer='Lulu';");
-        $manager->getConnection()->exec(
-            "UPDATE occurrence SET user_id=23 WHERE observer='Gigi';");
-        $manager->flush();
     }
-
-    private function generateRandomString($length = 10) {
-        return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
-    }
-
-    private function generateRandomWsgCoordinate() {
-         $beforeZ = ( rand(0,89) );
-         $afterZ = ( rand(0,100)/100 );
-         return $beforeZ + $afterZ;   
-    }
-
 }

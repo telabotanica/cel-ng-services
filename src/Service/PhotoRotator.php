@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 
 /** 
@@ -22,6 +22,8 @@ class PhotoRotator {
     // the <code>Security</code> service to retrieve the current user:
     protected $security;
 
+    private $urlMiniregen;
+
     const DUPLICATE_NAME_MSG = "A photo with the same name is already present "
         . "in the user gallery. This is not allowed.";
 
@@ -29,8 +31,8 @@ class PhotoRotator {
      * Returns a new <code>RotatePhotoController</code> instance 
      * initialized with (injected) services passed as parameters.
      *
-     * @param RegistryInterface $doctrine The injected 
-     *        <code>RegistryInterface</code> service.
+     * @param EntityManagerInterface $doctrine The injected
+     *        <code>EntityManagerInterface</code> service.
      * @param Security $security The injected <code>Security</code> service.
      *
      * @return CreatePhotoAction Returns a new  
@@ -38,10 +40,13 @@ class PhotoRotator {
      *         with (injected) services passed as parameters.
      */
     public function __construct(
-        RegistryInterface $doctrine, 
-        Security $security) {
+        EntityManagerInterface $doctrine,
+        Security $security,
+        string $urlMiniregen
+    ) {
         $this->security = $security;
         $this->doctrine = $doctrine;
+        $this->urlMiniregen = $urlMiniregen;
     }
 
 
@@ -65,7 +70,7 @@ class PhotoRotator {
         }
 
         // Call to mini-regen service to generate new thumbnails
-        $miniregenServiceUrl = sprintf(getenv('URL_MINIREGEN'), $photo->getId());
+        $miniregenServiceUrl = sprintf($this->urlMiniregen, $photo->getId());
         $ch = curl_init($miniregenServiceUrl);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

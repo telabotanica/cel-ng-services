@@ -30,7 +30,7 @@ class OccurrenceValidation {
     /**
       * A Photo can belong to a single Occurrence.
       *
-      * @ORM\ManyToOne(targetEntity="Occurrence", inversedBy="photos")
+      * @ORM\ManyToOne(targetEntity="Occurrence", inversedBy="validations")
       * @ORM\JoinColumn(name="occurrence_id", referencedColumnName="id")
       */
     private $occurrence;

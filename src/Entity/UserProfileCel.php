@@ -90,19 +90,12 @@ class UserProfileCel {
    private $language = LanguageEnumType::FR;
 
 
-    /**
-     * The references to CustomUserField this user has created.
-     *
-     * @ORM\OneToMany(targetEntity="UserCustomField", mappedBy="userProfileCel", cascade={"remove"})
-     * @Groups({"read", "write"})  
-     */
-    private $userCustomFields;
+   private $occurrences;
 
 
     public function __construct()
     {
         $this->occurrences = new ArrayCollection();
-//        $this->administeredProjects = new ArrayCollection();
     }
 
     public function getId(): ?int

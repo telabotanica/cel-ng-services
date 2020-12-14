@@ -24,13 +24,23 @@ class PhotoEventListener {
 
     private $requestContext;
     private $em;
+    private $tmpFolder;
+    private $baseTelaPhotoApiUrl;
+    private $directoryNamer;
 
     public function __construct(
         RequestContext $requestContext,
-        EntityManagerInterface $em) {
+        EntityManagerInterface $em,
+        string $baseTelaPhotoApiUrl,
+        string $tmpFolder,
+        TelaImageDirectoryNamer $directoryNamer
+    ) {
 
 		$this->requestContext = $requestContext;
         $this->em = $em;
+        $this->tmpFolder = $tmpFolder;
+        $this->baseTelaPhotoApiUrl = $baseTelaPhotoApiUrl;
+        $this->directoryNamer = $directoryNamer;
     }
 
     /**
@@ -91,14 +101,14 @@ class PhotoEventListener {
       $srcPhotoName  = $entity->getOriginalName();
       $targetPhotoName = TelaImageNamer::buildTelaPhotoApiFileName($entity);
       $targetUrlPhotoName = TelaImageNamer::buildTelaPhotoApiUrlFileName($entity);
-      $targetFolder = TelaImageDirectoryNamer::buildTelaPhotoApiFolderName($entity);
-      $srcFolder = getEnv("TMP_FOLDER");
+      $targetFolder = $this->directoryNamer->buildTelaPhotoApiFolderName($entity);
+      $srcFolder = $this->tmpFolder;
 
       // Moving the file from temp to tela photo API base folder:
       $this->moveFile($srcFolder, $srcPhotoName, $targetFolder, $targetPhotoName);
 
       // Setting URL:
-      $imgUrl = getEnv('BASE_TELA_PHOTO_API_URL').$targetUrlPhotoName;
+      $imgUrl = $this->baseTelaPhotoApiUrl.$targetUrlPhotoName;
       $entity->setContentUrl($targetFolder . '/' . $targetPhotoName);
       $entity->setUrl($imgUrl);
       $this->em->persist($entity);

@@ -112,7 +112,7 @@ Class OccurrencePdfGenerator {
                                         // last page
                                         $height = $end_y - $this->pdf->tMargin;
                                 } else {
-                                        $height = $this->pdf->h - $this->pdf->tMargin - $this->bMargin;
+                                        $height = $this->pdf->h - $this->pdf->tMargin - $this->pdf->bMargin;
                                 }
                         }
                 }

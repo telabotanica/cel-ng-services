@@ -6,12 +6,12 @@ use App\Entity\Occurrence;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 //@refactor transfer responsability for findBySignature to elastica repository+ deleteme
 class OccurrenceRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Occurrence::class);
     }

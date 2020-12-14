@@ -4,7 +4,7 @@ api_platform:
     formats:
         jsonld:    ['application/ld+json']
         jsonhal:   ['application/hal+json']
-        jsonapi:   ['application/vnd.api+json']
+        jsonapi:   ['application/vnd.api+json', 'application/json']
         json:      ['application/json']
         xml:       ['application/xml', 'text/xml']
         yaml:      ['application/x-yaml']
@@ -13,11 +13,11 @@ api_platform:
         geojson:   ['application/vnd.geo+json']
         jsonpatch: ['application/json-patch+json']
         pdf:       ['application/pdf']
+    patch_formats:
+        json:     ['application/merge-patch+json']
+        jsonapi:  ['application/vnd.api+json', 'application/json']
     swagger:
-         api_keys:
-             apiKey:
-                name: Authorization
-                type: header
+        versions: [3]
     exception_to_status:
         App\Security\User\UnloggedAccessException: 403
         Symfony\Component\Security\Core\Exception\AuthenticationException: 403

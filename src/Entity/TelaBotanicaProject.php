@@ -90,12 +90,6 @@ class TelaBotanicaProject
     private $extendedFields;
 
 
-    /**
-     * @ORM\OneToMany(targetEntity="UserProfileCel", mappedBy="project")
-     */
-    private $administratorProfiles;
-
-
     public function __construct() {
         $this->projectSettings = new ArrayCollection();
         $this->occurrences = new ArrayCollection();

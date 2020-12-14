@@ -20,21 +20,21 @@ class PlantnetProxyController extends AbstractController {
 
     private $tmpFolder;
 
-    public function __construct() {
-        $this->tmpFolder = getenv('TMP_FOLDER');
+    public function __construct(string $tmpFolder) {
+        $this->tmpFolder = $tmpFolder;
     }
 
     /**
      *
      * @Route("/api/plantnet", name="api_plantnet")
      */
-    public function invoke(Request $request) {        
+    public function invoke(Request $request, string $tmpFolder, string $plantnetApiUrl, string $plantnetApiKey) {
 
-        $url = $this->buildUrl($request);
+        $url = $this->buildUrl($request, $plantnetApiUrl, $plantnetApiKey);
 
         $pnRespFileName = PlantnetProxyController::PN_RESPONSE_PREFIX . time();
         $pnRespFileName .= PlantnetProxyController::PN_RESPONSE_EXTENSION;
-        $pnRespFilePath = $this->tmpFolder . '/' . $pnRespFileName;
+        $pnRespFilePath = $tmpFolder . '/' . $pnRespFileName;
 
         try {
 
@@ -49,14 +49,12 @@ class PlantnetProxyController extends AbstractController {
             $jsonResp = array('errorMessage' => $t->getMessage());
             // Return a  500 with an informative msg as JSON:
             return new Response(json_encode($jsonResp), Response::HTTP_INTERNAL_SERVER_ERROR, []);
-        }   
-
-        exit;
+        }
     }
 
 
-    private function buildUrl($request) {
-        return getenv('PLANTNET_API_URL') . '?' . urldecode($request->getQueryString()) . '&api-key=' . getenv('PLANTNET_API_KEY'); 
+    private function buildUrl(Request $request, string $plantnetApiUrl, string $plantnetApiKey) {
+        return $plantnetApiUrl . '?' . urldecode($request->getQueryString()) . '&api-key=' . $plantnetApiKey;
     }
 
 }

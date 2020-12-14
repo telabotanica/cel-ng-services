@@ -22,13 +22,19 @@ class ResourceVoter extends AbstractVoter {
      * @inheritdoc
      */
     protected function supportsEntity($subject): bool {
+        dump(!$subject instanceof Photo);
+        dump(!$subject instanceof Occurrence);
 
-        if (!$subject instanceof Occurrence ||
-            !$subject instanceof Photo) {
-            return false;
+        dump(!$subject instanceof Occurrence || !$subject instanceof Photo);
+        if ($subject instanceof Occurrence) {
+            return true;
         }
 
-        return true;
+        if ($subject instanceof Photo) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -43,7 +49,6 @@ class ResourceVoter extends AbstractVoter {
             return true;
         }
 	    if (null !== $subject->getProject()) {
-            $prjId = $subject->getProject()->getId();
 		    if ($user->getAdministeredProjectId() == $subject->getProject()->getId()) {
 		        return $subject->getIsPublic();
 		    }

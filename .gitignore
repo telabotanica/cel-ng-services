@@ -1,15 +1,13 @@
 ###> symfony/framework-bundle ###
 /.env.local
-/.env.*.local
 /.env.local.php
-
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
 /vendor/
 /public/media/
 ###< symfony/framework-bundle ###
-
-###> symfony/web-server-bundle ###
-/.web-server-pid
-###< symfony/web-server-bundle ###
-.idea/
+###> liip/imagine-bundle ###
+/public/media/cache/
+###< liip/imagine-bundle ###

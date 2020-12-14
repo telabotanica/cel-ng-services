@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Elastica\Client\ElasticsearchClient;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\Security\Core\Security;
 use FOS\ElasticaBundle\Manager\RepositoryManagerInterface;
@@ -20,12 +21,14 @@ class XcountResponseListener {
 
     private $repositoryManager;
     private $security;  
-    private $tokenStorage;    
+    private $tokenStorage;
+    private $elasticsearchClient;
 
-    public function __construct(Security $security, RepositoryManagerInterface $repositoryManager, TokenStorageInterface $tokenStorage) {
+    public function __construct(Security $security, RepositoryManagerInterface $repositoryManager, TokenStorageInterface $tokenStorage, ElasticsearchClient $elasticsearchClient) {
         $this->repositoryManager = $repositoryManager;
         $this->security = $security;
         $this->tokenStorage = $tokenStorage;
+        $this->elasticsearchClient = $elasticsearchClient;
     }
 
     /**
@@ -35,7 +38,7 @@ class XcountResponseListener {
      * 
      * @var FilterResponseEvent $event the Event which has just been raised.
      */
-    public function onKernelResponse(FilterResponseEvent $event) {   
+    public function onKernelResponse(FilterResponseEvent $event) {
 
         $request = $event->getRequest(); 
         $user = $this->security->getUser();
@@ -43,13 +46,13 @@ class XcountResponseListener {
 
         if ( $request->attributes->get('_route') === "api_occurrences_get_collection") {
             $repository = $this->repositoryManager->getRepository('App:Occurrence');
-            $results = $repository->countWithRequest($request, $user);
+            $results = $repository->countWithRequest($request, $this->elasticsearchClient, $user);
             $responseHeaders->set('X-count', $results);
         }
         else if ( $request->attributes->get('_route') === "api_photos_get_collection") {
 
             $repository = $this->repositoryManager->getRepository('App:Photo');
-            $results = $repository->countWithRequest($request, $user);
+            $results = $repository->countWithRequest($request, $this->elasticsearchClient, $user);
             $responseHeaders->set('X-count', $results);
         }
     } 

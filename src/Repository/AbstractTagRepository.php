@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\TagInterface;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * <code>ServiceEntityRepository</code> for <code>UTagInterfaceserOccurrenceTag</code>

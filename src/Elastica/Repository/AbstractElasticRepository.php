@@ -52,7 +52,7 @@ abstract class AbstractElasticRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function findWithRequest($request, $user) {
+    public function findWithRequest(Request $request, $user) {
         $query = $this->requestToFindQuery($request);
         // build the query:
         $queryBuilder = $this->getBuilder();
@@ -76,13 +76,13 @@ abstract class AbstractElasticRepository extends Repository
     /**
      * @inheritdoc
      */
-    public function countWithRequest(Request $request, $user)   {
+    public function countWithRequest(Request $request, ElasticsearchClient $elasticsearchClient, $user)   {
 
         $query = $this->requestToFindQuery($request);
         $queryBuilder = $this->getBuilder();
         $esQuery = $queryBuilder->build($user, $query);
 
-        return ElasticsearchClient::count($esQuery, $this->getEntityName());
+        return $elasticsearchClient->count($esQuery, $this->getEntityName());
 
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Form\OccurrenceType;
+use App\Entity\Occurrence;
 use App\Utils\ArrayToOccurrenceTransformer;
 use App\Elastica\Client\ElasticsearchClient;
 
@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,6 +56,7 @@ final class ImportOccurrenceAction {
         ' existe dans le carnet. Line/ligne: ';
     const IMPORT_OK = 'Occurrence succesfully imported. Observation importée' .
         ' avec succès. Line/ligne:';
+    const IMPORT_KO = 'Occurrence import failed / Échec de l\'import';
     const REQUEST_FILE_NAME = 'file';
 
     /**
@@ -66,21 +67,21 @@ final class ImportOccurrenceAction {
      *        <code>TokenStorageInterface</code> service.
      * @param ValidatorInterface $validator The injected 
      *        <code>ValidatorInterface</code> service.
-     * @param RegistryInterface $doctrine The injected 
-     *        <code>RegistryInterface</code> service.
+     * @param EntityManagerInterface $doctrine The injected
+     *        <code>EntityManagerInterface</code> service.
      * 
      * @return ImportOccurrenceAction Returns a new  
      *         <code>ImportOccurrenceAction</code> instance initialized 
      *         with (injected) services passed as parameters.
      */
     public function __construct(
-        TokenStorageInterface $tokenStorage, RegistryInterface $doctrine, 
-        ValidatorInterface $validator) {
+        TokenStorageInterface $tokenStorage, EntityManagerInterface $doctrine,
+        ValidatorInterface $validator, string $tmpFolder) {
 
 	$this->tokenStorage = $tokenStorage;
         $this->validator = $validator;
         $this->doctrine = $doctrine;
-        $this->tmpFolder = getenv('TMP_FOLDER');
+        $this->tmpFolder = $tmpFolder;
     }
 
     /**
@@ -137,19 +138,19 @@ final class ImportOccurrenceAction {
      * and update $jsonResp with ids afterward after the periodical flush.
      * @perf @todo: optimize this...
      */
-    public function __invoke(Request $request): Response {
+    public function __invoke(Request $request, ElasticsearchClient $elasticsearchClient): Response {
 
-        $em = $this->doctrine->getManager();
+        $em = $this->doctrine;
 		$occRepo = $em->getRepository('App\Entity\Occurrence');
     	$user = $this->getUser();
         $reqFiles = $request->files;
         $file = $reqFiles->get(ImportOccurrenceAction::REQUEST_FILE_NAME);
         $occArray = $this->extractArrayFromSpreadsheet($file);
         if ( null === $occArray ) {
-        	$jsonResp = new Response(
-                json_encode($jsonResp), Response::HTTP_UNPROCESSABLE_ENTITY, []);
-        }
-        else {
+            $jsonResp[] = $this->buildAtomicResponse(
+                -1, Response::HTTP_UNPROCESSABLE_ENTITY, null,
+                $occArray, ImportOccurrenceAction::IMPORT_KO);
+        } else {
             $occTransformer = new ArrayToOccurrenceTransformer($this->doctrine);
             // Isolate the import in a transaction to allow rollbacking the INSERTs
             // in case an Exception occurs so the DB isn't left in a messy state.
@@ -225,7 +226,7 @@ final class ImportOccurrenceAction {
                 $em->getConnection()->rollBack();
                 // Delete associated ES documents to avoid creating orphans 
                 // and, thus, having  an out of sync ES index:
-                $this->deleteDocumentsByIds($persistedOccIds);
+                $elasticsearchClient->deleteByIds($persistedOccIds, Occurrence::RESOURCE_NAME);
                 // swallow the Exception and inform the caller using the 
                 // exception message:
                 $jsonResp[] = $this->buildAtomicResponse(
@@ -253,10 +254,6 @@ final class ImportOccurrenceAction {
                 'body' => $body
             )
         );
-    }
-
-    private static function deleteDocumentsByIds(array $ids) {
-        ElasticsearchClient::deleteByIds($ids, 'occurrence');
     }
 
     protected function getUser() {

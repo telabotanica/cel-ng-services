@@ -37,7 +37,7 @@ class ExtendedFieldOccurrence {
 
     /**
      * @Assert\NotNull
-     * @ORM\ManyToOne(targetEntity="ExtendedField", inversedBy="extendedFieldValues")
+     * @ORM\ManyToOne(targetEntity="ExtendedField", inversedBy="extendedFieldOccurrences")
      * @ORM\JoinColumn(name="extended_field_id", referencedColumnName="id", nullable=FALSE)
      */
     private $extendedField;

@@ -6,6 +6,8 @@ use App\Entity\ChangeLog;
 use App\Elastica\Client\ElasticsearchClient;
 use App\Command\UnknownEntityNameException;
 
+use App\Entity\Occurrence;
+use App\Entity\Photo;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 
 use Doctrine\ORM\EntityManager;
@@ -29,18 +31,22 @@ class SyncDocumentIndexCommand  extends Command {
     private $entityManager;
     private $occurrencePersister;
     private $photoPersister;
-    private const ALLOWED_ENTITY_NAMES = ['occurrence', 'photo'];
+    private $elasticsearchClient;
+
+    private const ALLOWED_ENTITY_NAMES = [Occurrence::RESOURCE_NAME, Photo::RESOURCE_NAME];
     private const OCC_PERSISTER_ALIAS = 'fos_elastica.object_persister.' . 
         'occurrences.occurrence';
     private const PHOTO_PERSISTER_ALIAS = 'fos_elastica.object_persister.' . 
         'photos.photo';
 
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerInterface $container, ElasticsearchClient $elasticsearchClient) {
         $this->entityManager = $container->get('doctrine')->getManager();
         $this->occurrencePersister = $container->get(
             SyncDocumentIndexCommand::OCC_PERSISTER_ALIAS);
         $this->photoPersister = $container->get(
             SyncDocumentIndexCommand::PHOTO_PERSISTER_ALIAS);
+        $this->elasticsearchClient = $elasticsearchClient;
+
         parent::__construct();
     }
 
@@ -56,13 +62,11 @@ class SyncDocumentIndexCommand  extends Command {
 
     protected function execute(InputInterface $input, OutputInterface $output) {
 	    $counter = 0;
-	    $variator = 1;
         $output->writeln("Loading change logs...");
         $this->init();
         $output->writeln("Change logs loaded.");
 
-        foreach( $this->changeLogsAsIterable as $row) {
-
+        foreach ($this->changeLogsAsIterable as $row) {
             /**
              * @var ChangeLog $changeLog
              */
@@ -72,11 +76,23 @@ class SyncDocumentIndexCommand  extends Command {
                 try {
                     $this->executeAction($changeLog);
                 } catch (\Exception $e) {
+                    $syncInfo = sprintf('%s %s %d',
+                        $changeLog->getActionType(),
+                        $changeLog->getEntityName(),
+                        $changeLog->getEntityId()
+                    );
+                    $subject = 'CEL-services : Erreur de synchro ES : '.$syncInfo;
+                    $exceptionInfo = sprintf("Message : %s \n Fichier : %s \n Ligne : %d",
+                        $e->getMessage(),
+                        $e->getFile(),
+                        $e->getLine()
+                    );
+                    $message = $subject.'\n'.$exceptionInfo;
+
                     $changeLog->setActionType('error');
                     $this->entityManager->flush();
 
-                    $subject = sprintf('CEL-services : Erreur de synchro ES, obs %d', $changeLog->getEntityId());
-                    mail('webmestre@tela-botanica.org', $subject, $subject);
+                    mail('webmestre@tela-botanica.org', $subject, $message);
 
                     continue;
                 }
@@ -103,37 +119,33 @@ class SyncDocumentIndexCommand  extends Command {
         $this->entityManager->flush();
         $this->entityManager->clear();
         $output->writeln("All changes have been mirrored.");
-
     }
-
 
     private function loadChangeLogsAsIterable() {
         $q = $this->entityManager->createQuery("select u from App\Entity\ChangeLog u where u.actionType != 'error'");
         return $q->iterate();
     }
 
-    private function executeAction($changeLog){
+    private function executeAction(ChangeLog $changeLog){
         switch ($changeLog->getActionType()) {
             case "create":
                 $entity = $this->getRepository($changeLog->getEntityName())->find($changeLog->getEntityId());
                 if ($entity !== null) {
                     $this->createDocument($entity, $changeLog->getEntityName());
                 }
-            break;
+                break;
             case "update":
                 $entity = $this->getRepository($changeLog->getEntityName())->find($changeLog->getEntityId());
                 if ($entity !== null) {
                     $this->updateDocument($entity, $changeLog->getEntityName());
                 }
-            break;
+                break;
             case "delete":
                     $this->deleteDocument($changeLog->getEntityId(), $changeLog->getEntityName());
-            break;
+                break;
             default:
                 break;
         }
-
-
     }
 
     private function getRepository($entityClassName) {
@@ -141,22 +153,36 @@ class SyncDocumentIndexCommand  extends Command {
     }
 
     private function getPersister($entityClassName) {
-        if ( $entityClassName == 'occurrence') {
-            return $this->occurrencePersister;
+        switch ($entityClassName) {
+            case Occurrence::RESOURCE_NAME:
+                return $this->occurrencePersister;
+                break;
+            case Photo::RESOURCE_NAME:
+                return $this->photoPersister;
+                break;
+            default:
+                throw new \LogicException(sprintf('you shoud not land here, class "%s" not supported', $entityClassName));
+                break;
         }
-        return $this->photoPersister;
     }
 
     private function deleteDocument(int $id, string $resourceTypeName) {
-        ElasticsearchClient::deleteById($id, $resourceTypeName);
+        $this->elasticsearchClient->deleteById($id, $resourceTypeName);
     }
 
-    private function updateDocument(object $entity, $entityName) {
+    /**
+     * @param Occurrence|Photo $entity
+     * @param string $entityName
+     */
+    private function updateDocument($entity, string $entityName) {
         $this->getPersister($entityName)->replaceOne($entity);
     }
 
-
-    private function createDocument(object $entity, $entityName) {
+    /**
+     * @param Occurrence|Photo $entity
+     * @param string $entityName
+     */
+    private function createDocument($entity, string $entityName) {
         $this->getPersister($entityName)->replaceOne($entity);
     }
 

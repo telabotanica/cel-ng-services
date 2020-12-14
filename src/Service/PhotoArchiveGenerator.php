@@ -10,7 +10,7 @@ use ZipArchive;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,8 +40,8 @@ final class PhotoArchiveGenerator {
      *        <code>TokenStorageInterface</code> service.
      * @param StorageInterface $storage The injected 
      *        <code>StorageInterface</code> service.
-     * @param RegistryInterface $doctrine The injected 
-     *        <code>RegistryInterface</code> service.
+     * @param EntityManagerInterface $doctrine The injected
+     *        <code>EntityManagerInterface</code> service.
      * 
      * @return PhotoArchiveGenerator Returns a new  
      *         <code>PhotoArchiveGenerator</code> instance initialized 
@@ -49,7 +49,7 @@ final class PhotoArchiveGenerator {
      */
     public function __construct(
         StorageInterface $storage, 
-        RegistryInterface $doctrine,
+        EntityManagerInterface $doctrine,
         TokenStorageInterface $tokenStorage) {
 
     	$this->tokenStorage = $tokenStorage;
@@ -76,7 +76,7 @@ final class PhotoArchiveGenerator {
             $zipFilePath,  
             \ZipArchive::CREATE)) {
 
-            $em = $this->doctrine->getManager();
+            $em = $this->doctrine;
 		    $photoRepo = $em->getRepository('App\Entity\Photo');
             // @todo Do a DQL 'in' query instead:
             $photos = $photoRepo->findById($ids);

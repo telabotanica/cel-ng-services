@@ -15,7 +15,7 @@ class TelaImageNamer implements NamerInterface {
      */
     public function name($object, PropertyMapping $mapping): string {
         return ( null !== $object->getId() ) ? 
-            TelaNamer::buildTelaPhotoApiFileName($entity) : 
+            TelaImageNamer::buildTelaPhotoApiFileName($object) :
             $mapping->getFile($object)->getClientOriginalName();
     }
 

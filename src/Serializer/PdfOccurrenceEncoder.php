@@ -13,14 +13,21 @@ use Symfony\Component\Dotenv\Dotenv;
  */
 class PdfOccurrenceEncoder implements EncoderInterface, DecoderInterface {
 
+    private $tmpFolder;
+
+    public function __construct(string $tmpFolder)
+    {
+        $this->tmpFolder = $tmpFolder;
+    }
+
     /**
      * @inheritdoc
      */
     public function encode($data, $format, array $context = array()) {
         $pdfGenerator = new OccurrencePdfGenerator();
-        $pdf = $pdfGenerator->export($data);
+        $pdfGenerator->export($data);
         $now = date_format(new \DateTime('now'), 'd_m_Y_H_i_s');
-        $filename = getenv('TMP_FOLDER') . '/' . $now . '.pdf';
+        $filename = $this->tmpFolder . '/' . $now . '.pdf';
         $pdfGenerator->pdf->Output($filename,'F');
 
         return file_get_contents($filename);

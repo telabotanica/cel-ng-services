@@ -5,7 +5,7 @@ namespace App\Security\SSO;
 use App\Security\SSO\SSOConfigurationException;
 use App\Security\SSO\SSOValidationException;
 
-use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * Simple tela annuaire SSO validation Web service client.
@@ -24,10 +24,14 @@ class SSOTokenValidator {
         'requesting telabotaica SSO validation Web service. The curl error' . 
         'nbr is: ';
 
-	public function __construct() {
-	    $this->annuaireURL = getenv('SSO_ANNUAIRE_URL');
-	    $this->ignoreSSLIssues = getenv('IGNORE_SSL_ISSUES');
-	}
+	public function __construct(ParameterBagInterface $params) {
+	    $this->annuaireURL = $params->get('sso.annuaire.url');
+        if ( empty($this->annuaireURL) ) {
+            throw new SSOConfigurationException(
+                SSOTokenValidator::BADLY_CONFIGURED_SSO_URL_MSG);
+        }
+        $this->ignoreSSLIssues = $params->get('ignore.ssl.issues');
+    }
 
 	private function generateAuthCheckURL($token) {
 		$verificationServiceURL = $this->annuaireURL;
@@ -45,10 +49,6 @@ class SSOTokenValidator {
      *         success), else false.
      */
 	public function validateToken(string $token) {
-		if ( empty($this->annuaireURL) ) {
-			throw new SSOConfigurationException(
-                SSOTokenValidator::BADLY_CONFIGURED_SSO_URL_MSG);
-		}
 		$verificationServiceURL = $this->generateAuthCheckURL($token);
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $verificationServiceURL);

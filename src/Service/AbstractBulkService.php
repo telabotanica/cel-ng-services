@@ -3,9 +3,10 @@
 namespace App\Service;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use App\Controller\AbstractBulkAction;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -67,6 +68,8 @@ abstract class AbstractBulkService {
     protected $authorizationChecker;
     protected $jsonResp = array();
 
+    private $appPrefixPath;
+
     const INVALID_PATH_MSG = 'Given path is either an invalid path or a path' .
         ' that is not handled by the CEL2 API.';
     const MALFORMED_PATH_MSG = 'Malformed path: cannot extract id from it.';
@@ -82,8 +85,8 @@ abstract class AbstractBulkService {
      * Returns a new <code>AbstractBulkAction</code> instance 
      * initialized with (injected) services passed as parameters.
      *
-     * @param RegistryInterface $doctrine The injected 
-     *        <code>RegistryInterface</code> service.
+     * @param EntityManagerInterface $doctrine The injected
+     *        <code>EntityManagerInterface</code> service.
      * @param FormFactoryInterface $formFactory The injected 
      *        <code>FormFactoryInterface</code> service.
      * @param ValidatorInterface $validator The injected 
@@ -99,16 +102,20 @@ abstract class AbstractBulkService {
      *         with (injected) services passed as parameters.
      */
     public function __construct(
-        RegistryInterface $doctrine, FormFactoryInterface $formFactory, 
+        EntityManagerInterface $doctrine,
+        FormFactoryInterface $formFactory,
         ValidatorInterface $validator, 
         AuthorizationCheckerInterface $authorizationChecker, 
-        HttpKernelInterface $kernel, SerializerInterface $serializer) {
-
+        HttpKernelInterface $kernel,
+        SerializerInterface $serializer,
+        string $appPrefixPath
+    ) {
         $this->doctrine = $doctrine;
         $this->formFactory = $formFactory;
         $this->serializer = $serializer;
         $this->kernel = $kernel;
         $this->authorizationChecker = $authorizationChecker;
+        $this->appPrefixPath = $appPrefixPath;
         $this->initRepo();
     }
 
@@ -240,7 +247,7 @@ abstract class AbstractBulkService {
                     AbstractBulkAction::INVALID_PATH_MSG);
 		            return null;
                 }
-                $from = str_replace(getenv('APP_PREFIX_PATH'), '', $from);
+                $from = str_replace($this->appPrefixPath, '', $from);
                 $fromId = $this->extractIdFromPath($from);
 
                 if ( null == $fromId ) {
@@ -290,7 +297,7 @@ abstract class AbstractBulkService {
                 AbstractBulkAction::METHOD_NOT_ALLOWED);
 		    return null;
 	    }		
-            $path = str_replace(getenv('APP_PREFIX_PATH'), '', $path);
+            $path = str_replace($this->appPrefixPath, '', $path);
 		$request = Request::create(
             $path, $method, array(), array(), array(), 
             array(), json_encode($value));

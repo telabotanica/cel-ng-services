@@ -48,10 +48,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      "denormalization_context"={"groups"={"write"}},
  *      "filters"={IsPublicFilter::class, CertaintyFilter::class, DateObservedYearFilter::class, DateObservedMonthFilter::class, DateObservedDayFilter::class, UserSciNameFilter::class, CountryFilter::class, IdentiplanteScoreFilter::Class, IsIdentiplanteValidatedFilter::Class, CountyFilter::Class, FamilyFilter::Class, ProjectIdFilter::Class}},
  *      itemOperations={
- *          "get"={"method"="GET", "access_control"="is_granted('view', object)"},
- *          "patch"={"method"="PATCH", "access_control"="is_granted('edit', object)"},
- *          "put"={"method"="PUT", "access_control"="is_granted('edit', object)"},
- *          "delete"={"method"="DELETE", "access_control"="is_granted('delete', object)"}
+ *          "get"={"method"="GET", "security"="is_granted('view', object)"},
+ *          "patch"={"method"="PATCH", "security"="is_granted('edit', object)"},
+ *          "put"={"method"="PUT", "security"="is_granted('edit', object)"},
+ *          "delete"={"method"="DELETE", "security"="is_granted('delete', object)"}
  *      },
  *      collectionOperations={
  *          "get",
@@ -584,6 +584,8 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      * @ApiSubresource(maxDepth=1)
      */
     protected $userTagRelations;
+
+    public const RESOURCE_NAME = 'occurrence';
     
     public function isPublishable(): ?bool {
         return ( 
