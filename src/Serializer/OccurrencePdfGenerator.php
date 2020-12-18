@@ -253,9 +253,8 @@ Class OccurrencePdfGenerator {
                                                                   $border = 'LR', $ln = 1, $fill = false, $reset = true, $align = 'L', $autopadding = true);
 
                 // collecteur
-                // TODO: pseudo
                 $limite_nom = 26;
-                $pseudo = $obs['userPseudo'];
+                $pseudo = $obs['observer'] ?? $obs['userPseudo'];
                 $this->pdf->writeHTMLCell($w = $width - 25, '', '', '',
                                                                   $html = '<strong>Collecteur</strong> : ' . $pseudo,
                                                                   $border = 'L', $ln = 0, $fill = false, $reset = true, $align = 'L', $autopadding = true);

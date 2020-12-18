@@ -17,10 +17,11 @@ class PdfOccurrenceEncoder implements EncoderInterface, DecoderInterface {
      * @inheritdoc
      */
     public function encode($data, $format, array $context = array()) {
-        $pdfGenerator = new OccurrencePdfGenerator();
-        $pdf = $pdfGenerator->export($data);
         $now = date_format(new \DateTime('now'), 'd_m_Y_H_i_s');
         $filename = getenv('TMP_FOLDER') . '/' . $now . '.pdf';
+
+        $pdfGenerator = new OccurrencePdfGenerator();
+        $pdfGenerator->export($data);
         $pdfGenerator->pdf->Output($filename,'F');
 
         return file_get_contents($filename);
