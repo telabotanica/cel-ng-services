@@ -114,8 +114,9 @@ final class ImportOccurrenceAction {
             $fileOriginalName = $file->getClientOriginalName();
 	        $file->move($this->tmpFolder, $fileOriginalName);
             $spreadsheet = $reader->load(
-                $this->tmpFolder . '/' . $fileOriginalName);          
-            return $spreadsheet->getActiveSheet()->toArray();
+                $this->tmpFolder . '/' . $fileOriginalName);
+            die(var_dump($spreadsheet->getActiveSheet()->getCell('S2')->getFormattedValue()));
+            return $spreadsheet->getActiveSheet()->toArray(null, false, true, true);
         }
         // @refactor: throw a custom exception
         return null;

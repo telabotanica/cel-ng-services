@@ -53,7 +53,7 @@ class SSOUserExtractor {
         $roles = array();
         if (in_array( 
             SSOUserExtractor::ADMIN_PERMISSION,
-            $userInfo[SSOUserExtractor::PERMISSIONS_TOKEN_PROPERTY])) {
+            $userInfo[SSOUserExtractor::PERMISSIONS_TOKEN_PROPERTY] ?? [])) {
             /*
             $role->setName(SSOAuthenticator::ADMIN_ROLE_NAME);
             $role->setRole(SSOAuthenticator::ADMIN_ROLE);
@@ -72,7 +72,7 @@ class SSOUserExtractor {
         $user = new TelaBotanicaUser(
             intval($userInfo['id']), $userInfo['sub'], $userInfo['prenom'], 
             $userInfo['nom'], $userInfo['pseudo'], 
-            $userInfo['pseudoUtilise'], $userInfo['avatar'], 
+            $userInfo['pseudoUtilise'], $userInfo['avatar'] ?? '',
             $roles, null, $token);
 //die(var_dump($user));  
         // Returns the user, checkCredentials() is gonna be called

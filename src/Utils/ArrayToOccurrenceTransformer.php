@@ -90,17 +90,17 @@ class ArrayToOccurrenceTransformer {
      */
 	public function transform(array $csvLine, TelaBotanicaUser $user) {
 		$resultMsgs = array();
-		$em = $this->doctrine->getManager();     
-
+		$em = $this->doctrine->getManager();
 	    if ( $this->lineCount == 0 ) {
-		     for( $i = 0; $i<sizeof($csvLine); $i++ ) {
-			    if (null !== $csvLine[$i]) {
-				    $this->headerIndexArray[$csvLine[$i]] = $i;
-			    }
-		    }		
+//		     for( $i = 0; $i<sizeof($csvLine); $i++ ) {
+//			    if (null !== $csvLine[$i]) {
+//				    $this->headerIndexArray[$csvLine[$i]] = $i;
+//			    }
+//		    }
 		    $this->lineCount++;			
 	    }
 	    else {
+            die(var_dump($csvLine));
 
 		    $occ = new Occurrence();
 		    $occ = $this->populateWithUserInfo($occ, $user);
@@ -109,7 +109,7 @@ class ArrayToOccurrenceTransformer {
 		    // Handle the photos.
 		    // Attach the photos with original names (separated by commas) in 
 		    // column with header "Image(s)":
-		    $imageNameAsString = $csvLine[$this->headerIndexArray["Image(s)"]];
+		    $imageNameAsString = $csvLine["Image(s)"];
 		    $photoOriginalNames = $this->explodeAndClean($imageNameAsString);
 		    $occ = $this->populateWithPhotos($occ, $user, $photoOriginalNames);
 
@@ -117,7 +117,7 @@ class ArrayToOccurrenceTransformer {
 		    $em->persist($occ);
 
 		    // Handle the user tags:
-		    $tagsAsString = $csvLine[$this->headerIndexArray["Mots Clés"]];
+		    $tagsAsString = $csvLine["Mots Clés"];
 		    $tagNames = $this->explodeAndClean($tagsAsString);
         
 		    $occ = $this->populateWithUserTags($occ, $user, $tagNames);
@@ -196,8 +196,8 @@ class ArrayToOccurrenceTransformer {
 
     private function populate($occ, $user, $csvLine) {
 
-        $lat  = $csvLine[$this->headerIndexArray['Latitude']];
-        $long = $csvLine[$this->headerIndexArray['Longitude']];
+        $lat  = $csvLine['Latitude'];
+        $long = $csvLine['Longitude'];
         
         if ( ( null !== $lat ) && ( null !== $long ) ) {
     	    $occ->setGeometry('{"type" : "Point","coordinates" : [' .  $long . ',' . $lat . ']}');
@@ -205,14 +205,14 @@ class ArrayToOccurrenceTransformer {
 
         foreach (ArrayToOccurrenceTransformer::CSV_HEADER_OCC_PROP_MAP as $svHeader => $propertyName) {
 
-	        if ( array_key_exists($svHeader, $this->headerIndexArray) && array_key_exists($this->headerIndexArray[$svHeader], $csvLine) ) {
-	            if ( null !== $csvLine[$this->headerIndexArray[$svHeader]] ) {
+	        if ( array_key_exists($svHeader, $this->headerIndexArray) && array_key_exists($svHeader, $csvLine) ) {
+	            if ( null !== $csvLine[$svHeader] ) {
 
                     if ( $svHeader == 'Referentiel taxonomique') {
 
-                         if ( in_array($csvLine[$this->headerIndexArray[$svHeader]], ArrayToOccurrenceTransformer::ALLOWED_TAXO_REPOS ) 
-                            && null !== $csvLine[$this->headerIndexArray[$svHeader]] && '' !== $csvLine[$this->headerIndexArray[$svHeader]]) {
-	                        $occ->setTaxoRepo($csvLine[$this->headerIndexArray[$svHeader]]);
+                         if ( in_array($csvLine[$svHeader], ArrayToOccurrenceTransformer::ALLOWED_TAXO_REPOS )
+                            && null !== $csvLine[$svHeader] && '' !== $csvLine[$svHeader]) {
+	                        $occ->setTaxoRepo($csvLine[$svHeader]);
                         }
                         else {
 
@@ -221,19 +221,19 @@ class ArrayToOccurrenceTransformer {
                     }
                     else {
                         $setterMethodName = 'set' . ucfirst($propertyName);
-	                    $occ->$setterMethodName($csvLine[$this->headerIndexArray[$svHeader]]);
+	                    $occ->$setterMethodName($csvLine[$svHeader]);
                     }
 	            }         
             }
         }
-
-        $strObsDate = $csvLine[$this->headerIndexArray["Date"]];
+die(var_dump($csvLine["Date"]));
+        $strObsDate = $csvLine["Date"];
 	    if ( null !== $strObsDate ) {
 		    $occ->setDateObserved($this->datishToDate($strObsDate));
 	    }
 
 
-        $taxoRepo = $csvLine[$this->headerIndexArray['Référentiel taxonomique']];
+        $taxoRepo = $csvLine['Référentiel taxonomique'];
 	    if ( ( null == $taxoRepo ) || ( '' == $taxoRepo ) )  {
 		    $occ->setTaxoRepo('Autre/inconnu');
 	    }
@@ -262,6 +262,7 @@ class ArrayToOccurrenceTransformer {
                return DateTime::createFromFormat('d/m/Y', $datish);
             } 
             else {
+                die(var_dump($datish));
                 throw new InvalidDateFormatException();
             }
 	}

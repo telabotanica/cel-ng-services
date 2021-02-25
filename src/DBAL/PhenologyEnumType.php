@@ -45,7 +45,7 @@ class PhenologyEnumType extends Type {
                "'20-29: formation de pousses latérales, tallage', " .
                "'30-39: développement des tiges, croissance des rosettes', " .
                "'40-49: développement des organes de propagation végétative', " .
-               "'50-59: apparition de l'inflorescence, épiaison', " .
+               "'50-59: apparition de l''inflorescence, épiaison', " .
                "'60-69: floraison', " .
                "'61: par ex, environ 10% des fleurs épanouies', " .
                "'65: par ex, environ 50% des fleurs épanouies', " .
