@@ -68,11 +68,31 @@ class SyncDocumentIndexCommand  extends Command {
                 try {
                     $this->executeAction($changeLog);
                 } catch (\Exception $e) {
-                    $changeLog->setActionType('error');
-                    $this->entityManager->flush();
+                    $changeLog->setErrorCount($changeLog->getErrorCount() + 1);
+                    if (10 <= $changeLog->getErrorCount()) {
+                        $changeLog->setActionType('error');
 
-                    $subject = sprintf('CEL-services : Erreur de synchro ES, obs %d', $changeLog->getEntityId());
-                    mail('webmestre@tela-botanica.org', $subject, $subject);
+                        $subject = sprintf('CEL-services : Erreur de synchro ES : %s %s %d',
+                            $changeLog->getActionType(),
+                            $changeLog->getEntityName(),
+                            $changeLog->getEntityId()
+                        );
+
+                        $text = 'Abandon après '.$changeLog->getErrorCount().' essais.';
+
+                        $exceptionInfo = sprintf("Message d'erreur : %s \n Fichier : %s \n Ligne : %d \n EntityName : %s \n EntityId : %d \n Action : %s",
+                            $e->getMessage(),
+                            $e->getFile(),
+                            $e->getLine(),
+                            $changeLog->getEntityName(),
+                            $changeLog->getEntityId(),
+                            $changeLog->getActionType()
+                        );
+
+                        $message = $subject."\n".$text."\n".$exceptionInfo;
+
+                        mail('webmestre@tela-botanica.org', $subject, $message);
+                    }
 
                     continue;
                 }
@@ -149,13 +169,11 @@ class SyncDocumentIndexCommand  extends Command {
         ElasticsearchClient::deleteById($id, $resourceTypeName);
     }
 
-    private function updateDocument(object $entity, $entityName) {
+    private function updateDocument($entity, $entityName) {
         $this->getPersister($entityName)->replaceOne($entity);
     }
 
-
-    private function createDocument(object $entity, $entityName) {
+    private function createDocument($entity, $entityName) {
         $this->getPersister($entityName)->replaceOne($entity);
     }
-
 }   

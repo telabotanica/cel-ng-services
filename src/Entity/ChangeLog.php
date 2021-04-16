@@ -61,6 +61,11 @@ class ChangeLog  {
      */
     private $entityName = null;
 
+    /**
+     * @ORM\Column(name="error_count", type="integer", nullable=true, options={"comment":"Nombre d'échecs lors du traitement de ce changeLog"})
+     */
+    private $errorCount;
+
 
     public function getEntityName(): string {
         return $this->entityName;
@@ -88,6 +93,18 @@ class ChangeLog  {
 
     public function setActionType(string $actionType): self {
         $this->actionType = $actionType;
+
+        return $this;
+    }
+
+    public function getErrorCount(): int
+    {
+        return $this->errorCount ?? 0;
+    }
+
+    public function setErrorCount(?int $errorCount): self
+    {
+        $this->errorCount = $errorCount;
 
         return $this;
     }
