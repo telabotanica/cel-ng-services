@@ -70,8 +70,6 @@ class SyncDocumentIndexCommand  extends Command {
                 } catch (\Exception $e) {
                     $changeLog->setErrorCount($changeLog->getErrorCount() + 1);
                     if (10 <= $changeLog->getErrorCount()) {
-                        $changeLog->setActionType('error');
-
                         $subject = sprintf('CEL-services : Erreur de synchro ES : %s %s %d',
                             $changeLog->getActionType(),
                             $changeLog->getEntityName(),
@@ -92,6 +90,8 @@ class SyncDocumentIndexCommand  extends Command {
                         $message = $subject."\n".$text."\n".$exceptionInfo;
 
                         mail('webmestre@tela-botanica.org', $subject, $message);
+
+                        $changeLog->setActionType('error');
                     }
 
                     continue;
