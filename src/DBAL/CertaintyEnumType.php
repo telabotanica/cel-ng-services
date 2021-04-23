@@ -38,6 +38,7 @@ class CertaintyEnumType extends Type {
      * @inheritdoc
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform) {
+        $value = mb_strtolower($value);
         if (!in_array($value, array(null, self::DOUBTFUL, self::CERTAIN, self::TO_BE_DETERMINED))) {
             throw new \InvalidArgumentException("Invalid certainty value");
         }

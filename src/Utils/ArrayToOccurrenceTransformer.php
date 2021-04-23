@@ -44,13 +44,12 @@ class ArrayToOccurrenceTransformer {
             "Echantillon d'herbier" => 'sampleHerbarium',
             "Certitude" => 'certainty',
             "Altitude" => 'elevation',
-            'Référentiel Géographique' => 'geodatum',
             "Milieu" => 'environment',
             "Lieu-dit" => 'sublocality',
             "Station" => 'station',
             "Commune" => 'locality',
             "Pays" => 'osmCountry',
-            'Referentiel taxonomique' => 'taxoRepo'
+            'Référentiel taxonomique' => 'taxoRepo'
         );
 
     const ALLOWED_TAXO_REPOS = array(
@@ -77,6 +76,11 @@ class ArrayToOccurrenceTransformer {
         return $values;
     }
 
+    private function containsOnlyNull($input)
+    {
+        return empty(array_filter($input, function ($a) { return $a !== null;}));
+    }
+
 	/**
      * Instanciate and persist an Occurrence instance populated with the 
      * data in the array provided. 
@@ -100,7 +104,7 @@ class ArrayToOccurrenceTransformer {
 		    }		
 		    $this->lineCount++;			
 	    }
-	    else {
+	    elseif (!$this->containsOnlyNull($csvLine)) {
 
 		    $occ = new Occurrence();
 		    $occ = $this->populateWithUserInfo($occ, $user);
@@ -156,8 +160,7 @@ class ArrayToOccurrenceTransformer {
 
         foreach($tagNames as $tagName) {
             if ( ( $tagName !== '' ) && ( null !== $tagName ) ) {
-                $tags = $userOccurrenceTagRepo->findByNameAndUserId(
-                    $tagName, $user->getId());
+                $tags = $userOccurrenceTagRepo->findBy(['name' => $tagName, 'userId' => $user->getId()]);
 
                 if ( sizeof($tags)>0 ) {
                     // creates and persists a new OccurrenceUserOccurrenceTag 
@@ -195,7 +198,6 @@ class ArrayToOccurrenceTransformer {
     }
 
     private function populate($occ, $user, $csvLine) {
-
         $lat  = $csvLine[$this->headerIndexArray['Latitude']];
         $long = $csvLine[$this->headerIndexArray['Longitude']];
         
@@ -208,7 +210,7 @@ class ArrayToOccurrenceTransformer {
 	        if ( array_key_exists($svHeader, $this->headerIndexArray) && array_key_exists($this->headerIndexArray[$svHeader], $csvLine) ) {
 	            if ( null !== $csvLine[$this->headerIndexArray[$svHeader]] ) {
 
-                    if ( $svHeader == 'Referentiel taxonomique') {
+                    if ( $svHeader == 'Référentiel taxonomique') {
 
                          if ( in_array($csvLine[$this->headerIndexArray[$svHeader]], ArrayToOccurrenceTransformer::ALLOWED_TAXO_REPOS ) 
                             && null !== $csvLine[$this->headerIndexArray[$svHeader]] && '' !== $csvLine[$this->headerIndexArray[$svHeader]]) {

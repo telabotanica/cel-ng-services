@@ -110,12 +110,14 @@ final class ImportOccurrenceAction {
                 $reader = new Xlsx();
             }
 	    // @refactor streaming the result would be far nicer
-	    $reader->setReadDataOnly(true);
             $fileOriginalName = $file->getClientOriginalName();
 	        $file->move($this->tmpFolder, $fileOriginalName);
-            $spreadsheet = $reader->load(
-                $this->tmpFolder . '/' . $fileOriginalName);          
-            return $spreadsheet->getActiveSheet()->toArray();
+            $spreadsheet = $reader->load($this->tmpFolder . '/' . $fileOriginalName);
+            $worksheet = $spreadsheet->getActiveSheet();
+            $numRow = $worksheet->getHighestRow();
+            $worksheet->getStyle("S2:S$numRow")->applyFromArray(array("numberFormat"=>array("formatCode"=>'dd/mm/yyyy'))); // S is the date column
+
+            return $worksheet->toArray();
         }
         // @refactor: throw a custom exception
         return null;
@@ -165,7 +167,7 @@ final class ImportOccurrenceAction {
 
 		            if ( null !== $occ) {
                             
-			            if ( $errors = $this->validator->validate($occ) ) {
+			            if ( $this->validator->validate($occ) ) {
                     		// persist the occurrence and associated photos  
 	                        // alongside (consequently updating elasticsearch 
                             // 'photos' index):
