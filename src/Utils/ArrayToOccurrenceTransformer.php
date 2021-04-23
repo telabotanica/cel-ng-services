@@ -48,6 +48,7 @@ class ArrayToOccurrenceTransformer {
             "Lieu-dit" => 'sublocality',
             "Station" => 'station',
             "Commune" => 'locality',
+            "Identifiant Commune" => 'localityInseeCode',
             "Pays" => 'osmCountry',
             'Référentiel taxonomique' => 'taxoRepo'
         );
