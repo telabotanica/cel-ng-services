@@ -8,12 +8,9 @@ class EfloreTaxon
     private $acceptedSciName;
     private $acceptedSciNameId;
 
-    /**
-     * @return mixed
-     */
-    public function getFamily()
+    public function getFamily(): string
     {
-        return $this->family;
+        return $this->family ?? '';
     }
 
     /**
@@ -24,12 +21,9 @@ class EfloreTaxon
         $this->family = $family;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAcceptedSciName()
+    public function getAcceptedSciName(): string
     {
-        return $this->acceptedSciName;
+        return $this->acceptedSciName ?? '';
     }
 
     /**
