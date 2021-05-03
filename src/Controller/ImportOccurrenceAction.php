@@ -51,7 +51,7 @@ final class ImportOccurrenceAction {
     const UNREGISTERED_SECURITY_BUNDLE_MSG = 'The SecurityBundle is not ' .
         'registered in your application.';
     const IMPORT_OK_POSSIBLE_DUPLICATE_MSG = 'Occurrence succesfully ' . 
-        'imported. Warining: possible duplicate already exists in DB. ' .
+        'imported. Warning: possible duplicate already exists in DB. ' .
         'Observation importée avec succès. Attention toutefois : un doublon' .
         ' existe dans le carnet. Line/ligne: ';
     const IMPORT_OK = 'Occurrence succesfully imported. Observation importée' .
@@ -161,6 +161,9 @@ final class ImportOccurrenceAction {
             $persistedOccIds = array();
 
             try {
+                if (count($occArray) > 300) {
+                    set_time_limit(0);
+                }
                 foreach( $occArray as $occAsArray ) {
                     $occCount++;
                     $occ = $occTransformer->transform($occAsArray, $user);

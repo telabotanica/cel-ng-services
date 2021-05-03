@@ -117,7 +117,6 @@ class OccurrenceEventListener {
             return;
         }
 
-        $entity->getPhotos();
         foreach ($entity->getPhotos() as $photo){
             $photo->setOccurrence(null);
             $this->em->persist($photo);
@@ -158,12 +157,12 @@ class OccurrenceEventListener {
         }
 
         if (null === $token = $this->tokenStorage->getToken()) {
-            return;
+            return null;
         }
 
         if (!is_object($user = $token->getUser())) {
             // e.g. anonymous authentication
-            return;
+            return null;
         }
 
         return $user;
