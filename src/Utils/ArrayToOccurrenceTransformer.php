@@ -257,18 +257,19 @@ class ArrayToOccurrenceTransformer {
 
     // @refactor create a normalizer interface and a BooleanNormalizer
 	private function datishToDate(string $datish): DateTime {
-
-            if ( strlen($datish) === 8 )  {
-                return DateTime::createFromFormat('d/m/y', $datish);
+        if (preg_match('@\d+/\d+/(\d\d+)@', $datish, $matches)) {
+            switch (strlen($matches[1])) {
+                case 2:
+                    return DateTime::createFromFormat('d/m/y', $datish);
+                    break;
+                case 4:
+                    return DateTime::createFromFormat('d/m/Y', $datish);
+                    break;
+                default:
+                    throw new InvalidDateFormatException();
             }
-            else if ( strlen($datish) === 10 ) {
-               return DateTime::createFromFormat('d/m/Y', $datish);
-            } 
-            else {
-                throw new InvalidDateFormatException();
-            }
+        } else {
+            throw new InvalidDateFormatException();
+        }
 	}
-
 }
-
-
