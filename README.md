@@ -45,7 +45,7 @@ Run the data fixture to populate the DB:
 php bin/console doctrine:fixtures:load -v
 ```
 
-To populate the index by scanning the whole DB, run the following:
+To populate the index by scanning the existing DB, run the following:
 
 ```
 php bin/console fos:elastica:populate -v
@@ -57,27 +57,26 @@ You can do so by issuing the following command:
 
 ```
 php bin/console server:start
-
 ```
 
 Or, if the 80 port is already used:
-
 ```
 php bin/console server:start *:8080
-
 ```
 
 Stopping the server is done by issuing:
-
 ```
 php bin/console server:stop
-
 ```
 
 ## Prod: Deploying on server
 
-
 You can then follow the symfony manual depending on the server you want to deploy on: https://symfony.com/doc/current/deployment.html
+
+To rebuild the ES index by scanning the existing DB, run the following:
+```
+php bin/console fos:elastica:populate --no-debug --no-reset --env=prod
+```
 
 ## Deleting generated temporary files
 
@@ -85,7 +84,6 @@ In production, a cleanup script must be executed periodically (crontabed) to del
 
 ```
 find /path/to/tmp/folder/ -type f -mtime +2 -exec rm {} \;
-
 ```
 
 
