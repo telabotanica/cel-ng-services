@@ -23,14 +23,14 @@ fos_elastica:
             types:
                 occurrence:
                     properties:
-                        id_keyword:   
-                            type: "keyword" 
+                        id_keyword:
+                            type: "integer"
                         geom: 
                             type: "geo_shape"
                         userId: 
-                            type: "long"
+                            type: "integer"
                         projectId: 
-                            type: "long"
+                            type: "integer"
                         userEmail: ~
                         userPseudo: ~
                         observer: ~
@@ -42,11 +42,11 @@ fos_elastica:
                         dateObserved_keyword:   
                             type: "keyword" 
                         dateObservedYear:
-                            type: "long"
+                            type: "integer"
                         dateObservedMonth:
-                            type: "long"
+                            type: "integer"
                         dateObservedDay:
-                            type: "long"
+                            type: "integer"
                         dateCreated: 
                             type: "date"
                             format: 'yyyy-MM-dd HH:mm:ss' 
@@ -65,17 +65,17 @@ fos_elastica:
                             type: "keyword" 
                             normalizer: "occ_normalizer"
                         userSciNameId: 
-                            type: "long"
+                            type: "integer"
                         acceptedSciName: ~
                         acceptedSciNameId: 
-                            type: "long"
+                            type: "integer"
                         # sortable property
                         family:
                             type: "text"
                         family_keyword:
                             type: "keyword" 
                         plantnetId:
-                            type: "long"
+                            type: "integer"
                         taxoRepo:
                             type: "text"
                         # sortable property
@@ -102,9 +102,9 @@ fos_elastica:
                         signature: ~
                         # sortable property
                         elevation:
-                            type: "text"
+                            type: "short"
                         elevation_keyword:
-                            type: "keyword" 
+                            type: "short"
                         geodatum: ~
                         # sortable property
                         locality:
@@ -129,9 +129,9 @@ fos_elastica:
                         osmPlaceId: ~
                         # sortable property
                         identiplanteScore:
-                            type: "long"
+                            type: "integer"
                         identiplanteScore_keyword:
-                            type: "keyword"
+                            type: "integer"
                         isIdentiplanteValidated:
                             type: "boolean"
                         tags: ~
@@ -170,7 +170,7 @@ fos_elastica:
                 photo:
                     properties:
                         userId: 
-                            type: "long"
+                            type: "integer"
                         userEmail: ~
                         userPseudo: ~
                         originalName: ~
@@ -181,20 +181,20 @@ fos_elastica:
                         dateShot_keyword:
                             type: "keyword"
                         dateShotYear:
-                            type: "long"
+                            type: "integer"
                         dateShotMonth:
-                            type: "long"
+                            type: "integer"
                         dateShotDay:
-                            type: "long"
+                            type: "integer"
                         dateObserved: 
                             type: "date"
                             format: 'yyyy-MM-dd HH:mm:ss' 
                         dateObservedYear:
-                            type: "long"
+                            type: "integer"
                         dateObservedMonth:
-                            type: "long"
+                            type: "integer"
                         dateObservedDay:
-                            type: "long"
+                            type: "integer"
                         dateCreated: 
                             type: "date"
                             format: 'yyyy-MM-dd HH:mm:ss' 
@@ -205,7 +205,7 @@ fos_elastica:
                             format: 'yyyy-MM-dd HH:mm:ss' 
                         userSciName: ~
                         userSciNameId: 
-                            type: "long"
+                            type: "integer"
                         # sortable property
                         family:
                             type: "text"
@@ -222,14 +222,14 @@ fos_elastica:
                         locality:
                             type: "text"
                         frenchDep:
-                            type: "long"
+                            type: "integer"
                         locality_keyword:
                             type: "keyword"
                         osmCounty: ~
                         osmCountry: ~
                         osmCountryCode: ~
                         projectId: 
-                            type: "long"
+                            type: "integer"
                         tags: ~
                     persistence:
                         driver: orm
