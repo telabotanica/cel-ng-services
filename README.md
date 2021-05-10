@@ -75,6 +75,11 @@ You can then follow the symfony manual depending on the server you want to deplo
 
 To rebuild the ES index by scanning the existing DB, run the following:
 ```
+php bin/console fos:elastica:populate --no-debug --env=prod
+```
+
+To fix the ES index without emptying data :
+```
 php bin/console fos:elastica:populate --no-debug --no-reset --env=prod
 ```
 

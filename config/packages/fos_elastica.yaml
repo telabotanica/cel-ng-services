@@ -102,9 +102,9 @@ fos_elastica:
                         signature: ~
                         # sortable property
                         elevation:
-                            type: "short"
+                            type: "integer"
                         elevation_keyword:
-                            type: "short"
+                            type: "integer"
                         geodatum: ~
                         # sortable property
                         locality:
