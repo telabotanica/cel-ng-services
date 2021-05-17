@@ -161,7 +161,7 @@ final class ImportOccurrenceAction {
             $persistedOccIds = array();
 
             try {
-                if (count($occArray) > 300) {
+                if (count($occArray) > 200) {
                     set_time_limit(0);
                 }
                 foreach( $occArray as $occAsArray ) {
