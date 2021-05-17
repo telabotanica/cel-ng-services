@@ -260,16 +260,20 @@ class ArrayToOccurrenceTransformer {
         if (preg_match('@\d+/\d+/(\d\d+)@', $datish, $matches)) {
             switch (strlen($matches[1])) {
                 case 2:
-                    return DateTime::createFromFormat('d/m/y', $datish);
+                    $format = 'd/m/y';
                     break;
                 case 4:
-                    return DateTime::createFromFormat('d/m/Y', $datish);
+                    $format = 'd/m/Y';
                     break;
                 default:
-                    throw new InvalidDateFormatException();
+                    throw new InvalidDateFormatException($datish);
             }
-        } else {
-            throw new InvalidDateFormatException();
+            $date = DateTime::createFromFormat($format, $datish);
+            if ($date && $date->format($format) === $datish) {
+                return $date;
+            }
         }
-	}
+
+        throw new InvalidDateFormatException($datish);
+    }
 }
