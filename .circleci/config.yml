@@ -50,7 +50,7 @@ jobs:
       # prepare the database
       #- run: php bin/console doctrine:migrations:migrate --no-interaction
       #- run: php bin/console doctrine:fixtures:load --no-interaction
-      - run: mysql -u root circle_test < ./sql/cel2.sql
+      - run: mysql circle_test < ./sql/cel2.sql
 
       # Cache warmup
       - run: php bin/console cache:clear
