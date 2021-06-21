@@ -55,7 +55,7 @@ jobs:
           command: while ! nc -z 127.0.0.1 3306 ; do sleep 1 ; done
       - run: 
           name: Insert database schema
-          command: mysql circle_test < ./sql/cel2.sql
+          command: mysql -h 127.0.0.1 -P 3306 --protocol=tcp circle_test < ./sql/cel2.sql
 
       # Cache warmup
       - run: php bin/console cache:clear
