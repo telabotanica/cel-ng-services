@@ -29,7 +29,8 @@ jobs:
       - checkout
 
       - run: sudo apt update # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
-      - run: sudo docker-php-ext-install pdo_mysql
+      - run: sudo apt install -y libpng-dev mariadb-client
+      - run: sudo docker-php-ext-install mysqli gd
 
       # Download and cache dependencies
       - restore_cache:
@@ -49,7 +50,12 @@ jobs:
       # prepare the database
       #- run: php bin/console doctrine:migrations:migrate --no-interaction
       #- run: php bin/console doctrine:fixtures:load --no-interaction
-      - run: mysql -u root circle_test < ./sql/cel2.sql
+      - run:
+          name: Wait for Database Port
+          command: while ! nc -z 127.0.0.1 3306 ; do sleep 1 ; done
+      - run: 
+          name: Insert database schema
+          command: mysql -u root -h 127.0.0.1 -P 3306 --protocol=tcp circle_test < ./sql/cel2.sql
 
       # Cache warmup
       - run: php bin/console cache:clear
