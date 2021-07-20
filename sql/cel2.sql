@@ -408,17 +408,16 @@ DROP TABLE IF EXISTS `user_profile_cel`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_profile_cel` (
-  `id` int(11) NOT NULL,
-  `administered_project_id` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
   `anonymize_data` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Anonymisation des données d''observation',
-  `is_end_user_licence_accepted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Validation des conditions d''utilisation',
+  `is_end_user_licence_accepted` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Validation des conditions d''utilisation',
   `always_display_advanced_fields` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Validation des conditions d''utilisation',
   `language` enum('EN','FR') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FR' COMMENT 'langage choisi pour communiquer dans l''interface.(DC2Type:languageenum)',
   PRIMARY KEY (`id`),
-  KEY `IDX_EEE77E506C1DD863` (`administered_project_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des préférences utilisateurs';
+  UNIQUE KEY `UNIQ_EEE77E50A76ED395` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des préférences utilisateurs';
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
