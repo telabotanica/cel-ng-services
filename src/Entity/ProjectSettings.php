@@ -68,7 +68,7 @@ class ProjectSettings
 
    /**
     * @Groups({"read"})
-    * @ORM\Column(type="string", nullable=true, options={"comment":"Langue du projet"}, length=2, "default": "fr")
+    * @ORM\Column(type="string", nullable=true, options={"comment":"Langue du projet", "default": "fr"}, length=2)
     */
    private $language = "fr";
 
@@ -177,24 +177,24 @@ class ProjectSettings
    private $publishedLocation = null;
    
    /**
-    * Affichage d'un fond de carte OSM ou photo aérienne - OSM, aerienne
+    * Affichage d'un fond de carte OSM ou photo aérienne - OSM, googleHybrid
     * 
     * @Groups({"read"})
-    * @ORM\Column(name="basemap", type="string", nullable=true, options={"comment":"Précision du fond de carte affiché lors de la saisie", "default": "OSM"})
+    * @ORM\Column(name="basemap", type="string", nullable=true, options={"comment":"Précision du fond de carte affiché lors de la saisie", "default": "osm"})
     */
-   private $basemap = "OSM";
+   private $basemap = "osm";
    
    /**
     * Indique s'il faut stocker l'adresse.
     *
-    * @ORM\Column(name="is_mandatory_adress", type="boolean", nullable=true, options={"comment":"Indique si l'adresse doit être stockée ou non"}, "default": false)
+    * @ORM\Column(name="is_mandatory_adress", type="boolean", nullable=true, options={"comment":"Indique si l'adresse doit être stockée ou non", "default": false})
     */
    private $isMandatoryAdress = false;
    
    /**
     * Indique si la photo est obligatoire pour envoyer la donnée ou non.
     *
-    * @ORM\Column(name="is_mandatory_photo", type="boolean", nullable=true, options={"comment":"Indique si la photo est obligatoire pour envoyer la donnée ou non"}, "default": false)
+    * @ORM\Column(name="is_mandatory_photo", type="boolean", nullable=true, options={"comment":"Indique si la photo est obligatoire pour envoyer la donnée ou non", "default": false})
     */
    private $isMandatoryPhoto = false;
 
