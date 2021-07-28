@@ -53,8 +53,8 @@ class ExtendedField {
     /**
      * Champ invisible de l'utilisateur mais nécessaire au projet.
      *
-     * @ORM\Column(name="is_visible", type="boolean", nullable=true, options={"comment":"Champ invisible de l'utilisateur mais nécessaire au projet, "default": true
-     "})
+     * @ORM\Column(name="is_visible", type="boolean", nullable=true, options={"comment":"Champ invisible de l'utilisateur mais nécessaire au projet", "default": true
+     })
      */
     private $isVisible = true;
 
