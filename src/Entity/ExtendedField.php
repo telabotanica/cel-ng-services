@@ -53,17 +53,15 @@ class ExtendedField {
     /**
      * Champ invisible de l'utilisateur mais nécessaire au projet.
      *
-     * @Assert\NotNull
-     * @ORM\Column(name="is_visible", type="boolean", nullable=false, options={"comment":"Champ invisible de l'utilisateur mais nécessaire au projet
-     "})
+     * @ORM\Column(name="is_visible", type="boolean", nullable=true, options={"comment":"Champ invisible de l'utilisateur mais nécessaire au projet", "default": true
+     })
      */
-    private $isVisible = false;
+    private $isVisible = true;
 
     /**
      * Indique si le champ est obligatoire pour envoyer la donnée ou non.
      *
-     * @Assert\NotNull
-     * @ORM\Column(name="is_mandatory", type="boolean", nullable=false, options={"comment":"Indique si le champ est obligatoire pour envoyer la donnée ou non"})
+     * @ORM\Column(name="is_mandatory", type="boolean", nullable=true, options={"comment":"Indique si le champ est obligatoire pour envoyer la donnée ou non", "default": false})
      */
     private $isMandatory = false;
 

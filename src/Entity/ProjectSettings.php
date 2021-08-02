@@ -68,10 +68,9 @@ class ProjectSettings
 
    /**
     * @Groups({"read"})
-    * @Assert\NotNull
-    * @ORM\Column(type="string", nullable=false, options={"comment":"Langue du projet"}, length=2)
+    * @ORM\Column(type="string", nullable=true, options={"comment":"Langue du projet", "default": "fr"}, length=2)
     */
-   private $language = null;
+   private $language = "fr";
 
    /**
     * @Groups({"read"})
@@ -85,9 +84,9 @@ class ProjectSettings
     * 'repository_name: taxoId1,taxoId2, ...,taxoIdn'
     *
     * @Groups({"read"})
-    * @ORM\Column(name="taxo_restriction_value", type="string", nullable=true, options={"comment":"Liste de valeurs possibles pour le taxon. Prend la forme 'repository_name: taxoId1,taxoId2, ...,taxoIdn'"})
+    * @ORM\Column(name="taxo_restriction_value", type="string", nullable=true, options={"comment":"Liste de valeurs possibles pour le taxon. Prend la forme 'repository_name: taxoId1,taxoId2, ...,taxoIdn'", "default": "bdtfx"})
     */
-   private $taxoRestrictionValue = null;
+   private $taxoRestrictionValue = "bdtfx";
 
 
    /**
@@ -176,7 +175,28 @@ class ProjectSettings
     * @ORM\Column(name="published_location", type="publishedlocationenum", nullable=true, options={"comment":"Précision géographique à laquelle est publiée l'obs, permet de gérer le floutage", "default": PublishedLocationEnumType::TEN_BY_TEN})
     */
    private $publishedLocation = null;
-
+   
+   /**
+    * Affichage d'un fond de carte OSM ou photo aérienne - OSM, googleHybrid
+    * 
+    * @Groups({"read"})
+    * @ORM\Column(name="basemap", type="string", nullable=true, options={"comment":"Précision du fond de carte affiché lors de la saisie", "default": "osm"})
+    */
+   private $basemap = "osm";
+   
+   /**
+    * Indique s'il faut stocker l'adresse.
+    *
+    * @ORM\Column(name="is_mandatory_address", type="boolean", nullable=true, options={"comment":"Indique si l'adresse doit être stockée ou non", "default": false})
+    */
+   private $isMandatoryAddress = false;
+   
+   /**
+    * Indique si la photo est obligatoire pour envoyer la donnée ou non.
+    *
+    * @ORM\Column(name="is_mandatory_photo", type="boolean", nullable=true, options={"comment":"Indique si la photo est obligatoire pour envoyer la donnée ou non", "default": false})
+    */
+   private $isMandatoryPhoto = false;
 
    /**
     * Un tag par défaut est associé à toutes les obs du projet.
@@ -364,6 +384,37 @@ class ProjectSettings
    public function setEnvironments($environments): self
    {
        $this->environments = $environments;
+       return $this;
+   }
+   
+   public function getBasemap()
+   {
+       return $this->basemap;
+   }
+   
+   public function setBasemap($basemap): self
+   {
+       $this->basemap = $basemap;
+       return $this;
+   }
+   
+   public function getIsMandatoryAddress(): ?bool {
+       return $this->isMandatoryAddress;
+   }
+   
+   public function setIsMandatoryAddress(bool $isMandatoryAddress): self {
+       $this->isMandatoryAddress = $isMandatoryAddress;
+       
+       return $this;
+   }
+   
+   public function getIsMandatoryPhoto(): ?bool {
+       return $this->isMandatoryPhoto;
+   }
+   
+   public function setIsMandatoryPhoto(bool $isMandatoryPhoto): self {
+       $this->isMandatoryPhoto = $isMandatoryPhoto;
+       
        return $this;
    }
 
