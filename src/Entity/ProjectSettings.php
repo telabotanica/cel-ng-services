@@ -187,9 +187,9 @@ class ProjectSettings
    /**
     * Indique s'il faut stocker l'adresse.
     *
-    * @ORM\Column(name="is_mandatory_adress", type="boolean", nullable=true, options={"comment":"Indique si l'adresse doit être stockée ou non", "default": false})
+    * @ORM\Column(name="is_mandatory_address", type="boolean", nullable=true, options={"comment":"Indique si l'adresse doit être stockée ou non", "default": false})
     */
-   private $isMandatoryAdress = false;
+   private $isMandatoryAddress = false;
    
    /**
     * Indique si la photo est obligatoire pour envoyer la donnée ou non.
@@ -398,8 +398,8 @@ class ProjectSettings
        return $this;
    }
    
-   public function getIsMandatoryAdress(): ?bool {
-       return $this->isMandatoryAdress;
+   public function getIsMandatoryAddress(): ?bool {
+       return $this->isMandatoryAddress;
    }
    
    public function setIsMandatoryAdress(bool $isMandatoryAdress): self {
