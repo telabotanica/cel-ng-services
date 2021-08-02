@@ -402,8 +402,8 @@ class ProjectSettings
        return $this->isMandatoryAddress;
    }
    
-   public function setIsMandatoryAdress(bool $isMandatoryAdress): self {
-       $this->isMandatoryAdress = $isMandatoryAdress;
+   public function setIsMandatoryAddress(bool $isMandatoryAddress): self {
+       $this->isMandatoryAddress = $isMandatoryAddress;
        
        return $this;
    }
