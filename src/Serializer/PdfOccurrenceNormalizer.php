@@ -82,6 +82,7 @@ final class PdfOccurrenceNormalizer implements NormalizerInterface, Denormalizer
                 $crtOccAsArray['annotation']      = $crtOcc->getAnnotation();
                 $crtOccAsArray['userSciName'] = $crtOcc->getUserSciName();
                 $crtOccAsArray['userPseudo'] = $crtOcc->getUserPseudo();
+                $crtOccAsArray['observer'] = $crtOcc->getObserver();
                 $crtOccAsArray['dateObserved'] = $crtOcc->getDateObserved();
                 $result[] = $crtOccAsArray;
             }           
