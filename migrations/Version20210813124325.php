@@ -14,7 +14,7 @@ final class Version20210813124325 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return '';
+        return 'Add pn_tb_pair database, used to track shared occurrences ids between Tela and Pl@ntNet';
     }
 
     public function up(Schema $schema) : void
