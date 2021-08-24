@@ -23,7 +23,7 @@ final class PhotoQueryBuilder extends BaseQueryBuilder {
                 'userSciName', 'locality', 'osmCountry', 'osmCounty', 'isPublic', 
                 'certainty', 'projectId', 'frenchDep'), 
             array('family', 'station', 'annotation', 'userSciName', 'locality', 
-                  'sublocality', 'environment', 'taxoRepo', 'certainty'), 
+                  'sublocality', 'environment', 'taxoRepo', 'certainty', 'id'), 
             array('id', 'tags') 
         );
     }
