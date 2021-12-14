@@ -8,15 +8,16 @@ use App\Security\User\TelaBotanicaUser;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\HttpFoundation\Request;
 
 class SSOUserProvider implements UserProviderInterface {
 
     protected $requestStack;
 
-    public function __construct(RequestStack $requestStack) {
+    private $ssoUserExtractor;
+
+    public function __construct(RequestStack $requestStack, SSOUserExtractor $ssoUserExtractor) {
         $this->requestStack = $requestStack;
+        $this->ssoUserExtractor = $ssoUserExtractor;
     }
  
     public function loadUserByUsername($username) {
@@ -25,10 +26,9 @@ class SSOUserProvider implements UserProviderInterface {
     }
 
     public function refreshUser(UserInterface $user) {
-        $userExtractor = new SSOUserExtractor();
         $request = $this->requestStack->getCurrentRequest();
 
-        return $userExtractor->extractUser($request);
+        return $this->ssoUserExtractor->extractUser($request);
     }
 
     public function supportsClass($class) {

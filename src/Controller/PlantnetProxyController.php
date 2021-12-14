@@ -56,7 +56,7 @@ class PlantnetProxyController extends AbstractController {
 
 
     private function buildUrl($request) {
-        return getenv('PLANTNET_API_URL') . '?' . urldecode($request->getQueryString()) . '&api-key=' . getenv('PLANTNET_API_KEY'); 
+        return getenv('PLANTNET_IDENTIFY_URL') . '?' . urldecode($request->getQueryString()) . '&api-key=' . getenv('PLANTNET_API_KEY');
     }
 
 }

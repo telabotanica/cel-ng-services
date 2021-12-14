@@ -4,29 +4,32 @@ namespace App\Command;
 
 use App\Entity\Occurrence;
 use App\Entity\PnTbPair;
+use App\Service\PlantnetService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class CelSyncGetPnTbPairsIdsCommand extends Command
 {
     protected static $defaultName = 'cel:sync:get-pn-tb-pairs-ids';
 
     private $em;
-    private $pnTbPairRepository;
-    private $occurrenceRepository;
+    private $plantnetService;
 
-    public function __construct(EntityManagerInterface $em)
+    /**
+     * @var SymfonyStyle
+     */
+    private $io;
+
+    public function __construct(EntityManagerInterface $em, PlantnetService $plantnetService)
     {
         $this->em = $em;
-        $this->pnTbPairRepository = $this->em->getRepository(PnTbPair::class);
-        $this->occurrenceRepository = $this->em->getRepository(Occurrence::class);
+        $this->plantnetService = $plantnetService;
 
         parent::__construct();
     }
@@ -35,44 +38,41 @@ class CelSyncGetPnTbPairsIdsCommand extends Command
     {
         $this
             ->setDescription('Get all PlantNet Occurrences corresponding IDs to Tela Botanica Occurrences')
-            ->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'If set, don’t persist changes to database')
-            ->addArgument('pn-token', InputArgument::REQUIRED, 'PN Token')
-//            ->addOption('pn-token', null, InputOption::VALUE_REQUIRED, 'PN Token')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'If set, don’t persist changes to database')
         ;
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        // See https://symfony.com/doc/current/console/style.html
+        $this->io = new SymfonyStyle($input, $output);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
-        $client = HttpClient::create();
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('pn-tb-pairs-ids');
 
         $dryRun = $input->getOption('dry-run');
-        $pnToken = $input->getArgument('pn-token');
 
-        // get IDS
-        $io->text('Getting info from PN server.');
-        $response = $client->request('GET', 'https://my-api.plantnet.org/v2/observations/partnerids?api-key='.$pnToken, [
-            'headers' => [
-                'Accept' => 'text/plain',
-            ],
-        ]);
-        $io->text('Fetching response, could take a moment...');
+        $occurrenceRepository = $this->em->getRepository(Occurrence::class);
+        $pnTbPairRepository = $this->em->getRepository(PnTbPair::class);
 
-        $pairs = $response->getContent();
-        $pairs = json_decode($pairs, true);
+        $this->io->text('Wait for it...');
+        $pairs = $this->plantnetService->getExistingPairs();
 
         $bar = new ProgressBar($output, count($pairs));
 
-        $io->text('Let’s go computing all that stuff!');
+        $this->io->text('Let’s go computing all that stuff!');
         $unknownOccurrences = 0;
         $knownOccurrences = 0;
         $savedPairs = 0;
         foreach ($pairs as $pair) {
             $bar->advance();
 
-            $occurrence = $this->occurrenceRepository->findOneBy(['id' => $pair['tela']]);
+            $occurrence = $occurrenceRepository->findOneBy(['id' => $pair['tela']]);
             if ($occurrence) {
-                $pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
+                $pnTbPair = $pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
                 if (!$pnTbPair) {
                     $pnTbPair = new PnTbPair(
                         $occurrence,
@@ -94,10 +94,11 @@ class CelSyncGetPnTbPairsIdsCommand extends Command
         }
         $bar->finish();
 
-        $io->newLine();
-        $io->success(
-            sprintf('PN TB pairs successfully synced! (Stats: %s new pairs | %s known | %s unknown)',
+        $event = $stopwatch->stop('pn-tb-pairs-ids');
+        $this->io->success(
+            sprintf('PN TB pairs successfully synced! (Stats: %s new pairs | %s known occurrences | %s unknown)',
                 $savedPairs, $knownOccurrences, $unknownOccurrences)
         );
+        $this->io->comment(sprintf('Elapsed time: %.2f ms / Consumed memory: %.2f MB', $event->getDuration(), $event->getMemory() / (1024 ** 2)));
     }
 }

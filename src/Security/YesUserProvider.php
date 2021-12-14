@@ -13,14 +13,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class YesUserProvider implements UserProviderInterface 
 {
-
-
-
     protected $requestStack;
 
-    public function __construct(RequestStack $requestStack)
+    private $ssoUserExtractor;
+
+    public function __construct(RequestStack $requestStack, SSOUserExtractor $ssoUserExtractor)
     {
         $this->requestStack = $requestStack;
+        $this->ssoUserExtractor = $ssoUserExtractor;
     }
  
     public function loadUserByUsername($username)
@@ -31,10 +31,9 @@ class YesUserProvider implements UserProviderInterface
 
     public function refreshUser(UserInterface $user)
     {
-        $userExtractor = new SSOUserExtractor();
         $request = $this->requestStack->getCurrentRequest();
 //        die(var_dump($request->headers));
-        return $userExtractor->extractUser($request);
+        return $this->ssoUserExtractor->extractUser($request);
 
     }
 

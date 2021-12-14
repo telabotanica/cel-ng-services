@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Service;
+
+use App\Model\AnnuaireUser;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+
+class AnnuaireService
+{
+    public const PLANTNET_BOT_USER_ID = 6;
+
+    private $cachedUsers = [];
+    private $client;
+    private $annuaireBaseUrl;
+
+    public function __construct(string $annuaireBaseUrl)
+    {
+        $this->client = HttpClient::create();
+        $this->annuaireBaseUrl = $annuaireBaseUrl;
+    }
+
+    /**
+     * @return false|AnnuaireUser
+     */
+    public function findUserInfo(string $email)
+    {
+        if (array_key_exists($email, $this->cachedUsers)) {
+            return $this->cachedUsers[$email];
+        }
+
+        $response = $this->client->request(
+            'GET', $this->annuaireBaseUrl.':utilisateur/identite-par-courriel/'.$email
+        );
+
+        if (200 !== $response->getStatusCode()) {
+            if (500 === $response->getStatusCode()) {
+                // annuaire returns a 500 when email is not found
+                return false;
+            }
+
+            throw new \Exception(sprintf(
+                'Annuaire is not happy, getting some %d error for: "%s"',
+                $response->getStatusCode(),
+                $response->getInfo('url')
+            ));
+        }
+
+        $userData = $response->getContent();
+        if ('[]' === $userData) {
+            return false;
+        }
+        $userData = $this->fixDumbAnnuaireDataStructure($userData);
+
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $normalizer = [
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, $extractor),
+        ];
+        $serializer = new Serializer($normalizer, [new JsonEncoder()]);
+
+        $user = $serializer->deserialize($userData, AnnuaireUser::class, 'json');
+        if ($user) {
+            $this->cachedUsers[$email] = $user;
+        }
+
+        return $user;
+    }
+
+    public function isKnownUser(string $email): bool
+    {
+        return (bool)$this->findUserInfo($email);
+    }
+
+    private function fixDumbAnnuaireDataStructure(string $data): string
+    {
+        // switch from "{"killian@tela-botanica.org":{"id":"1312","prenom":null,"nom":null,"pseudo":null,"pseudoUtilise":false,"intitule":"killian-stefanini","groupes":[],"nomWiki":"Killianstefanini"}}"
+        // to
+        $data = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+        $email = array_key_first($data);
+        $id = $data[$email]['id'];
+        $intitule = $data[$email]['intitule'] ?? $data[$email]['pseudo'] ?? $data[$email]['prenom'] ?? 'anonymous';
+
+        return json_encode([
+            'id' => $id,
+            'email' => $email,
+            'intitule' => $intitule,
+        ], JSON_THROW_ON_ERROR);
+    }
+}

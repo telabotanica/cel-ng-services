@@ -22,8 +22,8 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
 
     private $tokenUtils;
 
-    public function __construct() {
-        $this->tokenUtils = new SSOUserExtractor();
+    public function __construct(SSOUserExtractor $ssoUserExtractor) {
+        $this->tokenUtils = $ssoUserExtractor;
     }
 
     /**

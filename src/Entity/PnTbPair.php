@@ -5,6 +5,11 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * This class aimed to link local Occurrence info with remote PN Occurrences
+ * We need to store:
+ *  - corresponding IDs
+ *  - PN Occ updated date: if this date is even with remote, then we're already up-to-date
+ *
  * @ORM\Entity(repositoryClass="App\Repository\PnTbPairRepository")
  */
 class PnTbPair
@@ -17,7 +22,7 @@ class PnTbPair
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Occurrence", inversedBy="pnTbPair", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\Occurrence", inversedBy="", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $occurrence;
@@ -41,6 +46,13 @@ class PnTbPair
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId($id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getOccurrence(): ?Occurrence

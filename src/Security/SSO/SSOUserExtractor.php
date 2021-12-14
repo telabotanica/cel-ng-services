@@ -3,9 +3,6 @@
 namespace App\Security\SSO;
 
 use App\Security\User\UnloggedAccessException;
-
-use App\Security\SSO\SSOTokenValidator;
-use App\Security\SSO\SSOTokenDecoder;
 use App\Security\User\TelaBotanicaUser;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +29,15 @@ class SSOUserExtractor {
     // App "user" role name:
     const USER_ROLE_NAME                = 'User';
 
+    private $ssoTokenValidator;
+    private $ssoTokenDecoder;
+
+    public function __construct(SSOTokenValidator $ssoTokenValidator, SSOTokenDecoder $ssoTokenDecoder)
+    {
+        $this->ssoTokenValidator = $ssoTokenValidator;
+        $this->ssoTokenDecoder = $ssoTokenDecoder;
+    }
+
     public function extractUser(Request $request) {
         $token = $this->extractTokenFromRequest($request);
         if ( null === $token) {
@@ -46,9 +52,8 @@ class SSOUserExtractor {
             return null;
         }
 
-        $tokenDecoder = new SSOTokenDecoder();
 // die(var_dump($tokenDecoder)); 
-        $userInfo = $tokenDecoder->getUserFromToken($token);
+        $userInfo = $this->ssoTokenDecoder->getUserFromToken($token);
         //$role = new Role();
         $roles = array();
         if (in_array( 
@@ -97,8 +102,6 @@ class SSOUserExtractor {
             return false;
         }
 
-        $tokenValidator = new SSOTokenValidator();
-
-        return $tokenValidator->validateToken($token);
+        return $this->ssoTokenValidator->validateToken($token);
     }
 }

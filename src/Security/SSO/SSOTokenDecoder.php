@@ -2,9 +2,6 @@
 
 namespace App\Security\SSO;
 
-use App\Security\SSO\SSOTokenValidator;
-use App\Security\SSO\MisconfiguredSSOTokenValidatorException;
-
 /**
  * Authentication and user management using Tela Botanica's SSO
  * @todo : if annuaireURL null ou vide => return UnknownUser
@@ -15,8 +12,8 @@ class SSOTokenDecoder {
 	/** The validator for the JWT tokens as used by SSO Web services */
 	protected $tokenValidator;
 
-	public function __construct() {
-        $this->tokenValidator = new SSOTokenValidator();
+	public function __construct(SSOTokenValidator $ssoTokenValidator) {
+        $this->tokenValidator = $ssoTokenValidator;
 	}
 
 	/**
