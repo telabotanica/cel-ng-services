@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\DBAL\TaxoRepoEnumType;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 
 class TaxoRepoService
 {
@@ -52,9 +53,13 @@ class TaxoRepoService
     private $baseNamesearchUrl;
     private $taxonInfoUrl;
 
-    public function __construct(string $baseNamesearchUrl, string $taxonInfoUrl)
+    public function __construct(string $baseNamesearchUrl, string $taxonInfoUrl, bool $useNativeHttpClient)
     {
-        $this->client = HttpClient::create();
+        if ($useNativeHttpClient) {
+            $this->client = new NativeHttpClient();
+        } else {
+            $this->client = HttpClient::create();
+        }
         $this->baseNamesearchUrl = $baseNamesearchUrl;
         $this->taxonInfoUrl = $taxonInfoUrl;
     }

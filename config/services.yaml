@@ -226,6 +226,7 @@ services:
         arguments:
             - '%env(EFLORE_NAME_SEARCH_URL)%'
             - '%env(EFLORE_TAXON_INFO_URL)%'
+            - '%env(USE_NATIVE_HTTP_CLIENT)%'
 
     App\Security\SSO\SSOTokenValidator:
         arguments:
