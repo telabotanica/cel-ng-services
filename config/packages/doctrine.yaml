@@ -16,6 +16,8 @@ doctrine:
             collate: utf8mb4_unicode_ci
 
         url: '%env(resolve:DATABASE_URL)%'
+        mapping_types:
+            enum: string
         types:
             taxorepoenum: App\DBAL\TaxoRepoEnumType
             occurrencetypeenum: App\DBAL\OccurrenceTypeEnumType

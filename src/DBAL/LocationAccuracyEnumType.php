@@ -59,4 +59,19 @@ class LocationAccuracyEnumType extends Type {
         return true;
     }
 
+    public static function getAccuracyRangeForFloat(float $accuracy)
+    {
+        if (($accuracy >= 0) && ($accuracy < 10)) {
+            return self::LESS_THAN_TEN;
+        }
+
+        if (($accuracy >= 10) && ($accuracy < 100)) {
+            return self::TENS;
+        }
+
+        if ($accuracy >= 100) {
+            return self::HUNDREDS;
+        }
+    }
+
 }

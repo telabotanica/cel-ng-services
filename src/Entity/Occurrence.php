@@ -29,6 +29,7 @@ use App\Entity\TimestampedEntityInterface;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use App\Model\PlantnetImage;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -542,7 +543,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
      */
     private $taxoRepo;
 
-   /**
+    /**
      * The tela botanica project the occurrence belongs to.
      *
      * @Groups({"read", "write"})
@@ -808,6 +809,12 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
 
     public function setValidSciNameId(int $validSciNameId): self {
         $this->validSciNameId = $validSciNameId;
+
+        return $this;
+    }
+
+    public function setPlantnetId(int $plantnetId): self {
+        $this->plantnetId = $plantnetId;
 
         return $this;
     }
@@ -1306,6 +1313,17 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         // We must urlencode the because of the "Unicode Problem":
         // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding 
         $this->signature = base64_encode(rawurlencode($unencodedSignature));
+    }
+
+    public function isExistingPhoto(PlantnetImage $image): bool
+    {
+        foreach ($this->getPhotos() as $photo) {
+            if ($photo->getOriginalName() === $image->getId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function __clone() {

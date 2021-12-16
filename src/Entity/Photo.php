@@ -442,6 +442,17 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
        return $this->dateLinkedToOccurrence;
    }
 
+   public function setImageFile(?File $file = null): self
+   {
+       $this->file = $file;
+
+        if ($file) {
+            $this->setDateUpdated(new \DateTimeImmutable());
+        }
+
+        return $this;
+   }
+
     public function __construct() {
 
        $this->photoRelations = new ArrayCollection();

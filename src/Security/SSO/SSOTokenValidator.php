@@ -2,10 +2,6 @@
 
 namespace App\Security\SSO;
 
-use App\Security\SSO\MisconfiguredSSOTokenValidatorException;
-
-use Symfony\Component\Dotenv\Dotenv;
-
 /**
  * Authentication and user management using Tela Botanica's SSO
  *
@@ -13,19 +9,21 @@ use Symfony\Component\Dotenv\Dotenv;
  */
 class SSOTokenValidator {
 
-	/** The URL for the "annuaire" SSO Web Service */
-	protected $annuaireURL;
-	/** The URL for the "annuaire" SSO Web Service */
-	protected $ignoreSSLIssues = false;
+	/** The base URL for the "annuaire" SSO Web Service */
+	protected $annuaireBaseUrl;
 
-	public function __construct() {
-	    $this->annuaireURL = getenv('SSO_ANNUAIRE_URL');
-	    $this->ignoreSSLIssues = getenv('IGNORE_SSL_ISSUES');
+	protected $ignoreSslIssues = false;
+
+	public function __construct(string $annuaireBaseUrl, bool $ignoreSslIssues) {
+	    $this->annuaireBaseUrl = $annuaireBaseUrl;
+        if (empty($this->annuaireBaseUrl)) {
+            throw new MisconfiguredSSOTokenValidatorException();
+        }
+	    $this->ignoreSslIssues = $ignoreSslIssues ;
 	}
 
 	private function generateAuthCheckURL($token) {
-		$verificationServiceURL = $this->annuaireURL;
-		$verificationServiceURL = trim($verificationServiceURL, '/') . "/verifytoken";
+		$verificationServiceURL = $this->annuaireBaseUrl.':auth/verifierjeton';
 		$verificationServiceURL .= "?token=" . $token;
 
         return $verificationServiceURL;
@@ -35,9 +33,6 @@ class SSOTokenValidator {
 	 * Verifies the authenticity of a token using the "annuaire" SSO service
 	 */
 	public function validateToken($token) {
-		if ( empty($this->annuaireURL) ) {
-			throw new MisconfiguredSSOTokenValidatorException();
-		}
 		$verificationServiceURL = $this->generateAuthCheckURL($token);
 		$ch = curl_init();
 		$timeout = 5;
@@ -46,7 +41,7 @@ class SSOTokenValidator {
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
 		// equivalent of "-k", ignores SSL self-signed certificate issues
 		// (for local testing only)
-		if (! empty($this->ignoreSSLIssues) && $this->ignoreSSLIssues === true) {
+		if ($this->ignoreSslIssues) {
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		}

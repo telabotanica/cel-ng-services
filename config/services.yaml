@@ -208,3 +208,26 @@ services:
         tags:
             - { name: 'console.command', command: 'cel:sync-es' }
 
+    # config
+    App\Service\PlantnetService:
+        arguments:
+            - '%env(PLANTNET_API_KEY)%'
+            - '%env(PLANTNET_BASE_API_URL)%'
+
+    App\Service\AnnuaireService:
+        arguments:
+            - '%env(SSO_ANNUAIRE_URL)%'
+
+    App\Service\IdentiplanteService:
+        arguments:
+            - '%env(IDENTIPLANTE_SERVICE_URL)%'
+
+    App\Service\TaxoRepoService:
+        arguments:
+            - '%env(EFLORE_NAME_SEARCH_URL)%'
+            - '%env(EFLORE_TAXON_INFO_URL)%'
+
+    App\Security\SSO\SSOTokenValidator:
+        arguments:
+            - '%env(SSO_ANNUAIRE_URL)%'
+            - '%env(IGNORE_SSL_ISSUES)%'
