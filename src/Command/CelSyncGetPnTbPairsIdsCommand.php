@@ -100,5 +100,7 @@ class CelSyncGetPnTbPairsIdsCommand extends Command
                 $savedPairs, $knownOccurrences, $unknownOccurrences)
         );
         $this->io->comment(sprintf('Elapsed time: %.2f ms / Consumed memory: %.2f MB', $event->getDuration(), $event->getMemory() / (1024 ** 2)));
+
+        return 0;
     }
 }

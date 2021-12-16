@@ -2,8 +2,6 @@
 
 namespace App\Command;
 
-use App\DBAL\CertaintyEnumType;
-use App\DBAL\InputSourceEnumType;
 use App\Entity\ChangeLog;
 use App\Entity\Occurrence;
 use App\Entity\PnTbPair;
@@ -13,17 +11,12 @@ use App\Service\IdentiplanteService;
 use App\Service\OccurrenceBuilderService;
 use App\Service\PhotoBuilderService;
 use App\Service\PlantnetService;
-use App\Service\TaxoRepoService;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 final class CelSyncProcessJobsCommand extends Command

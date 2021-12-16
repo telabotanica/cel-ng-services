@@ -4,6 +4,8 @@ namespace App\Command;
 
 use App\Entity\ChangeLog;
 use App\Entity\Occurrence;
+use App\Model\PlantnetOccurrence;
+use App\Model\PlantnetOccurrences;
 use App\Service\AnnuaireService;
 use App\Service\PlantnetPaginator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -80,10 +82,17 @@ final class CelSyncGetJobsCommand extends Command
         $this->plantnetPaginator->start($startDate, $email);
 
         do {
+            /**
+             * @var $occurrences PlantnetOccurrences
+             */
             $occurrences = $this->plantnetPaginator->getContent();
             if (!$occurrences) {
                 break;
             }
+
+            /**
+             * @var $occurrences PlantnetOccurrence[]
+             */
             $occurrences = $occurrences->getData();
 
             foreach ($occurrences as $occurrence) {
@@ -120,6 +129,8 @@ final class CelSyncGetJobsCommand extends Command
 
             $this->io->comment(sprintf('Elapsed time: %.2f ms / Consumed memory: %.2f MB', $event->getDuration(), $event->getMemory() / (1024 ** 2)));
         }
+
+        return 0;
     }
 
     private function addJob(string $type, int $id)
@@ -128,8 +139,7 @@ final class CelSyncGetJobsCommand extends Command
             throw new \Exception('Job has be deleted, created or updated, nothing else');
         }
 
-        $changelog = $this->changeLogRepository->findOneBy(
-            ['entityName' => 'plantnet', 'entityId' => $id]);
+        $changelog = $this->changeLogRepository->findOneBy(['entityName' => 'plantnet', 'entityId' => $id]);
         if (!$changelog) {
             $changelog = new ChangeLog();
             $changelog->setActionType($type);

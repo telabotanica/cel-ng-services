@@ -57,6 +57,7 @@ class AnnuaireService
             return false;
         }
         $userData = $this->fixDumbAnnuaireDataStructure($userData);
+        var_dump($userData);
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = [
@@ -78,10 +79,14 @@ class AnnuaireService
         return (bool)$this->findUserInfo($email);
     }
 
+    /**
+     * Switch data structure from email indexed form (stupid isn't it?)
+     * "{"killian@tela-botanica.org":{"id":"1312",...,"intitule":"killian-stefanini",...}}"
+     * to standard form: email inside data structure
+     * "{"id":"1312","email":"killian@tela-botanica.org","intitule":"killian-stefanini"}"
+     */
     private function fixDumbAnnuaireDataStructure(string $data): string
     {
-        // switch from "{"killian@tela-botanica.org":{"id":"1312","prenom":null,"nom":null,"pseudo":null,"pseudoUtilise":false,"intitule":"killian-stefanini","groupes":[],"nomWiki":"Killianstefanini"}}"
-        // to
         $data = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
         $email = array_key_first($data);
         $id = $data[$email]['id'];
