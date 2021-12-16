@@ -70,8 +70,6 @@ class PlantnetService
             ],
         ]);
 
-        echo "$this->plantnetBaseApiUrl/observations/sync/latest?$params";
-
         $response = $this->handleOccurrencesResponse($response);
 
         return $this->deserializeOccurrences($response->getContent());

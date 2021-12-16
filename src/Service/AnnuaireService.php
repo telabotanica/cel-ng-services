@@ -57,7 +57,6 @@ class AnnuaireService
             return false;
         }
         $userData = $this->fixDumbAnnuaireDataStructure($userData);
-        var_dump($userData);
 
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = [
