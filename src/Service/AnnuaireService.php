@@ -39,17 +39,23 @@ class AnnuaireService
             'GET', $this->annuaireBaseUrl.':utilisateur/identite-par-courriel/'.$email
         );
 
-        if (200 !== $response->getStatusCode()) {
-            if (500 === $response->getStatusCode()) {
-                // annuaire returns a 500 when email is not found
-                return false;
-            }
+        // Sometimes annuaire doesn't respond, this trycatch aims to avoid breaking associated command.
+        // It's not perfect because false should not be used both for network errors and unknown users.
+        try {
+            if (200 !== $response->getStatusCode()) {
+                if (500 === $response->getStatusCode()) {
+                    // annuaire returns a 500 when email is not found
+                    return false;
+                }
 
-            throw new \Exception(sprintf(
-                'Annuaire is not happy, getting some %d error for: "%s"',
-                $response->getStatusCode(),
-                $response->getInfo('url')
-            ));
+                throw new \Exception(sprintf(
+                    'Annuaire is not happy, getting some %d error for: "%s"',
+                    $response->getStatusCode(),
+                    $response->getInfo('url')
+                ));
+            }
+        } catch (\Exception $e) {
+            return false;
         }
 
         $userData = $response->getContent();
