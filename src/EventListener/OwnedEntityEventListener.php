@@ -40,6 +40,12 @@ class OwnedEntityEventListener {
             ( $entity instanceof PhotoTag ) )) {
             return;
         }
+
+        // Entity already have an userId
+        if ($entity->getUserId()) {
+            return;
+        }
+
         if ( null !== $currentUser = $this->getUser() ) {
 
             $entity->setUserId($currentUser->getId());
