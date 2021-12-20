@@ -107,7 +107,6 @@ final class CelSyncGetJobsCommand extends Command
                     $this->addJob('create', $occurrence->getId());
                 } // else we don't want to consider this occurrence
             }
-
         } while ($this->plantnetPaginator->nextPage());
 
         if (!$dryRun) {
@@ -141,6 +140,10 @@ final class CelSyncGetJobsCommand extends Command
             $changelog->setEntityId($id);
             $this->em->persist($changelog);
             $this->newJobsCount++;
+
+            if (0 === $this->newJobsCount % 50) {
+                $this->em->flush();
+            }
         } else {
             $this->existingJobsCount++;
         }
