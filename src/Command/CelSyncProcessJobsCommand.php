@@ -136,6 +136,8 @@ final class CelSyncProcessJobsCommand extends Command
 
         if (!$dryRun) {
             $this->em->flush();
+            // Need another flush to save Photo postPersist updates. Maybe there is some better way to do that
+            $this->em->flush();
 
             foreach ($this->occurrencesToComment as $occurrenceToComment) {
                 $this->identiplanteService->addComment($occurrenceToComment);
