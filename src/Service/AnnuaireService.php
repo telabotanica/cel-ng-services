@@ -45,6 +45,8 @@ class AnnuaireService
             if (200 !== $response->getStatusCode()) {
                 if (500 === $response->getStatusCode()) {
                     // annuaire returns a 500 when email is not found
+                    $this->cachedUsers[$email] = false;
+
                     return false;
                 }
 

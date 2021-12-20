@@ -82,19 +82,13 @@ final class CelSyncGetJobsCommand extends Command
         $this->plantnetPaginator->start($startDate, $email);
 
         do {
-            /**
-             * @var $occurrences PlantnetOccurrences
-             */
             $occurrences = $this->plantnetPaginator->getContent();
             if (!$occurrences) {
                 break;
             }
 
-            /**
-             * @var $occurrences PlantnetOccurrence[]
-             */
+            // Switch from PlantnetOccurrences to PlantnetOccurrence[]
             $occurrences = $occurrences->getData();
-
             foreach ($occurrences as $occurrence) {
                 // filter out partners occurrences
                 if ($occurrence->getPartner()) {
