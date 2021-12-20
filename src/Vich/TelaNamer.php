@@ -39,6 +39,9 @@ class TelaNamer implements NamerInterface {
         // retrieve the file extension based on its original name:
         // @refactor use getMimeType() instead...
         $ext  = substr(strrchr($entity->getOriginalName(),'.'),1);
+        if (!$ext) {
+            $ext = 'jpg';
+        }
 
         return substr($obsStrId, 0, 3) . '_' . substr($obsStrId, 3, 3) . '_' . substr($obsStrId, 6, 3) .  '_O.' . $ext;
     }
@@ -56,6 +59,9 @@ class TelaNamer implements NamerInterface {
         // retrieve the file extension based on its original name:
         // @refactor use getMimeType() instead...
         $ext  = substr(strrchr($entity->getOriginalName(),'.'),1);
+        if (!$ext) {
+            $ext = 'jpg';
+        }
 
         return $obsStrId .  'O.' . $ext;
     }
