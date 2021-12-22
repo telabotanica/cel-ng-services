@@ -37,12 +37,14 @@ class OccurrenceBuilderService
 
     public function updateWithPlantnetOccurrence(Occurrence $occurrence, PlantnetOccurrence $pnOccurrence): Occurrence
     {
-        if (!$pnOccurrence->getCurrentName()) {
+        $firstIdentificationResult = $pnOccurrence->getIdentificationResults()[0] ?? false;
+        if (!$pnOccurrence->getCurrentName() && !$firstIdentificationResult) {
             return $occurrence;
         }
+        $taxonName = $pnOccurrence->getCurrentName() ?? $firstIdentificationResult->getSpecies();
 
         // search taxon data
-        $taxonInfo = $this->taxoRepoService->getTaxonInfo($pnOccurrence->getCurrentName(), $pnOccurrence->getProject());
+        $taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
 
         $occurrence->setDateObserved($pnOccurrence->getDateObs())
             ->setDateCreated($pnOccurrence->getDateCreated())
@@ -50,7 +52,7 @@ class OccurrenceBuilderService
             ->setDatePublished($pnOccurrence->getDateCreated());
 
         $occurrence->setTaxoRepo($taxonInfo['taxoRepo'])
-            ->setUserSciName($taxonInfo['sciName'] ?? $pnOccurrence->getCurrentName())
+            ->setUserSciName($taxonInfo['sciName'] ?? $taxonName)
             ->setUserSciNameId($taxonInfo['sciNameId'])
             ->setAcceptedSciName($taxonInfo['acceptedSciName'])
             ->setAcceptedSciNameId($taxonInfo['acceptedSciNameId'])
