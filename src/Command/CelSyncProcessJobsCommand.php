@@ -78,6 +78,8 @@ final class CelSyncProcessJobsCommand extends Command
                 'If set, don’t persist changes to database')
             ->addOption('process-order', null, InputOption::VALUE_REQUIRED,
                 'Order to take job, older first, or newer first', 'older')
+            ->addOption('pn-occurrence-id', null, InputOption::VALUE_REQUIRED,
+                'PlantNet occurrence ID to process (forced update/create)')
         ;
     }
 
@@ -98,8 +100,13 @@ final class CelSyncProcessJobsCommand extends Command
             $this->io->error('Jobs process order mode has to be either ’older’ (default) or ’newer’');
             return 1;
         }
+        $pnOccurrenceId = $input->getOption('pn-occurrence-id');
 
-        $jobs = $this->getJobs($processOrder);
+        if ($pnOccurrenceId) {
+            $jobs = $this->simulateJobs($pnOccurrenceId);
+        } else {
+            $jobs = $this->getJobs($processOrder);
+        }
 
         /**
          * @var $job ChangeLog
@@ -274,5 +281,42 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
         // tag plantnet-project ? No. No need to tag, we have inputSource column
+    }
+
+    private function simulateJobs(int $pnOccurrenceId): array
+    {
+        $pnOccurrence = $this->plantnetService->getOccurrenceById($pnOccurrenceId);
+        if (!$pnOccurrence) {
+            $this->io->error('Unknown PlantNet occurrence ID: '.$pnOccurrenceId);
+            return [];
+        }
+
+        $changelog = new ChangeLog();
+        $changelog->setEntityName('plantnet');
+        $changelog->setEntityId($pnOccurrenceId);
+
+        $occurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $pnOccurrence->getId()]);
+        if (!$occurrence) {
+            $changelog->setActionType('create');
+        } else {
+            $changelog->setActionType('update');
+
+            $oldEnoughDate = new \DateTime('1312-01-01');
+            $pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
+            if ($pnTbPair) {
+                $pnTbPair->setPlantnetOccurrenceUpdatedAt($oldEnoughDate);
+            } else {
+                $this->em->persist(new PnTbPair(
+                    $occurrence,
+                    $pnOccurrenceId,
+                    $oldEnoughDate,
+                ));
+            }
+            $this->em->flush();
+        }
+
+        return [
+            $changelog
+        ];
     }
 }
