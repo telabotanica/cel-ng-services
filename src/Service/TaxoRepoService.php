@@ -100,7 +100,7 @@ class TaxoRepoService
 
         $info['taxoRepo'] = $taxoRepo;
         $info['sciNameId'] = $response['id'] ?? null;
-        $info['sciName'] = $response['nom_sci_complet'] ?? '';
+        $info['sciName'] = $response['nom_sci_complet'] ?? $taxonName;
         $info['acceptedSciNameId'] = $response['nom_retenu.id'] ?? null;
         $info['acceptedSciName'] = $response['nom_retenu_complet'] ?? '';
         $info['family'] = $response['famille'] ?? '';

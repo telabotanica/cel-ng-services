@@ -3,11 +3,10 @@
 namespace App\EventListener;
 
 use App\Entity\Occurrence;
-use App\TelaBotanica\Eflore\Api\EfloreApiClient;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use App\Service\TaxoRepoService;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Populates various properties of <code>Occurrence</code> instances 
@@ -22,13 +21,17 @@ class OccurrenceEventListener {
 
     private $tokenStorage;
     private $em;
+    private $taxoRepo;
 
     public function __construct(
         TokenStorageInterface $tokenStorage = null,
-        EntityManagerInterface $em)  {
+        EntityManagerInterface $em,
+        TaxoRepoService $taxoRepo
+    )  {
 
         $this->tokenStorage = $tokenStorage;
         $this->em = $em;
+        $this->taxoRepo = $taxoRepo;
     }
 
     /**
@@ -54,17 +57,19 @@ class OccurrenceEventListener {
         }
         $entity->setIdentiplanteScore(0);
 
-        if ( null !== $entity->getTaxoRepo() && 
-            null !== $entity->getUserSciNameId()  ){
-
-            $efClient = new EfloreApiClient();
-            $taxon = $efClient->getTaxonInfo(
+        if ( null === $entity->getFamily() &&
+            null === $entity->getAcceptedSciName() &&
+            null === $entity->getAcceptedSciNameId() &&
+            null !== $entity->getTaxoRepo() &&
+            null !== $entity->getUserSciNameId()
+        ) {
+            $taxon = $this->taxoRepo->getTaxonInfo(
                 $entity->getUserSciNameId(),
                 $entity->getTaxoRepo()
             );
-            $entity->setFamily($taxon->getFamily());
-            $entity->setAcceptedSciName($taxon->getAcceptedSciName());
-            $entity->setAcceptedSciNameId($taxon->getAcceptedSciNameId());
+            $entity->setFamily($taxon['family']);
+            $entity->setAcceptedSciName($taxon['acceptedSciName']);
+            $entity->setAcceptedSciNameId($taxon['acceptedSciNameId']);
         }
     }
 
@@ -95,17 +100,16 @@ class OccurrenceEventListener {
 
         $this->doCommon($entity);
 
-        if ( null !== $entity->getTaxoRepo() && 
-            null !== $entity->getUserSciNameId()  ){
-
-            $efClient = new EfloreApiClient();
-            $taxon = $efClient->getTaxonInfo(
+        if ( null !== $entity->getTaxoRepo() &&
+            null !== $entity->getUserSciNameId()
+        ) {
+            $taxon = $this->taxoRepo->getTaxonInfo(
                 $entity->getUserSciNameId(),
                 $entity->getTaxoRepo()
             );
-            $entity->setFamily($taxon->getFamily());
-            $entity->setAcceptedSciName($taxon->getAcceptedSciName());
-            $entity->setAcceptedSciNameId($taxon->getAcceptedSciNameId());
+            $entity->setFamily($taxon['family']);
+            $entity->setAcceptedSciName($taxon['acceptedSciName']);
+            $entity->setAcceptedSciNameId($taxon['acceptedSciNameId']);
         }
     }
 
