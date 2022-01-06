@@ -54,8 +54,8 @@ class SyncDocumentIndexCommand  extends Command {
         $this->init();
         $output->writeln("Change logs loaded.");
 
-	$counter = 0;
-	$variator = 1;
+    $counter = 0;
+    $variator = 1;
 
         foreach( $this->changeLogsAsIterable as $row) {
 
@@ -64,7 +64,7 @@ class SyncDocumentIndexCommand  extends Command {
              */
             $changeLog = $row[0];
 
-            if ( in_array($changeLog->getEntityName(), SyncDocumentIndexCommand::ALLOWED_ENTITY_NAMES) ) {
+            if (in_array($changeLog->getEntityName(), SyncDocumentIndexCommand::ALLOWED_ENTITY_NAMES)) {
                 try {
                     $this->executeAction($changeLog);
                 } catch (\Exception $e) {
@@ -101,24 +101,20 @@ class SyncDocumentIndexCommand  extends Command {
                 // Should not be required, removing should detach
                 //$this->entityManager->detach($changeLog);
                 $counter++;
-		if ( $counter%10000 === 0 ) {
-			$s = microtime(true);
-			$this->entityManager->flush();
-			$e = microtime(true);
-			$output->writeln("Flushed $counter rows in " . ($e - $s));
-			$this->entityManager->clear();
-			$counter = 0;
+                if ($counter%10000 === 0) {
+                    $s = microtime(true);
+                    $this->entityManager->flush();
+                    $e = microtime(true);
+                    $output->writeln("Flushed $counter rows in " . ($e - $s));
+                    $this->entityManager->clear();
+                    $counter = 0;
 
-                    $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());    
-		}
-            }
-            else {
-                $ex = new UnknownEntityNameException('Unknwown entity name: ' . $changeLog->getEntityName());
-                throw $ex;
+                    $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());
+                }
             }
         }
         $this->entityManager->flush();
-	$this->entityManager->clear();
+        $this->entityManager->clear();
         $output->writeln("All changes have been mirrored.");
 
     }
@@ -145,7 +141,7 @@ class SyncDocumentIndexCommand  extends Command {
                 }
             break;
             case "delete":
-                    $this->deleteDocument($changeLog->getEntityId(), $changeLog->getEntityName());
+                $this->deleteDocument($changeLog->getEntityId(), $changeLog->getEntityName());
             break;
             default:
                 break;
@@ -159,10 +155,13 @@ class SyncDocumentIndexCommand  extends Command {
     }
 
     private function getPersister($entityClassName) {
-        if ( $entityClassName == 'occurrence') {
+        if ($entityClassName === 'occurrence') {
             return $this->occurrencePersister;
         }
-        return $this->photoPersister;
+
+        if ($entityClassName === 'photo') {
+            return $this->photoPersister;
+        }
     }
 
     private function deleteDocument(int $id, string $resourceTypeName) {
