@@ -214,7 +214,11 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
         // update photos
+        $photosIds = []; // used to fix duplicates images in some occurrences
         foreach ($pnOccurrence->getImages() as $image) {
+            if (in_array($image->getId(), $photosIds)) {
+                continue;
+            }
             if ($image->getPartnerId()) {
                 continue;
             }
@@ -223,6 +227,7 @@ final class CelSyncProcessJobsCommand extends Command
                 $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
 
                 $this->em->persist($photo);
+                $photosIds[] = $image->getId();
                 $this->stats['new photo']++;
             }
         }
@@ -269,7 +274,11 @@ final class CelSyncProcessJobsCommand extends Command
         $this->occurrencesToComment[] = $occurrence;
 
         // create Photos
+        $photosIds = []; // used to fix duplicates images in some occurrences
         foreach ($pnOccurrence->getImages() as $image) {
+            if (in_array($image->getId(), $photosIds)) {
+                continue;
+            }
             if ($image->getPartnerId()) {
                 continue;
             }
@@ -277,6 +286,7 @@ final class CelSyncProcessJobsCommand extends Command
             $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
 
             $this->em->persist($photo);
+            $photosIds[] = $image->getId();
             $this->stats['new photo']++;
         }
 
