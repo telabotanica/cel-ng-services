@@ -8,6 +8,7 @@ use App\Model\PlantnetOccurrence;
 use App\Model\PlantnetOccurrences;
 use App\Service\AnnuaireService;
 use App\Service\PlantnetPaginator;
+use App\Service\PlantnetService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,6 +26,7 @@ final class CelSyncGetJobsCommand extends Command
     private $changeLogRepository;
     private $annuaireService;
     private $plantnetPaginator;
+    private $plantnetService;
     private $newJobsCount = 0;
     private $existingJobsCount = 0;
 
@@ -36,13 +38,15 @@ final class CelSyncGetJobsCommand extends Command
     public function __construct(
         EntityManagerInterface $em,
         AnnuaireService $annuaireService,
-        PlantnetPaginator $plantnetPaginator
+        PlantnetPaginator $plantnetPaginator,
+        PlantnetService $plantnetService
     ) {
         $this->em = $em;
         $this->occurrenceRepository = $this->em->getRepository(Occurrence::class);
         $this->changeLogRepository = $this->em->getRepository(ChangeLog::class);
         $this->annuaireService = $annuaireService;
         $this->plantnetPaginator = $plantnetPaginator;
+        $this->plantnetService = $plantnetService;
 
         parent::__construct();
     }
@@ -51,10 +55,12 @@ final class CelSyncGetJobsCommand extends Command
     {
         $this
             ->setDescription('Creates sync jobs of PlantNet occurrences created by Telabotaniste')
+            ->addOption('resume', null, InputOption::VALUE_NONE,
+                'If set, use last job updatedAt date to resume (overload from option)')
             ->addOption('dry-run', null, InputOption::VALUE_NONE,
                 'If set, don’t persist changes to database')
             ->addOption('from', null, InputOption::VALUE_REQUIRED,
-                'Start date to read the occurrences history')
+                'Get occurrences history from this timestamp')
             ->addOption('email', null, InputOption::VALUE_REQUIRED,
                  'Filter on author email')
         ;
@@ -74,9 +80,12 @@ final class CelSyncGetJobsCommand extends Command
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('pn-sync-get-jobs');
-
         $dryRun = $input->getOption('dry-run');
         $startDate = (int) $input->getOption('from');
+        $resume = $input->getOption('resume');
+        if ($resume) {
+            $startDate = $this->getLastJobUpdatedAt();
+        }
         $email = (string) $input->getOption('email');
 
         $this->plantnetPaginator->start($startDate, $email);
@@ -147,5 +156,19 @@ final class CelSyncGetJobsCommand extends Command
         } else {
             $this->existingJobsCount++;
         }
+    }
+
+    private function getLastJobUpdatedAt(): int
+    {
+        $lastDate = 0;
+        $changelog = $this->changeLogRepository->findOneBy(['entityName' => 'plantnet'], ['id' => 'desc']);
+        if ($changelog) {
+            $pnOccurrence = $this->plantnetService->getOccurrenceById($changelog->getEntityId());
+            if ($pnOccurrence && $pnOccurrence->getDateUpdated()) {
+                $lastDate = $pnOccurrence->getDateUpdated()->format('U');
+            }
+        }
+
+        return $lastDate;
     }
 }
