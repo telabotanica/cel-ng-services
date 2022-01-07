@@ -244,7 +244,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     * Identifiant plantnet.
     *
     * @Groups({"read"})
-    * @ORM\Column(name="plantnet_id", type="integer", nullable=true, options={"comment":"Identifiant plantnet"})
+    * @ORM\Column(name="plantnet_id", type="integer", unique=true, nullable=true, options={"comment":"Identifiant plantnet"})
     */
    private $plantnetId = null;
 
