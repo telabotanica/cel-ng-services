@@ -26,14 +26,17 @@ use FOS\ElasticaBundle\Persister\ObjectPersister;
 class SyncDocumentIndexCommand  extends Command {
 
     private $changeLogsAsIterable;
-    private $entityManager;
+    private $em;
     private $occurrencePersister;
     private $photoPersister;
     private const ALLOWED_ENTITY_NAMES = ['occurrence', 'photo'];
 
 
-    public function __construct(ContainerInterface $container) {
-        $this->entityManager = $container->get('doctrine')->getManager();
+    public function __construct(
+        ContainerInterface $container,
+        EntityManagerInterface $entityManager
+    ) {
+        $this->em = $entityManager;
         $this->occurrencePersister = $container->get('fos_elastica.object_persister.occurrences.occurrence');
         $this->photoPersister = $container->get('fos_elastica.object_persister.photos.photo');
         parent::__construct();
@@ -54,75 +57,76 @@ class SyncDocumentIndexCommand  extends Command {
         $this->init();
         $output->writeln("Change logs loaded.");
 
-    $counter = 0;
-    $variator = 1;
+        $counter = 0;
 
-        foreach( $this->changeLogsAsIterable as $row) {
+        foreach($this->changeLogsAsIterable as $row) {
 
             /**
              * @var ChangeLog $changeLog
              */
             $changeLog = $row[0];
 
-            if (in_array($changeLog->getEntityName(), SyncDocumentIndexCommand::ALLOWED_ENTITY_NAMES)) {
-                try {
-                    $this->executeAction($changeLog);
-                } catch (\Exception $e) {
-                    $changeLog->setErrorCount($changeLog->getErrorCount() + 1);
-                    if (10 <= $changeLog->getErrorCount()) {
-                        $subject = sprintf('CEL-services : Erreur de synchro ES : %s %s %d',
-                            $changeLog->getActionType(),
-                            $changeLog->getEntityName(),
-                            $changeLog->getEntityId()
-                        );
+            try {
+                $this->executeAction($changeLog);
+            } catch (\Exception $e) {
+                $changeLog->setErrorCount($changeLog->getErrorCount() + 1);
+                if (10 <= $changeLog->getErrorCount()) {
+                    $subject = sprintf('CEL-services : Erreur de synchro ES : %s %s %d',
+                        $changeLog->getActionType(),
+                        $changeLog->getEntityName(),
+                        $changeLog->getEntityId()
+                    );
 
-                        $text = 'Abandon après '.$changeLog->getErrorCount().' essais.';
+                    $text = 'Abandon après '.$changeLog->getErrorCount().' essais.';
 
-                        $exceptionInfo = sprintf("Message d'erreur : %s \n Fichier : %s \n Ligne : %d \n EntityName : %s \n EntityId : %d \n Action : %s",
-                            $e->getMessage(),
-                            $e->getFile(),
-                            $e->getLine(),
-                            $changeLog->getEntityName(),
-                            $changeLog->getEntityId(),
-                            $changeLog->getActionType()
-                        );
+                    $exceptionInfo = sprintf("Message d'erreur : %s \n Fichier : %s \n Ligne : %d \n EntityName : %s \n EntityId : %d \n Action : %s",
+                        $e->getMessage(),
+                        $e->getFile(),
+                        $e->getLine(),
+                        $changeLog->getEntityName(),
+                        $changeLog->getEntityId(),
+                        $changeLog->getActionType()
+                    );
 
-                        $message = $subject."\n".$text."\n".$exceptionInfo;
+                    $message = $subject."\n".$text."\n".$exceptionInfo;
 
-                        mail('webmestre@tela-botanica.org', $subject, $message);
+                    mail('webmestre@tela-botanica.org', $subject, $message);
 
-                        $changeLog->setActionType('error');
-                    }
-
-                    continue;
+                    $changeLog->setActionType('error');
                 }
-                //$output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());
-                $this->entityManager->remove($changeLog);
-                // Should not be required, removing should detach
-                //$this->entityManager->detach($changeLog);
-                $counter++;
-                if ($counter%10000 === 0) {
-                    $s = microtime(true);
-                    $this->entityManager->flush();
-                    $e = microtime(true);
-                    $output->writeln("Flushed $counter rows in " . ($e - $s));
-                    $this->entityManager->clear();
-                    $counter = 0;
 
-                    $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());
-                }
+                continue;
+            }
+            //$output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());
+            $this->em->remove($changeLog);
+            // Should not be required, removing should detach
+            //$this->entityManager->detach($changeLog);
+            $counter++;
+            if ($counter%10000 === 0) {
+                $s = microtime(true);
+                $this->em->flush();
+                $e = microtime(true);
+                $output->writeln("Flushed $counter rows in " . ($e - $s));
+                $this->em->clear();
+                $counter = 0;
+
+                $output->writeln("Change log mirrored in ES index for entity/document with ID = " . $changeLog->getEntityId());
             }
         }
-        $this->entityManager->flush();
-        $this->entityManager->clear();
+        $this->em->flush();
+        $this->em->clear();
         $output->writeln("All changes have been mirrored.");
 
     }
 
-
     private function loadChangeLogsAsIterable() {
-        // return $this->entityManager->getRepository('App:ChangeLog')->findAll();
-        $q = $this->entityManager->createQuery("select u from App\Entity\ChangeLog u where u.actionType != 'error'");
+        // this should be done in a dedicated ChangelogRepository method
+        $entities = implode('\',\'', self::ALLOWED_ENTITY_NAMES);
+        $q = sprintf(
+            "SELECT u FROM App\Entity\ChangeLog u WHERE u.actionType != 'error' AND u.entityName IN ('%s')",
+            $entities
+        );
+        $q = $this->em->createQuery($q);
         return $q->iterate();
     }
 
@@ -151,7 +155,7 @@ class SyncDocumentIndexCommand  extends Command {
     }
 
     private function getRepository($entityClassName) {
-        return $this->entityManager->getRepository('App:' . ucfirst($entityClassName));
+        return $this->em->getRepository('App:' . ucfirst($entityClassName));
     }
 
     private function getPersister($entityClassName) {
