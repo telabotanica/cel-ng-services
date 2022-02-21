@@ -76,7 +76,7 @@ class SSOUserExtractor {
             intval($userInfo['id']), $userInfo['sub'], $userInfo['prenom'], 
             $userInfo['nom'], $userInfo['pseudo'], 
             $userInfo['pseudoUtilise'], $userInfo['avatar'], 
-            $roles, null);
+            $roles, null, $token);
 
         return $user;
     }

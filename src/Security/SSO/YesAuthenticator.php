@@ -33,7 +33,7 @@ class YesAuthenticator  extends AbstractGuardAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        $user = new TelaBotanicaUser(22, 'toto@wanadoo.fr', 'toto', 'litoto', 'teehell', 'teehell', '', array(), null);
+        $user = new TelaBotanicaUser(22, 'toto@wanadoo.fr', 'toto', 'litoto', 'teehell', 'teehell', '', array(), null, '');
         return $user;
     }
 
