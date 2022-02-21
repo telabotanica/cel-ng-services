@@ -40,6 +40,13 @@ class SSOUserExtractor {
     const NO_AUTH_HEADER_MSG            = 'The "Authorization" header ' .
         'is not set';
 
+    private $ssoTokenDecoder;
+
+    public function __construct(SSOTokenDecoder $ssoTokenDecoder)
+    {
+        $this->ssoTokenDecoder = $ssoTokenDecoder;
+    }
+
     public function extractUser(Request $request) {
         $token = $this->extractTokenFromRequest($request);
         if (null === $token) {
@@ -55,9 +62,7 @@ class SSOUserExtractor {
             return null;
         }
 
-        $tokenDecoder = new SSOTokenDecoder();
-
-        $userInfo = $tokenDecoder->getUserFromToken($token);
+        $userInfo = $this->ssoTokenDecoder->getUserFromToken($token);
         $roles = array();
         if (in_array( 
             SSOUserExtractor::ADMIN_PERMISSION,
