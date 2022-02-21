@@ -567,15 +567,6 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     private $validations;
 
     /**
-     * Notifications that the status of the Occurence was changed on IdentiPlante (DEL). 
-     * One Occurrence can have many associated notifications.
-     * ATimpl to keep the eslasticsearch Occurrence index in sync with IdentiPlante (DEL).
-     * @ORM\OneToMany(targetEntity="DelUpdateNotification", mappedBy="occurrence")
-     * @ApiSubresource(maxDepth=1)
-     */
-    private $delUpdateNotifications;
-
-    /**
      * The values for ExtendedField attached to this occurrence.
      *
      * @ORM\OneToMany(targetEntity="ExtendedFieldOccurrence", mappedBy="occurrence", cascade={"remove"})
