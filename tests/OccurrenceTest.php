@@ -15,7 +15,7 @@ class OccurrenceTest extends WebTestCase
         $this->assertEquals(
             403,
             $client->getResponse()->getStatusCode(),
-            sprintf('Assert anonymous page %s is StatusCode 403', '/api/occurrence')
+            sprintf('Assert anonymous page %s is StatusCode 403', '/api/occurrences')
         );
     }
 
@@ -23,7 +23,7 @@ class OccurrenceTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $authorizationToken = 'badToken';
+        $authorizationToken = 'Bearer bad.token.lol';
 
         $client->request('GET', '/api/occurrences', [
             'headers' => [
@@ -34,7 +34,7 @@ class OccurrenceTest extends WebTestCase
         $this->assertEquals(
             403,
             $client->getResponse()->getStatusCode(),
-            sprintf('Assert logged in page %s is StatusCode 403', '/api/occurrence')
+            sprintf('Assert logged in page %s is StatusCode 403', '/api/occurrences')
         );
     }
 }

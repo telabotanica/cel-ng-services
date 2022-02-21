@@ -37,8 +37,8 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
         $this->usePseudo = $usePseudo;
         $this->avatar = $avatar;
         $this->administeredProjectId = $administeredProjectId;
-	$this->roles = $roles;
-	$this->token = $token;
+        $this->roles = $roles;
+        $this->token = $token;
     }
 
     public function setId($idd) {
