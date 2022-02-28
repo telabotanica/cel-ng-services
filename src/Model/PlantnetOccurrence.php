@@ -367,7 +367,13 @@ class PlantnetOccurrence
      */
     public function getImages(): array
     {
-        return $this->images;
+        // fix duplicates images with same id in some occurrences
+        $images = [];
+        foreach ($this->images as $image) {
+            $images[$image->getId()] = $image;
+        }
+
+        return array_values($images);
     }
 
     /**

@@ -10,6 +10,7 @@ use App\Service\AnnuaireService;
 use App\Service\IdentiplanteService;
 use App\Service\OccurrenceBuilderService;
 use App\Service\PhotoBuilderService;
+use App\Service\PhotoService;
 use App\Service\PlantnetService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -32,6 +33,7 @@ final class CelSyncProcessJobsCommand extends Command
     private $photoBuilderService;
     private $identiplanteService;
     private $annuaireService;
+    private $photoService;
 
     private $stats = [
         'ignored' => 0,
@@ -40,6 +42,7 @@ final class CelSyncProcessJobsCommand extends Command
         'deleted' => 0,
         'commented' => 0,
         'new photo' => 0,
+        'old photo' => 0,
     ];
 
     private $occurrencesToComment = [];
@@ -55,7 +58,8 @@ final class CelSyncProcessJobsCommand extends Command
         OccurrenceBuilderService $occurrenceBuilderService,
         PhotoBuilderService $photoBuilderService,
         IdentiplanteService $identiplanteService,
-        AnnuaireService $annuaireService
+        AnnuaireService $annuaireService,
+        PhotoService $photoService
     ) {
         $this->em = $em;
         $this->pnTbPairRepository = $this->em->getRepository(PnTbPair::class);
@@ -66,6 +70,7 @@ final class CelSyncProcessJobsCommand extends Command
         $this->photoBuilderService = $photoBuilderService;
         $this->identiplanteService = $identiplanteService;
         $this->annuaireService = $annuaireService;
+        $this->photoService = $photoService;
 
         parent::__construct();
     }
@@ -214,14 +219,7 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
         // update photos
-        $photosIds = []; // used to fix duplicates images in some occurrences
         foreach ($pnOccurrence->getImages() as $image) {
-            if (in_array($image->getId(), $photosIds)) {
-                continue;
-            }
-            if ($image->getPartnerId()) {
-                continue;
-            }
             if (!$occurrence->isExistingPhoto($image)) {
                 $file = $this->plantnetService->getImageFile($image);
                 $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
@@ -253,6 +251,10 @@ final class CelSyncProcessJobsCommand extends Command
             $this->stats['ignored']++;
             return;
         }
+        if (0 >= count($pnOccurrence->getImages())) {
+            $this->stats['ignored']++;
+            return;
+        }
 
         /**
          * @var $user AnnuaireUser
@@ -274,19 +276,16 @@ final class CelSyncProcessJobsCommand extends Command
         $this->occurrencesToComment[] = $occurrence;
 
         // create Photos
-        $photosIds = []; // used to fix duplicates images in some occurrences
         foreach ($pnOccurrence->getImages() as $image) {
-            if (in_array($image->getId(), $photosIds)) {
+            if ($image->getPartnerId() && $this->photoService->isPhotoAlreadyExists($image->getPartnerId())) {
+                $this->stats['old photo']++;
                 continue;
             }
-            if ($image->getPartnerId()) {
-                continue;
-            }
+
             $file = $this->plantnetService->getImageFile($image);
             $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
 
             $this->em->persist($photo);
-            $photosIds[] = $image->getId();
             $this->stats['new photo']++;
         }
 

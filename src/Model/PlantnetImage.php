@@ -55,11 +55,17 @@ class PlantnetImage
     private $organsVotes;
 
     /**
+     * References partner entity id
+     * If set, then this image is already imported, check if its url is still available before import again
+     *
      * @var ?int
      */
     private $partnerId;
 
     /**
+     * Same as partnerId, but don't check before import again
+     * (even if url is still online we can't get its entity info without importing image again)
+     *
      * @var ?string
      */
     private $partnerUrl;
