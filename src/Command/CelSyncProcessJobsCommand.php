@@ -33,7 +33,6 @@ final class CelSyncProcessJobsCommand extends Command
     private $photoBuilderService;
     private $identiplanteService;
     private $annuaireService;
-    private $photoService;
 
     private $stats = [
         'ignored' => 0,
@@ -42,7 +41,6 @@ final class CelSyncProcessJobsCommand extends Command
         'deleted' => 0,
         'commented' => 0,
         'new photo' => 0,
-        'old photo' => 0,
     ];
 
     private $occurrencesToComment = [];
@@ -58,8 +56,7 @@ final class CelSyncProcessJobsCommand extends Command
         OccurrenceBuilderService $occurrenceBuilderService,
         PhotoBuilderService $photoBuilderService,
         IdentiplanteService $identiplanteService,
-        AnnuaireService $annuaireService,
-        PhotoService $photoService
+        AnnuaireService $annuaireService
     ) {
         $this->em = $em;
         $this->pnTbPairRepository = $this->em->getRepository(PnTbPair::class);
@@ -70,7 +67,6 @@ final class CelSyncProcessJobsCommand extends Command
         $this->photoBuilderService = $photoBuilderService;
         $this->identiplanteService = $identiplanteService;
         $this->annuaireService = $annuaireService;
-        $this->photoService = $photoService;
 
         parent::__construct();
     }
@@ -277,11 +273,6 @@ final class CelSyncProcessJobsCommand extends Command
 
         // create Photos
         foreach ($pnOccurrence->getImages() as $image) {
-            if ($image->getPartnerId() && $this->photoService->isPhotoAlreadyExists($image->getPartnerId())) {
-                $this->stats['old photo']++;
-                continue;
-            }
-
             $file = $this->plantnetService->getImageFile($image);
             $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
 

@@ -178,7 +178,7 @@ class PlantnetService
                 'Unable to download image from: "'.$image->getOriginalImageUrl().'" Error #'.$response->getStatusCode());
         }
 
-        $filePath = '/tmp/'.$image->getId();
+        $filePath = '/tmp/'.uniqid($image->getId(), true);
         $fileHandler = fopen($filePath, 'wb');
         foreach ($this->client->stream($response) as $chunk) {
             fwrite($fileHandler, $chunk->getContent());
