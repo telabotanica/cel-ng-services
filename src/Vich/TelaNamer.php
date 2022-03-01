@@ -8,7 +8,13 @@ use Vich\UploaderBundle\Mapping\PropertyMapping;
 /**
  * Namer class.  * Namer class. Seems to be called during the preUpdate doctrine events.
  */
-class TelaNamer implements NamerInterface {
+class TelaNamer implements NamerInterface
+{
+    public const ALLOWED_EXTENSION = [
+        'jpeg',
+        'jpg',
+        'png'
+    ];
 
     /**
      * {@inheritdoc}
@@ -58,7 +64,7 @@ class TelaNamer implements NamerInterface {
         $obsStrId = str_pad((string) $entity->getId(), 9, '0', STR_PAD_LEFT);
         // retrieve the file extension based on its original name:
         $ext = pathinfo($entity->getOriginalName(), PATHINFO_EXTENSION);
-        if (!$ext) {
+        if (!in_array($ext, self::ALLOWED_EXTENSION, true)) {
             $ext = 'jpg';
         }
 
