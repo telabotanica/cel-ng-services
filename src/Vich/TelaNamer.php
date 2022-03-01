@@ -48,17 +48,16 @@ class TelaNamer implements NamerInterface {
 
 
     /**
-     * Returns the file name for the photo URL in tela's photo API, id-based 
-     *         format e.g. "000000252O.png"
-     * @return the name for the photo URL in tela's photo API, id-based 
-    *          format.
+     * Returns the file name for the photo URL in tela's photo API, id-based
+     * format e.g. "000000252O.png"
+     *
+     * @return string photo filename
      */
     public static function buildTelaPhotoApiUrlFileName($entity): string {
         // stretch the id to a 9 digits string:
-        $obsStrId = str_pad(strval($entity->getId()), 9, "0", STR_PAD_LEFT);
+        $obsStrId = str_pad((string) $entity->getId(), 9, '0', STR_PAD_LEFT);
         // retrieve the file extension based on its original name:
-        // @refactor use getMimeType() instead...
-        $ext  = substr(strrchr($entity->getOriginalName(),'.'),1);
+        $ext = pathinfo($entity->getOriginalName(), PATHINFO_EXTENSION);
         if (!$ext) {
             $ext = 'jpg';
         }
