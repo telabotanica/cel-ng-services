@@ -9,7 +9,7 @@ namespace App\Utils;
  */
 class ExifExtractionUtils {
 
-    private $exif;
+    public $exif;
     private $exifIfdzero;
 
     function __construct($imgPath) {
@@ -71,10 +71,10 @@ class ExifExtractionUtils {
      */
    public function getShootingDate() {
        // If no exifd in image
-       if ( is_bool($this->exifIfdzero) || empty($this->exifIfdzero['DateTime'])){
+       if ( is_bool($this->exifIfdzero) || empty($this->exifIfdzero['DateTimeOriginal'])){
         return  new \DateTime();
        }
-       return new \DateTime($this->exifIfdzero['DateTime']);
+       return new \DateTime($this->exifIfdzero['DateTimeOriginal']);
    }
 
 
