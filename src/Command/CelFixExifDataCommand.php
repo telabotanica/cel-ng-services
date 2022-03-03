@@ -68,10 +68,10 @@ class CelFixExifDataCommand extends Command
                 $ignoredCount++;
             }
             if ($dateShot && $dateShot != $photo->getDateShot()) {
-                if ($output->isVerbose()) {
+                if ($output->isVerbose() && $photo->getDateShot()) {
                     $io->comment(sprintf('Changed photo #%s from %s to %s',
                         $photo->getId(),
-                        $photo->getDateShot()->format('c') ?? 'null',
+                        $photo->getDateShot()->format('c'),
                         $dateShot->format('c')
                     ));
                 }
