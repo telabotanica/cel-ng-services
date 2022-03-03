@@ -58,9 +58,6 @@ class CelFixExifDataCommand extends Command
             $exifUtils = new ExifExtractionUtils($photo->getContentUrl());
             $dateShot = $exifUtils->getShootingDate();
             if ($dateShot && $dateShot != $photo->getDateShot()) {
-                $photo->setDateShot($dateShot);
-                $modifiedCount++;
-
                 if ($output->isVerbose()) {
                     $io->comment(sprintf('Changed photo #%s from %s to %s',
                         $photo->getId(),
@@ -68,6 +65,9 @@ class CelFixExifDataCommand extends Command
                         $dateShot->format('c')
                     ));
                 }
+
+                $photo->setDateShot($dateShot);
+                $modifiedCount++;
             }
         }
 
