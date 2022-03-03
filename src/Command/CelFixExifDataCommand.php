@@ -45,6 +45,7 @@ class CelFixExifDataCommand extends Command
         $photoId = $input->getArgument('photo-id');
 
         $modifiedCount = 0;
+        $ignoredCount = 0;
 
         $photos = [];
         if ($photoId) {
@@ -59,8 +60,13 @@ class CelFixExifDataCommand extends Command
 
         foreach ($photos as $photo) {
             $bar->advance();
+
             $exifUtils = new ExifExtractionUtils($photo->getContentUrl());
-            $dateShot = $exifUtils->getShootingDate();
+            try {
+                $dateShot = $exifUtils->getShootingDate();
+            } catch (\Exception $e) {
+                $ignoredCount++;
+            }
             if ($dateShot && $dateShot != $photo->getDateShot()) {
                 if ($output->isVerbose()) {
                     $io->comment(sprintf('Changed photo #%s from %s to %s',
@@ -80,6 +86,6 @@ class CelFixExifDataCommand extends Command
             $this->em->flush();
         }
 
-        $io->success('Yeah! '.$modifiedCount.' photos modified \o/');
+        $io->success('Yeah! '.$modifiedCount.' photos modified \o/ (and '.$ignoredCount.' faulty data');
     }
 }
