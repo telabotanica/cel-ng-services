@@ -9,7 +9,7 @@ namespace App\Utils;
  */
 class ExifExtractionUtils {
 
-    public $exif;
+    private $exif;
     private $exifIfdzero;
 
     function __construct($imgPath) {
