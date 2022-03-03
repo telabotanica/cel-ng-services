@@ -43,6 +43,8 @@ class CelFixExifDataCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $photoId = $input->getArgument('photo-id');
 
+        $modifiedCount = 0;
+
         $photos = [];
         if ($photoId) {
             $io->note(sprintf('Single photo selected: %s', $photoId));
@@ -57,6 +59,7 @@ class CelFixExifDataCommand extends Command
             $dateShot = $exifUtils->getShootingDate();
             if ($dateShot && $dateShot != $photo->getDateShot()) {
                 $photo->setDateShot($dateShot);
+                $modifiedCount++;
 
                 if ($output->isVerbose()) {
                     $io->comment(sprintf('Changed photo #%s from %s to %s',
@@ -72,6 +75,6 @@ class CelFixExifDataCommand extends Command
             $this->em->flush();
         }
 
-        $io->success('Yeah!');
+        $io->success('Yeah! '.$modifiedCount.' photos modified \o/');
     }
 }
