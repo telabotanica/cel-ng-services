@@ -35,7 +35,7 @@ class SSOTokenValidator {
 	public function validateToken($token) {
 		$verificationServiceURL = $this->generateAuthCheckURL($token);
 		$ch = curl_init();
-		$timeout = 5;
+		$timeout = 3;
 		curl_setopt($ch, CURLOPT_URL, $verificationServiceURL);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
@@ -46,7 +46,11 @@ class SSOTokenValidator {
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		}
 
-		$data = curl_exec($ch);
+        $retry = 0;
+        do {
+            $data = curl_exec($ch);
+            $retry++;
+        } while (curl_errno($ch) === 28 && $retry <= 5);
 
         if ( curl_errno($ch) ) {
             throw new \Exception ('curl erreur: ' . curl_errno($ch));
