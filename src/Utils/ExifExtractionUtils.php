@@ -63,19 +63,17 @@ class ExifExtractionUtils {
 
    }
 
-	/**
+    /**
      * Returns the image shooting date as extracted from image exif data.
      *
-     * @return DateTime The image shooting date as extracted from image exif 
-     *         data.
+     * @return \DateTime Image date shot or null if exif data not available
      */
-   public function getShootingDate() {
-       // If no exifd in image
-       if ( is_bool($this->exifIfdzero) || empty($this->exifIfdzero['DateTimeOriginal'])){
-        return  new \DateTime();
-       }
-       return new \DateTime($this->exifIfdzero['DateTimeOriginal']);
-   }
+    public function getShootingDate(): ?\DateTime {
+        $date = null;
+        if (is_array($this->exifIfdzero) && isset($this->exifIfdzero['DateTimeOriginal'])){
+            $date = new \DateTime($this->exifIfdzero['DateTimeOriginal']);
+        }
 
-
+       return $date;
+    }
 }
