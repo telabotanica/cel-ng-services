@@ -6,6 +6,7 @@ use App\Repository\PhotoRepository;
 use App\Utils\ExifExtractionUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -54,7 +55,10 @@ class CelFixExifDataCommand extends Command
             $photos = $this->photoRepository->findAll();
         }
 
+        $bar = new ProgressBar($output, count($photos));
+
         foreach ($photos as $photo) {
+            $bar->advance();
             $exifUtils = new ExifExtractionUtils($photo->getContentUrl());
             $dateShot = $exifUtils->getShootingDate();
             if ($dateShot && $dateShot != $photo->getDateShot()) {
@@ -70,6 +74,7 @@ class CelFixExifDataCommand extends Command
                 $modifiedCount++;
             }
         }
+        $bar->finish();
 
         if (!$input->getOption('dry-run')) {
             $this->em->flush();
