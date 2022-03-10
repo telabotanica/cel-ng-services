@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Model\PlantnetImage;
 use App\Model\PlantnetOccurrence;
 use App\Model\PlantnetOccurrences;
-use App\Serializer\MicroDateTimeNormalizer;
+use App\Serializer\PlantnetMicroDateTimeNormalizer;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -38,7 +38,7 @@ class PlantnetService
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = [
             new ArrayDenormalizer(),
-            new MicroDateTimeNormalizer(),
+            new PlantnetMicroDateTimeNormalizer(),
             new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter(), null, $extractor),
         ];
         $serializer = new Serializer($normalizer, $encoder);
@@ -138,7 +138,7 @@ class PlantnetService
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = [
             new ArrayDenormalizer(),
-            new MicroDateTimeNormalizer(),
+            new PlantnetMicroDateTimeNormalizer(),
             new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter(), null, $extractor),
         ];
         $serializer = new Serializer($normalizer, $encoder);

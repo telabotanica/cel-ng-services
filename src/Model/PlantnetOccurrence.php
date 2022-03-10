@@ -22,17 +22,17 @@ class PlantnetOccurrence
 
     /**
      * If dateObs is 0 then date is unknown and not Epoch (null date is not supported by plantnet code yet)
-     * @var ?\DateTime|null
+     * @var ?PlantnetMicroDateTime|null
      */
     private $dateObs;
 
     /**
-     * @var \DateTime
+     * @var PlantnetMicroDateTime
      */
     private $dateCreated;
 
     /**
-     * @var \DateTime
+     * @var PlantnetMicroDateTime
      */
     private $dateUpdated;
 

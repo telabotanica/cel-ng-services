@@ -2,13 +2,14 @@
 
 namespace App\Serializer;
 
+use App\Model\PlantnetMicroDateTime;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class MicroDateTimeNormalizer implements DenormalizerInterface
+class PlantnetMicroDateTimeNormalizer implements DenormalizerInterface
 {
     private static $supportedTypes = [
-        \DateTime::class => true,
+        PlantnetMicroDateTime::class => true,
     ];
 
     /**
