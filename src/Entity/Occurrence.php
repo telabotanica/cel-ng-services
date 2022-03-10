@@ -705,7 +705,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
 	    return null;
     }
 
-    public function setDateObserved(\DateTimeInterface $dateObserved): self {
+    public function setDateObserved(?\DateTimeInterface $dateObserved): self {
         $this->dateObserved = $dateObserved;
 
         return $this;
