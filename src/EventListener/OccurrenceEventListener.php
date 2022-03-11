@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\DBAL\InputSourceEnumType;
 use App\Entity\Occurrence;
 use App\Service\TaxoRepoService;
 use Doctrine\ORM\Event\LifecycleEventArgs;
@@ -57,19 +58,17 @@ class OccurrenceEventListener {
         }
         $entity->setIdentiplanteScore(0);
 
-        if ( null === $entity->getFamily() &&
-            null === $entity->getAcceptedSciName() &&
-            null === $entity->getAcceptedSciNameId() &&
-            null !== $entity->getTaxoRepo() &&
-            null !== $entity->getUserSciNameId()
-        ) {
+        // For other sources duplicated occurrences
+        $entity->setInputSource(InputSourceEnumType::CEL);
+
+        if ($entity->getTaxoRepo() && $entity->getUserSciNameId()) {
             $taxon = $this->taxoRepo->getTaxonInfo(
                 $entity->getUserSciNameId(),
                 $entity->getTaxoRepo()
             );
-            $entity->setFamily($taxon['family']);
-            $entity->setAcceptedSciName($taxon['acceptedSciName']);
-            $entity->setAcceptedSciNameId($taxon['acceptedSciNameId']);
+            $entity->setFamily($taxon['family'] ?? $entity->getFamily());
+            $entity->setAcceptedSciName($taxon['acceptedSciName'] ?? $entity->getAcceptedSciName());
+            $entity->setAcceptedSciNameId($taxon['acceptedSciNameId'] ?? $entity->getAcceptedSciNameId());
         }
     }
 
@@ -100,16 +99,14 @@ class OccurrenceEventListener {
 
         $this->doCommon($entity);
 
-        if ( null !== $entity->getTaxoRepo() &&
-            null !== $entity->getUserSciNameId()
-        ) {
+        if ($entity->getTaxoRepo() && $entity->getUserSciNameId()) {
             $taxon = $this->taxoRepo->getTaxonInfo(
                 $entity->getUserSciNameId(),
                 $entity->getTaxoRepo()
             );
-            $entity->setFamily($taxon['family']);
-            $entity->setAcceptedSciName($taxon['acceptedSciName']);
-            $entity->setAcceptedSciNameId($taxon['acceptedSciNameId']);
+            $entity->setFamily($taxon['family'] ?? $entity->getFamily());
+            $entity->setAcceptedSciName($taxon['acceptedSciName'] ?? $entity->getAcceptedSciName());
+            $entity->setAcceptedSciNameId($taxon['acceptedSciNameId'] ?? $entity->getAcceptedSciNameId());
         }
     }
 

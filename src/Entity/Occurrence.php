@@ -769,14 +769,14 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $this->acceptedSciNameId;
     }
 
-    public function setAcceptedSciName($acceptedSciName): self
+    public function setAcceptedSciName(?string $acceptedSciName): self
     {
         $this->acceptedSciName = $acceptedSciName;
 
         return $this;
     }
 
-    public function setAcceptedSciNameId($acceptedSciNameId): self
+    public function setAcceptedSciNameId(?int $acceptedSciNameId): self
     {
         $this->acceptedSciNameId = $acceptedSciNameId;
 
@@ -823,7 +823,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
         return $this->plantnetId;
     }
 
-    public function setFamily(string $family): self {
+    public function setFamily(?string $family): self {
         $this->family = $family;
 
         return $this;

@@ -49,6 +49,20 @@ class TaxoRepoService
         'weurope' => ['bdtfx'], // Western Europe
     ];
 
+    private const TELABOTANICA_TAXO_REPOS = [
+        'apd',
+        'aublet',
+        'bdtfx',
+        'bdtfxr',
+        'bdtxa',
+        'bdtre',
+        'florical',
+        'isfan',
+        'lbf',
+        'taxref',
+        'taxreflich',
+    ];
+
     private $client;
     private $baseNamesearchUrl;
     private $taxonInfoUrl;
@@ -67,40 +81,35 @@ class TaxoRepoService
     /**
      * @return array{taxoRepo: string, sciNameId: ?int, sciName: ?string, acceptedSciNameId: ?int, acceptedSciName: ?string, family: ?string}
      */
-    public function getTaxonInfo(string $taxonName, string $project): array
+    public function getTaxonInfo(string $taxonNameId, string $project): array
     {
         $info = [
             'taxoRepo' => TaxoRepoEnumType::OTHERUNKNOWN,
             'sciNameId' => null,
-            'sciName' => $taxonName,
+            'sciName' => null,
             'acceptedSciNameId' => null,
-            'acceptedSciName' => '',
-            'family' => '',
+            'acceptedSciName' => null,
+            'family' => null,
         ];
 
-        $taxoRepo = self::PLANTNET_PROJECTS_BY_TELABOTANICA_TAXO_REPOS[$project][0] ?? [];
+        $taxoRepo = in_array($project, self::TELABOTANICA_TAXO_REPOS)
+            ? $project
+            : (self::PLANTNET_PROJECTS_BY_TELABOTANICA_TAXO_REPOS[$project][0] ?? null);
         if (!$taxoRepo) {
             return $info;
         }
 
-        // eg. https://api.tela-botanica.org/service:cel/NameSearch/taxref/Symphyotrichum%20ericoides
-        $response = $this->client->request('GET', $this->baseNamesearchUrl.'/'.$taxoRepo.'/'.$taxonName);
-        $response = json_decode($response->getContent(), true)[0] ?? [];
-        if (empty($response)) {
-            return $info;
-        }
-
-        $sciNameId = $response[1];
         // eg. https://api.tela-botanica.org/service:eflore:0.1/taxref/taxons/125328
-        $response = $this->client->request('GET', $this->taxonInfoUrl.'/'.$taxoRepo.'/taxons/'.$sciNameId);
+        $response = $this->client->request('GET', $this->taxonInfoUrl.'/'.$taxoRepo.'/taxons/'.$taxonNameId);
         $response = json_decode($response->getContent(), true) ?? [];
         if (!$response) {
+            dump('lol3', $info);
             return $info;
         }
 
         $info['taxoRepo'] = $taxoRepo;
         $info['sciNameId'] = $response['id'] ?? null;
-        $info['sciName'] = $response['nom_sci_complet'] ?? $taxonName;
+        $info['sciName'] = $response['nom_sci_complet'];
         $info['acceptedSciNameId'] = $response['nom_retenu.id'] ?? null;
         $info['acceptedSciName'] = $response['nom_retenu_complet'] ?? '';
         $info['family'] = $response['famille'] ?? '';

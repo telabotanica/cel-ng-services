@@ -17,8 +17,7 @@ class PlantnetMicroDateTimeNormalizer implements DenormalizerInterface
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
-    {
+    public function denormalize($data, $class, $format = null, array $context = []) {
         $timestamp = substr($data, 0, -3);
         return \DateTime::createFromFormat('U', $timestamp);
     }
@@ -26,8 +25,7 @@ class PlantnetMicroDateTimeNormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
-    {
+    public function supportsDenormalization($data, $type, $format = null) {
         return isset(self::$supportedTypes[$type]);
     }
 }
