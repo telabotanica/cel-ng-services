@@ -103,7 +103,6 @@ class TaxoRepoService
         $response = $this->client->request('GET', $this->taxonInfoUrl.'/'.$taxoRepo.'/taxons/'.$taxonNameId);
         $response = json_decode($response->getContent(), true) ?? [];
         if (!$response) {
-            dump('lol3', $info);
             return $info;
         }
 
