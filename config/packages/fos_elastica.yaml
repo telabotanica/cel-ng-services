@@ -8,6 +8,7 @@ fos_elastica:
     indexes:
         occurrences: 
             index_name: '%env(FOS_ELASTICA_INDEXES_OCCURRENCES_INDEX_NAME)%'
+            use_alias: true
             settings:
                 index:
                     analysis:
@@ -154,6 +155,7 @@ fos_elastica:
 
         photos: 
             index_name: '%env(FOS_ELASTICA_INDEXES_PHOTOS_INDEX_NAME)%'
+            use_alias: true
             settings:
                 index:
                     analysis:
