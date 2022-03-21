@@ -24,6 +24,8 @@ fos_elastica:
             types:
                 occurrence:
                     properties:
+                        id:
+                            type: "text"
                         id_keyword:
                             type: "integer"
                         geom: 
@@ -171,6 +173,8 @@ fos_elastica:
             types:
                 photo:
                     properties:
+                        id:
+                            type: "text"
                         userId: 
                             type: "integer"
                         userEmail: ~

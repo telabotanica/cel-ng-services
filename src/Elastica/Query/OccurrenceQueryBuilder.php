@@ -23,7 +23,7 @@ final class OccurrenceQueryBuilder extends BaseQueryBuilder {
                 'certainty', 'projectId', 'signature', 'frenchDep'), 
             array(
                 'family', 'station', 'annotation', 'userSciName', 'locality', 
-                'sublocality', 'environment', 'taxoRepo', 'certainty'),
+                'sublocality', 'environment', 'taxoRepo', 'certainty', 'id'),
             array('id', 'tags')
         );
     }
