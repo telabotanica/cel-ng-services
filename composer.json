@@ -43,7 +43,7 @@
         "symfony/monolog-bundle": "^3.3",
         "symfony/security-bundle": "^3.0 || ^4.0",
         "symfony/security-guard": "4.3.*",
-        "symfony/serializer": "4.3.*",
+        "symfony/serializer": "4.4.*",
         "symfony/translation": "4.3.*",
         "symfony/twig-bundle": "^3.0 || ^4.0",
         "symfony/validator": "^3.0 || ^4.0",
