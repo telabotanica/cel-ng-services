@@ -34,7 +34,7 @@ class AppFixtures extends Fixture {
 
         $userProfile = new UserProfileCel();
         $userProfile->setLanguage('EN');
-        $userProfile->setId($userId);
+        $userProfile->setUserId($userId);
         $manager->persist($userProfile);
 
         return $userProfile;
