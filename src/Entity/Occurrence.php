@@ -179,8 +179,9 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     */
    private $dateObserved = null;
 
+   // TODO changer date created en dateUpdatedRemote
    /**
-    * Date de création de l'obs.
+    * Date de création de l'obs (date à laquelle l'obs est récupéré à partir de la bdd du partenaire).
     *
     * @Groups({"read"})
     * @ORM\Column(name="date_created", type="datetime", nullable=false, options={"comment":"Date de création de l'obs"})
@@ -195,9 +196,9 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     */
    private $dateUpdated = null;
 
-
+// TODO changer datePublished en dateCreated
    /**
-    * Date de publication de l'obs = transmission au réseau.
+    * Date de publication de l'obs = transmission au réseau (date de mise en ligne de l'obs).
     *
     * @Groups({"read"})
     * @ORM\Column(name="date_published", type="datetime", nullable=true, options={"comment":"Date de publication de l'obs = transmission au réseau"})

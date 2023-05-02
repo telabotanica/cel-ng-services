@@ -128,11 +128,22 @@ final class CelSyncProcessJobsCommand extends Command
 
                     break;
                 case 'update':
-                    $this->updateOccurrence($job->getEntityId());
-                    
+					try {
+						$this->updateOccurrence($job->getEntityId());
+					} catch (\Exception $e) {
+						$output->writeln(sprintf('Erreur lors du traitement d\'update du job %d: %s',
+												 $job->getEntityId(),
+												 $e->getMessage()));
+					}
+					
                     break;
                 case 'create':
-                    $this->createOccurrence($job->getEntityId());
+					try {
+						$this->createOccurrence($job->getEntityId());
+					}  catch (\Exception $e) {
+						$output->writeln(sprintf('Erreur lors du traitement de création du job %d: %s',
+												 $job->getEntityId(), $e->getMessage()));
+					}
 
                     break;
                 default:
@@ -301,11 +312,13 @@ final class CelSyncProcessJobsCommand extends Command
             if ($pnTbPair) {
                 $pnTbPair->setPlantnetOccurrenceUpdatedAt($oldEnoughDate);
             } else {
-                $this->em->persist(new PnTbPair(
-                    $occurrence,
-                    $pnOccurrenceId,
-                    $oldEnoughDate,
-                ));
+				$this->pnTbPairService->createPnTbPair($occurrence,
+													   $pnOccurrenceId);
+//                $this->em->persist(new PnTbPair(
+//                    $occurrence,
+//                    $pnOccurrenceId,
+//                    $oldEnoughDate,
+//                ));
             }
             $this->em->flush();
         }

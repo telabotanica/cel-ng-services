@@ -99,16 +99,19 @@ final class CelSyncGetJobsCommand extends Command
             // Switch from PlantnetOccurrences to PlantnetOccurrence[]
             $occurrences = $occurrences->getData();
             foreach ($occurrences as $occurrence) {
-                // filter out partners occurrences
+                // filter out partners occurrences && obs without images
                 if ($occurrence->getPartner()) {
                     continue;
                 }
+				
+				// TODO Vérifier si licence libre
                 // already known occurrence ? need to update ? delete ?
                 $existingOccurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $occurrence->getId()]);
                 if ($existingOccurrence) {
                     if ($occurrence->isDeleted() || $occurrence->isCensored()) {
                         $this->addJob('delete', $occurrence->getId());
                     } else {
+						//TODO: check si dateUpdatedRemote > dateUpdated
                         $this->addJob('update', $occurrence->getId());
                     }
                 // we got a not known occurrence, is its author a Telabotaniste?
@@ -154,7 +157,12 @@ final class CelSyncGetJobsCommand extends Command
                 $this->em->flush();
             }
         } else {
+			$changelog->setActionType($type);
+			$this->em->persist($changelog);
             $this->existingJobsCount++;
+			if (0 === $this->existingJobsCount % 50) {
+				$this->em->flush();
+			}
         }
     }
 

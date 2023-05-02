@@ -24,11 +24,12 @@ class TimestampedEntityEventListener {
     public function prePersist(LifecycleEventArgs $args) {
 
         $entity = $args->getEntity();
-
+	print_r($entity);
         // only act on entities implementing "TimestampedEntityInterface" 
         if (!$entity instanceof TimestampedEntityInterface ) {
             return;
         }
+		// TODO changer le date created ?
         $entity->setDateCreated(new \DateTime("now"));
     }
 

@@ -61,7 +61,7 @@ class PlantnetService
         if ('' !== $email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $params['email'] = $email;
         }
-
+		
         $params = http_build_query($params);
 
         $response = $this->client->request('GET', $this->plantnetBaseApiUrl.'/observations/sync/latest?'.$params, [

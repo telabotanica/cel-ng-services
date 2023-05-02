@@ -35,6 +35,11 @@ class PlantnetOccurrence
      * @var PlantnetMicroDateTime
      */
     private $dateUpdated;
+	
+	/**
+	 * @var PlantnetMicroDateTime|null
+	 */
+	private $dateUpdatedRemote;
 
     /**
      * Could be "©" for private or else any other public licence
@@ -439,4 +444,22 @@ class PlantnetOccurrence
         $this->votes = $votes;
         return $this;
     }
+	
+	/**
+	 * @return \DateTime|null
+	 */
+	public function getDateUpdatedRemote(): ?\DateTime
+	{
+		return $this->dateUpdatedRemote;
+	}
+	
+	/**
+	 * @param \DateTime|null $dateUpdatedRemote
+	 * @return PlantnetOccurrence
+	 */
+	public function setDateUpdatedRemote(?\DateTime $dateUpdatedRemote): PlantnetOccurrence
+	{
+		$this->dateUpdatedRemote = $dateUpdatedRemote;
+		return $this;
+	}
 }

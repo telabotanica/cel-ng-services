@@ -57,4 +57,38 @@ class PlantnetSpecies
     {
         return $this->genus;
     }
+	
+	/**
+	 * @param string $name
+	 */
+	public function setName(string $name): void
+	{
+		$this->name = $name;
+	}
+	
+	/**
+	 * @param string|null $author
+	 */
+	public function setAuthor(?string $author): void
+	{
+		$this->author = $author;
+	}
+	
+	/**
+	 * @param string $family
+	 */
+	public function setFamily(string $family): void
+	{
+		$this->family = $family;
+	}
+	
+	/**
+	 * @param string $genus
+	 */
+	public function setGenus(string $genus): void
+	{
+		$this->genus = $genus;
+	}
+	
+	
 }

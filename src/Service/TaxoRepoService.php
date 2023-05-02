@@ -66,8 +66,10 @@ class TaxoRepoService
     private $client;
     private $baseNamesearchUrl;
     private $taxonInfoUrl;
+	
+	private $taxonRechercheNomUrl;
 
-    public function __construct(string $baseNamesearchUrl, string $taxonInfoUrl, bool $useNativeHttpClient)
+    public function __construct(string $baseNamesearchUrl, string $taxonInfoUrl, bool $useNativeHttpClient, string $taxonRechercheNomUrl)
     {
         if ($useNativeHttpClient) {
             $this->client = new NativeHttpClient();
@@ -76,6 +78,7 @@ class TaxoRepoService
         }
         $this->baseNamesearchUrl = $baseNamesearchUrl;
         $this->taxonInfoUrl = $taxonInfoUrl;
+		$this->taxonRechercheNomUrl = $taxonRechercheNomUrl;
     }
 
     /**
@@ -101,6 +104,22 @@ class TaxoRepoService
 
         // eg. https://api.tela-botanica.org/service:eflore:0.1/taxref/taxons/125328
         $response = $this->client->request('GET', $this->taxonInfoUrl.'/'.$taxoRepo.'/taxons/'.$taxonNameId);
+		
+		if (200 !== $response->getStatusCode()) {
+			$recherche = ['recherche' => $taxonNameId, 'referentiel' => $taxoRepo];
+			$infos = $this->consulterRechercheNomsSciEflore($recherche);
+			if (isset($infos['resultat'])){
+				foreach ($infos['resultat'] as $taxonInfo){
+					if ($this->startsWith($taxonInfo['nom_sci_complet'], $taxonNameId) || $taxonInfo['nom_sci'] ===
+						$taxonNameId){
+						$taxonId = $taxonInfo['id'];
+						$response = $this->client->request('GET', $this->taxonInfoUrl.'/'.$taxoRepo.'/taxons/'.$taxonId);
+						break;
+					}
+				}
+			}
+		}
+		
         $response = json_decode($response->getContent(), true) ?? [];
         if (!$response) {
             return $info;
@@ -115,5 +134,38 @@ class TaxoRepoService
 
         return $info;
     }
+	
+	public function consulterRechercheNomsSciEflore($recherche) {
+		$url = $this->taxonInfoUrl.'/%s/noms?recherche=%s&masque=%s&retour.champs=id,nom_sci,auteur,nom_retenu.id,famille,num_taxonomique,nom_retenu_complet';
+//		$url = $this->taxonInfoUrl.'/%s/taxons?recherche=%s&masque=%s&retour.champs=id,nom_sci,auteur,nom_retenu.id,famille,num_taxonomique,nom_retenu_complet';
+		$urlRecherche = sprintf($url, strtolower($recherche['referentiel']), 'floue', urlencode
+($recherche['recherche'].'%'));
+//		$urlRecherche = sprintf($url, strtolower($recherche['referentiel']), 'etendue', urlencode(utf8_encode
+//																							   ($recherche['recherche'])));
+//		echo $urlRecherche;
+		// Quand il n'y pas de résultats eflore renvoie une erreur 404 (l'imbécile !)
+		// or le cas où l'on n'a pas de résultats est parfaitement valide
+		$infos = @file_get_contents($urlRecherche);
+		$infos = json_decode($infos, true);
+		return $infos;
+	}
+
+	public function consulterRechercheNomsVernaEflore($recherche) {
+		$url = $this->taxonInfoUrl."/%s/noms-vernaculaires?masque=%s&recherche=etendue&retour.champs=num_taxon&masque.lg=fra";
+		$url_verna = sprintf($url, strtolower($recherche['referentiel']), urlencode($recherche['recherche']));
+		
+		// Quand il n'y pas de résultats eflore renvoie une erreur 404 (l'imbécile !)
+		// or le cas où l'on n'a pas de résultats est parfaitement valide
+		$infos_verna = @file_get_contents($url_verna);
+		$infos_verna = json_decode($infos_verna, true);
+		
+		return $infos_verna;
+	}
+	
+	function startsWith ($string, $startString)
+	{
+		$len = strlen($startString);
+		return (substr($string, 0, $len) === $startString);
+	}
 
 }
