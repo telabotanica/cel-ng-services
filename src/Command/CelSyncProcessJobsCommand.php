@@ -4,9 +4,14 @@ namespace App\Command;
 
 use App\Entity\ChangeLog;
 use App\Entity\Occurrence;
+use App\Entity\Photo;
 use App\Entity\PhotoPhotoTagRelation;
+use App\Entity\PhotoTag;
 use App\Entity\PnTbPair;
 use App\Model\AnnuaireUser;
+use App\Model\PlantnetImage;
+use App\Repository\PhotoRepository;
+use App\Repository\PhotoTagPhotoRepository;
 use App\Repository\PhotoTagRepository;
 use App\Service\AnnuaireService;
 use App\Service\IdentiplanteService;
@@ -36,6 +41,8 @@ final class CelSyncProcessJobsCommand extends Command
     private $identiplanteService;
     private $annuaireService;
 	private $photoTagRepository;
+	private $photoTagPhotoRepository;
+	private $photoRepository;
 
     private $stats = [
         'ignored' => 0,
@@ -69,7 +76,9 @@ final class CelSyncProcessJobsCommand extends Command
         PhotoBuilderService $photoBuilderService,
         IdentiplanteService $identiplanteService,
         AnnuaireService $annuaireService,
-		PhotoTagRepository $photoTagRepository
+		PhotoTagRepository $photoTagRepository,
+		PhotoTagPhotoRepository $photoTagPhotoRepository,
+		PhotoRepository $photoRepository
     ) {
         $this->em = $em;
         $this->pnTbPairRepository = $this->em->getRepository(PnTbPair::class);
@@ -81,6 +90,8 @@ final class CelSyncProcessJobsCommand extends Command
         $this->identiplanteService = $identiplanteService;
         $this->annuaireService = $annuaireService;
 		$this->photoTagRepository = $photoTagRepository;
+		$this->photoTagPhotoRepository = $photoTagPhotoRepository;
+		$this->photoRepository = $photoRepository;
 
         parent::__construct();
     }
@@ -175,14 +186,12 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
         $event = $stopwatch->stop('pn-sync-process-jobs');
-		
-//        if ($output->isVerbose()) {
+
             $this->io->success('Success!');
             foreach ($this->stats as $stat => $value) {
                 $this->io->text(' '.ucfirst($stat).': '.$value);
             }
             $this->io->text(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000,$event->getMemory() / (1024 ** 2)));
-//        }
 
         return 0;
     }
@@ -252,25 +261,35 @@ final class CelSyncProcessJobsCommand extends Command
                 $photosIds[] = $image->getId();
                 $this->stats['new photo']++;
 				
-				$tagName = $image->getOrgan();
-				$tagName = self::PHOTO_TAG[$tagName];
-				$tag = $this->photoTagRepository->findOneBy(['name' => $tagName]);
-				
+				// On enregistre le tag de la photo
+				$tag = $this->photoBuilderService->getTag($image);
 				if ($tag){
-					$photoTagRelation = new PhotoPhotoTagRelation();
-					
-					$photoTagRelation->setPhoto($photo)
-						->setPhotoTag($tag);
-					
-					$this->em->persist($photoTagRelation);
+					$this->photoBuilderService->savePhotoTag($tag, $photo);
 				}
-            }
+				
+            } else {
+				//check tag -> update si différent, create si absent
+				$tag = $this->photoBuilderService->getTag($image);
+				if ($tag) {
+					$this->photoBuilderService->updatePhotoTag($tag, $image);
+				}
+			}
         }
         // list photos, add new, remove deleted
-
-        // update PnTbPair
-//        $pnTbPair->setPlantnetOccurrenceUpdatedAt($pnOccurrence->getDateUpdated());
 		
+		//  update du pnTbPair
+		$pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
+		if ($pnTbPair) {
+			$pnTbPair->setPlantnetOccurrenceUpdatedAt($pnOccurrence->getDateUpdated());
+			$this->em->persist($pnTbPair);
+		} else {
+			$this->em->persist(
+				new PnTbPair(
+					$occurrence,
+					$id,
+					$pnOccurrence->getDateUpdated(),
+				));
+		}
     }
 
     private function createOccurrence(int $id): void
@@ -322,21 +341,21 @@ final class CelSyncProcessJobsCommand extends Command
 			
             $this->stats['new photo']++;
 			
-			$tagName = $image->getOrgan();
-			$tagName = self::PHOTO_TAG[$tagName];
-			$tag = $this->photoTagRepository->findOneBy(['name' => $tagName]);
+			$tag = $this->photoBuilderService->getTag($image);
 			
 			if ($tag){
-				$photoTagRelation = new PhotoPhotoTagRelation();
-				
-				$photoTagRelation->setPhoto($photo)
-					->setPhotoTag($tag);
-				
-				$this->em->persist($photoTagRelation);
+				$this->photoBuilderService->savePhotoTag($tag, $photo);
 			}
         }
-
-    }
+		
+		// Création du pnTbPair
+		$this->em->persist(
+			new PnTbPair(
+				$occurrence,
+				$id,
+				$pnOccurrence->getDateUpdated(),
+			));
+	}
 
     private function simulateJobs(int $pnOccurrenceId): array
     {
