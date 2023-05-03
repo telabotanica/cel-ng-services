@@ -110,10 +110,16 @@ final class CelSyncGetJobsCommand extends Command
                 if ($existingOccurrence) {
                     if ($occurrence->isDeleted() || $occurrence->isCensored()) {
                         $this->addJob('delete', $occurrence->getId());
-                    } else {
-						//TODO: check si dateUpdatedRemote > dateUpdated
-                        $this->addJob('update', $occurrence->getId());
                     }
+//					elseif ($occurrence->getDateUpdatedRemote()) {
+//						// Si l'occ a été modifiée après le dernier pull par Pl@antnet
+//						if ($occurrence->getDateUpdatedRemote() < $occurrence->getDateUpdated()){
+//							$this->addJob('update', $occurrence->getId());
+//						}
+//                    }
+					else {
+						$this->addJob('update', $occurrence->getId());
+					}
                 // we got a not known occurrence, is its author a Telabotaniste?
                 } elseif ($this->annuaireService->isKnownUser($occurrence->getAuthor()->getEmail())) {
                     $this->addJob('create', $occurrence->getId());
@@ -126,14 +132,12 @@ final class CelSyncGetJobsCommand extends Command
         }
 
         $event = $stopwatch->stop('pn-sync-get-jobs');
-        if ($output->isVerbose()) {
             $this->io->success(sprintf(
                 'Success! Got %d new jobs, %d already know, out of %d total processed occurrences!',
                 $this->newJobsCount, $this->existingJobsCount, count($occurrences)
             ));
 
-            $this->io->comment(sprintf('Elapsed time: %.2f ms / Consumed memory: %.2f MB', $event->getDuration(), $event->getMemory() / (1024 ** 2)));
-        }
+            $this->io->comment(sprintf('Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000, $event->getMemory() / (1024 ** 2)));
 
         return 0;
     }

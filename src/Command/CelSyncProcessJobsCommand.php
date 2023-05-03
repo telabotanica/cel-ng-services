@@ -4,8 +4,10 @@ namespace App\Command;
 
 use App\Entity\ChangeLog;
 use App\Entity\Occurrence;
+use App\Entity\PhotoPhotoTagRelation;
 use App\Entity\PnTbPair;
 use App\Model\AnnuaireUser;
+use App\Repository\PhotoTagRepository;
 use App\Service\AnnuaireService;
 use App\Service\IdentiplanteService;
 use App\Service\OccurrenceBuilderService;
@@ -33,6 +35,7 @@ final class CelSyncProcessJobsCommand extends Command
     private $photoBuilderService;
     private $identiplanteService;
     private $annuaireService;
+	private $photoTagRepository;
 
     private $stats = [
         'ignored' => 0,
@@ -42,6 +45,15 @@ final class CelSyncProcessJobsCommand extends Command
         'commented' => 0,
         'new photo' => 0,
     ];
+	
+	private const PHOTO_TAG = [
+		'leaf' => 'feuille',
+		'flower' => 'fleur',
+		'fruit' => 'fruit',
+		'bark' => 'ecorce',
+		'habit' => 'port',
+		'other' => 'autre',
+	];
 
     private $occurrencesToComment = [];
 
@@ -56,7 +68,8 @@ final class CelSyncProcessJobsCommand extends Command
         OccurrenceBuilderService $occurrenceBuilderService,
         PhotoBuilderService $photoBuilderService,
         IdentiplanteService $identiplanteService,
-        AnnuaireService $annuaireService
+        AnnuaireService $annuaireService,
+		PhotoTagRepository $photoTagRepository
     ) {
         $this->em = $em;
         $this->pnTbPairRepository = $this->em->getRepository(PnTbPair::class);
@@ -67,6 +80,7 @@ final class CelSyncProcessJobsCommand extends Command
         $this->photoBuilderService = $photoBuilderService;
         $this->identiplanteService = $identiplanteService;
         $this->annuaireService = $annuaireService;
+		$this->photoTagRepository = $photoTagRepository;
 
         parent::__construct();
     }
@@ -131,6 +145,8 @@ final class CelSyncProcessJobsCommand extends Command
 					try {
 						$this->updateOccurrence($job->getEntityId());
 					} catch (\Exception $e) {
+						$this->stats['ignored']++;
+						
 						$output->writeln(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
 					}
 					
@@ -139,6 +155,8 @@ final class CelSyncProcessJobsCommand extends Command
 					try {
 						$this->createOccurrence($job->getEntityId());
 					}  catch (\Exception $e) {
+						$this->stats['ignored']++;
+						
 						$output->writeln(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
 					}
 
@@ -157,13 +175,14 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
         $event = $stopwatch->stop('pn-sync-process-jobs');
-        if ($output->isVerbose()) {
+		
+//        if ($output->isVerbose()) {
             $this->io->success('Success!');
             foreach ($this->stats as $stat => $value) {
                 $this->io->text(' '.ucfirst($stat).': '.$value);
             }
-            $this->io->text(sprintf('  Elapsed time: %.2f ms / Consumed memory: %.2f MB', $event->getDuration(), $event->getMemory() / (1024 ** 2)));
-        }
+            $this->io->text(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000,$event->getMemory() / (1024 ** 2)));
+//        }
 
         return 0;
     }
@@ -174,7 +193,8 @@ final class CelSyncProcessJobsCommand extends Command
         if ($mode === 'newer') {
             $order = 'desc';
         }
-        return $this->changeLogRepository->findBy(['entityName' => 'plantnet'], ['id' => $order], 50);
+		//TODO Augmenter la limite?
+        return $this->changeLogRepository->findBy(['entityName' => 'plantnet'], ['id' => $order], 100);
     }
 
     private function updateOccurrence(int $id): void
@@ -195,6 +215,8 @@ final class CelSyncProcessJobsCommand extends Command
             return;
         }
 
+		/*
+		 * // We don't use pn_tb_pair ?
         $pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
         if (!$pnTbPair) {
             $this->stats['ignored']++;
@@ -204,7 +226,8 @@ final class CelSyncProcessJobsCommand extends Command
             $this->stats['ignored']++;
             return;
         }
-
+		*/
+		
         // keep old sci name reference, easy to find if it changed after update
         $previousSciNameId = $occurrence->getAcceptedSciNameId();
 
@@ -216,6 +239,8 @@ final class CelSyncProcessJobsCommand extends Command
         if ($previousSciNameId !== $occurrence->getAcceptedSciNameId()) {
             $this->occurrencesToComment[] = $occurrence;
         }
+		
+		$this->em->persist($occurrence);
 
         // update photos
         foreach ($pnOccurrence->getImages() as $image) {
@@ -226,12 +251,26 @@ final class CelSyncProcessJobsCommand extends Command
                 $this->em->persist($photo);
                 $photosIds[] = $image->getId();
                 $this->stats['new photo']++;
+				
+				$tagName = $image->getOrgan();
+				$tagName = self::PHOTO_TAG[$tagName];
+				$tag = $this->photoTagRepository->findOneBy(['name' => $tagName]);
+				
+				if ($tag){
+					$photoTagRelation = new PhotoPhotoTagRelation();
+					
+					$photoTagRelation->setPhoto($photo)
+						->setPhotoTag($tag);
+					
+					$this->em->persist($photoTagRelation);
+				}
             }
         }
         // list photos, add new, remove deleted
 
         // update PnTbPair
-        $pnTbPair->setPlantnetOccurrenceUpdatedAt($pnOccurrence->getDateUpdated());
+//        $pnTbPair->setPlantnetOccurrenceUpdatedAt($pnOccurrence->getDateUpdated());
+		
     }
 
     private function createOccurrence(int $id): void
@@ -280,10 +319,23 @@ final class CelSyncProcessJobsCommand extends Command
             $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
 
             $this->em->persist($photo);
+			
             $this->stats['new photo']++;
+			
+			$tagName = $image->getOrgan();
+			$tagName = self::PHOTO_TAG[$tagName];
+			$tag = $this->photoTagRepository->findOneBy(['name' => $tagName]);
+			
+			if ($tag){
+				$photoTagRelation = new PhotoPhotoTagRelation();
+				
+				$photoTagRelation->setPhoto($photo)
+					->setPhotoTag($tag);
+				
+				$this->em->persist($photoTagRelation);
+			}
         }
 
-        // tag plantnet-project ? No. No need to tag, we have inputSource column
     }
 
     private function simulateJobs(int $pnOccurrenceId): array
@@ -309,13 +361,11 @@ final class CelSyncProcessJobsCommand extends Command
             if ($pnTbPair) {
                 $pnTbPair->setPlantnetOccurrenceUpdatedAt($oldEnoughDate);
             } else {
-				$this->pnTbPairService->createPnTbPair($occurrence,
-													   $pnOccurrenceId);
-//                $this->em->persist(new PnTbPair(
-//                    $occurrence,
-//                    $pnOccurrenceId,
-//                    $oldEnoughDate,
-//                ));
+                $this->em->persist(new PnTbPair(
+                    $occurrence,
+                    $pnOccurrenceId,
+                    $oldEnoughDate,
+                ));
             }
             $this->em->flush();
         }

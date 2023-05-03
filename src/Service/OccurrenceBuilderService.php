@@ -31,7 +31,7 @@ class OccurrenceBuilderService
         $occurrence->setCertainty(CertaintyEnumType::DOUBTFUL);
         $occurrence->setInputSource(InputSourceEnumType::PLANTNET);
 		//TODO: Gestion des obs  privées
-//        $occurrence->setIsPublic(true);
+        $occurrence->setIsPublic(true);
 
         return $occurrence;
     }
@@ -42,9 +42,6 @@ class OccurrenceBuilderService
         if (!$pnOccurrence->getCurrentName() && !$firstIdentificationResult) {
             return $occurrence;
         }
-//		print_r($pnOccurrence->getSpecies()->getName());
-//        $taxonName = $pnOccurrence->getCurrentName() ?? $firstIdentificationResult->getSpecies();
-		//TODO: pbl ici
 		$species = $pnOccurrence->getSpecies();
 		if (isset($species) && !empty($pnOccurrence->getSpecies()->getName())){
 			$taxonName = $pnOccurrence->getSpecies()->getName();
@@ -53,7 +50,6 @@ class OccurrenceBuilderService
 		} else {
 			$taxonName = $firstIdentificationResult->getSpecies();
 		}
-//        $taxonName = $pnOccurrence->getSpecies()->getName() ?? $firstIdentificationResult->getSpecies();
 
         // search taxon data
         $taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
@@ -61,9 +57,9 @@ class OccurrenceBuilderService
 		//TODO: changer le date published ?
 		//TODO ajouter dateUpdatedRemote -> changer entity Occurrence
         $occurrence->setDateObserved($pnOccurrence->getDateObs())
-//            ->setDateCreated($pnOccurrence->getDateCreated())
+            ->setDateCreated($pnOccurrence->getDateCreated())
             ->setDateUpdated($pnOccurrence->getDateUpdated())
-            ->setDatePublished($pnOccurrence->getDateCreated());
+            ->setDatePublished(new \DateTime("now"));
 
         $occurrence->setTaxoRepo($taxonInfo['taxoRepo'])
             ->setUserSciName($taxonInfo['sciName'] ?? $taxonName)
