@@ -78,6 +78,7 @@ final class CelSyncGetJobsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+		//TODO Ajout de stop date ?
         $stopwatch = new Stopwatch();
         $stopwatch->start('pn-sync-get-jobs');
         $dryRun = $input->getOption('dry-run');

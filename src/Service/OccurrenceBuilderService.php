@@ -8,14 +8,19 @@ use App\DBAL\LocationAccuracyEnumType;
 use App\Entity\Occurrence;
 use App\Model\AnnuaireUser;
 use App\Model\PlantnetOccurrence;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 
 class OccurrenceBuilderService
 {
     private $taxoRepoService;
+	private $client;
 
     public function __construct(TaxoRepoService $taxoRepoService)
     {
         $this->taxoRepoService = $taxoRepoService;
+		$this->client = HttpClient::create();
+		
     }
 
     public function createOccurrence(AnnuaireUser $user, PlantnetOccurrence $pnOccurrence): Occurrence
@@ -30,8 +35,6 @@ class OccurrenceBuilderService
         $occurrence->setPlantnetId($pnOccurrence->getId());
         $occurrence->setCertainty(CertaintyEnumType::DOUBTFUL);
         $occurrence->setInputSource(InputSourceEnumType::PLANTNET);
-		//TODO: Gestion des obs  privées
-        $occurrence->setIsPublic(true);
 
         return $occurrence;
     }
@@ -70,6 +73,13 @@ class OccurrenceBuilderService
                 ($pnOccurrence->getSpecies() ? $pnOccurrence->getSpecies()->getFamily() : ''));
 
         if ($pnOccurrence->getGeo()->getLon() && $pnOccurrence->getGeo()->getLat()) {
+			$occurrence->setIsPublic(true);
+			
+			$altitude = $this->getAltitude($pnOccurrence->getGeo()->getLon(), $pnOccurrence->getGeo()->getLat());
+			if ($altitude){
+				$occurrence->setElevation($altitude);
+			}
+			
             $occurrence->setGeometry(json_encode([
                 'type' => 'Point',
                 'coordinates' => [
@@ -82,9 +92,26 @@ class OccurrenceBuilderService
             if ($pnOccurrence->getGeo()->getAccuracy()) {
                 $occurrence->setLocationAccuracy(LocationAccuracyEnumType::getAccuracyRangeForFloat($pnOccurrence->getGeo()->getAccuracy()));
             }
-        }
+        } else {
+			$occurrence->setIsPublic(false);
+		}
 
         return $occurrence;
     }
+	
+	public function getAltitude($longitude, $latitude){
+		$altitude = null;
+		$opentopodataApi = 'https://api.opentopodata.org/v1/mapzen?';
+		$response = $this->client->request('GET', $opentopodataApi.'locations='.$latitude.','.$longitude);
+		
+		if (200 !== $response->getStatusCode()) {
+			print_r('Erreur lors de la récupération de l\'altitude.');
+			
+		} else {
+			$response = json_decode($response->getContent(), true) ?? [];
+			$altitude = $response['results'][0]['elevation'];
+		}
+		return $altitude;
+	}
 
 }
