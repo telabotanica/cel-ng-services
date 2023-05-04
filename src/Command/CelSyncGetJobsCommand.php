@@ -61,6 +61,8 @@ final class CelSyncGetJobsCommand extends Command
                 'If set, don’t persist changes to database')
             ->addOption('from', null, InputOption::VALUE_REQUIRED,
                 'Get occurrences history from this timestamp')
+			->addOption('to', null, InputOption::VALUE_REQUIRED,
+                'Get occurrences history up to this timestamp')
             ->addOption('email', null, InputOption::VALUE_REQUIRED,
                  'Filter on author email')
         ;
@@ -83,13 +85,14 @@ final class CelSyncGetJobsCommand extends Command
         $stopwatch->start('pn-sync-get-jobs');
         $dryRun = $input->getOption('dry-run');
         $startDate = (int) $input->getOption('from');
+        $endDate = (int) $input->getOption('to');
         $resume = $input->getOption('resume');
         if ($resume) {
             $startDate = $this->getLastJobUpdatedAt();
         }
         $email = (string) $input->getOption('email');
 
-        $this->plantnetPaginator->start($startDate, $email);
+		$this->plantnetPaginator->start($startDate, $email, $endDate);
 
         do {
             $occurrences = $this->plantnetPaginator->getContent();
@@ -111,14 +114,7 @@ final class CelSyncGetJobsCommand extends Command
                 if ($existingOccurrence) {
                     if ($occurrence->isDeleted() || $occurrence->isCensored()) {
                         $this->addJob('delete', $occurrence->getId());
-                    }
-//					elseif ($occurrence->getDateUpdatedRemote()) {
-//						// Si l'occ a été modifiée après le dernier pull par Pl@antnet
-//						if ($occurrence->getDateUpdatedRemote() < $occurrence->getDateUpdated()){
-//							$this->addJob('update', $occurrence->getId());
-//						}
-//                    }
-					else {
+                    } else {
 						$this->addJob('update', $occurrence->getId());
 					}
                 // we got a not known occurrence, is its author a Telabotaniste?
@@ -173,14 +169,22 @@ final class CelSyncGetJobsCommand extends Command
 
     private function getLastJobUpdatedAt(): int
     {
-        $lastDate = 0;
+		$lastDate = 0;
         $changelog = $this->changeLogRepository->findOneBy(['entityName' => 'plantnet'], ['id' => 'desc']);
+		// Si le process n'a pas été terminé (items encore présents dans le changelog) on récupère la dernière date
         if ($changelog) {
             $pnOccurrence = $this->plantnetService->getOccurrenceById($changelog->getEntityId());
             if ($pnOccurrence && $pnOccurrence->getDateUpdated()) {
-                $lastDate = $pnOccurrence->getDateUpdated()->format('U');
+				$lastDateSeconds = $pnOccurrence->getDateUpdated()->format('U');
+				$lastDate = $lastDateSeconds * 1000;
             }
-        }
+        } else { // Si le dernier process job s'est terminé on récupère la date de la dernière occurrence Plantnet
+			// mise à jour
+			$lastOccurrence = $this->occurrenceRepository->findOneBy(['inputSource' => 'PlantNet'], ['dateUpdated' =>
+				'desc']);
+			$lastDateSeconds = $lastOccurrence->getDateUpdated()->format('U');
+			$lastDate = $lastDateSeconds * 1000;
+		}
 
         return $lastDate;
     }

@@ -51,12 +51,16 @@ class PlantnetService
     /**
      * Get last occurrences starting at $startTime and filtered by $email
      */
-    public function getOccurrences(int $startDate = 0, string $email = ''): PlantnetOccurrences
+    public function getOccurrences(int $startDate = 0, string $email = '', int $endDate): PlantnetOccurrences
     {
         $params = [
             'startDate' => $startDate,
             'api-key' => $this->plantnetApiKey,
         ];
+		
+		if ($endDate){
+			$params['endDate'] = $endDate;
+		}
 
         if ('' !== $email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $params['email'] = $email;

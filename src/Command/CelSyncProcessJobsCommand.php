@@ -52,16 +52,6 @@ final class CelSyncProcessJobsCommand extends Command
         'commented' => 0,
         'new photo' => 0,
     ];
-	
-	private const PHOTO_TAG = [
-		'leaf' => 'feuille',
-		'flower' => 'fleur',
-		'fruit' => 'fruit',
-		'bark' => 'ecorce',
-		'habit' => 'port',
-		'other' => 'autre',
-	];
-
     private $occurrencesToComment = [];
 
     /**
@@ -202,8 +192,9 @@ final class CelSyncProcessJobsCommand extends Command
         if ($mode === 'newer') {
             $order = 'desc';
         }
-		//TODO Augmenter la limite?
-        return $this->changeLogRepository->findBy(['entityName' => 'plantnet'], ['id' => $order], 100);
+		//TODO Augmenter ou supprimer la limite ?
+        return $this->changeLogRepository->findBy(['entityName' => 'plantnet'], ['id' => $order]);
+//        return $this->changeLogRepository->findBy(['entityName' => 'plantnet'], ['id' => $order], 100);
     }
 
     private function updateOccurrence(int $id): void
@@ -218,24 +209,26 @@ final class CelSyncProcessJobsCommand extends Command
             return;
         }
 
+		//TODO: Vérifier les conditions avec PlantNet pour éviter les boucles infinis
         $occurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $id]);
-        if (!$occurrence) {
+        if (!$occurrence || $occurrence->getDatePublished() >= $pnOccurrence->getDateUpdated()) {
             $this->stats['ignored']++;
             return;
         }
-
-		/*
-		 * // We don't use pn_tb_pair ?
-        $pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
-        if (!$pnTbPair) {
-            $this->stats['ignored']++;
-            return;
-        }
-        if ($pnTbPair->getPlantnetOccurrenceUpdatedAt() >= $pnOccurrence->getDateUpdated()) {
-            $this->stats['ignored']++;
-            return;
-        }
-		*/
+		
+		//  update du pnTbPair
+		$pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
+		if ($pnTbPair) {
+			$pnTbPair->setPlantnetOccurrenceUpdatedAt($pnOccurrence->getDateUpdated());
+			$this->em->persist($pnTbPair);
+		} else {
+			$this->em->persist(
+				new PnTbPair(
+					$occurrence,
+					$id,
+					$pnOccurrence->getDateUpdated(),
+				));
+		}
 		
         // keep old sci name reference, easy to find if it changed after update
         $previousSciNameId = $occurrence->getAcceptedSciNameId();
@@ -276,20 +269,6 @@ final class CelSyncProcessJobsCommand extends Command
 			}
         }
         // list photos, add new, remove deleted
-		
-		//  update du pnTbPair
-		$pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
-		if ($pnTbPair) {
-			$pnTbPair->setPlantnetOccurrenceUpdatedAt($pnOccurrence->getDateUpdated());
-			$this->em->persist($pnTbPair);
-		} else {
-			$this->em->persist(
-				new PnTbPair(
-					$occurrence,
-					$id,
-					$pnOccurrence->getDateUpdated(),
-				));
-		}
     }
 
     private function createOccurrence(int $id): void
