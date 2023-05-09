@@ -209,9 +209,9 @@ final class CelSyncProcessJobsCommand extends Command
             return;
         }
 
-		//TODO: Vérifier les conditions avec PlantNet pour éviter les boucles infinis
+		//On vérifie la date d'update plantnet pour ne récupérer que les obs ayant été update chez Plantnet
         $occurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $id]);
-        if (!$occurrence || $occurrence->getDatePublished() >= $pnOccurrence->getDateUpdated()) {
+        if (!$occurrence || $occurrence->getDateUpdated() >= $pnOccurrence->getDateUpdated()) {
             $this->stats['ignored']++;
             return;
         }
