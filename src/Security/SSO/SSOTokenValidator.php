@@ -13,19 +13,28 @@ class SSOTokenValidator {
 	protected $annuaireBaseUrl;
 
 	protected $ignoreSslIssues = false;
+	
+	protected $telaApiKey;
+	protected $plantnetPullApiKey;
 
-	public function __construct(string $annuaireBaseUrl, bool $ignoreSslIssues) {
+	public function __construct(string $annuaireBaseUrl, bool $ignoreSslIssues, string $telaApiKey, string $plantnetPullApiKey) {
 	    $this->annuaireBaseUrl = $annuaireBaseUrl;
+		$this->telaApiKey = $telaApiKey;
+		$this->plantnetPullApiKey= $plantnetPullApiKey;
         if (empty($this->annuaireBaseUrl)) {
             throw new MisconfiguredSSOTokenValidatorException();
         }
+		if (empty($this->telaApiKey) && empty($this->plantnetPullApiKey)) {
+			throw new MisconfiguredAPIKeyTokenValidatorException();
+		}
 	    $this->ignoreSslIssues = $ignoreSslIssues ;
 	}
 
 	private function generateAuthCheckURL($token) {
+		print_r('verification du jeton #-> ');
 		$verificationServiceURL = $this->annuaireBaseUrl.':auth/verifierjeton';
 		$verificationServiceURL .= "?token=" . $token;
-
+//		print_r($verificationServiceURL);
         return $verificationServiceURL;
 	}
 
@@ -33,6 +42,13 @@ class SSOTokenValidator {
 	 * Verifies the authenticity of a token using the "annuaire" SSO service
 	 */
 	public function validateToken($token) {
+		print_r('validate token in SSOTokenValidator#-> ');
+//		print_r($token);
+//		print_r(' #-> ');
+//		if ($token == $this->telaApiKey || $token == $this->plantnetPullApiKey){
+//			print_r('api key ok');
+//		}
+		
 		$verificationServiceURL = $this->generateAuthCheckURL($token);
 		$ch = curl_init();
 		$timeout = 3;
@@ -60,6 +76,14 @@ class SSOTokenValidator {
 
 		$info = json_decode($info, true);
 		return ($info === true);
+	}
+	
+	public function validateAPIKey($token){
+		if ($this->plantnetPullApiKey == $token || $this->telaApiKey == $token){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

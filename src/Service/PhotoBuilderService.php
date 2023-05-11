@@ -49,6 +49,9 @@ class PhotoBuilderService
             ->setUserPseudo($occurrence->getUserPseudo())
             ->setUserEmail($occurrence->getUserEmail())
             ->setDateCreated(new \DateTimeImmutable());
+		
+//		print_r($occurrence->getGeometry());
+//		if ($occurrence->getGeometry())
 
         return $photo;
     }

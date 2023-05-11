@@ -1,5 +1,7 @@
 security:
     providers:
+#        api_key_user_provider:
+#            id: App\Security\ApiKeyUserProvider
         sso:
             id: App\Security\SSOUserProvider
             #id: App\Security\YesUserProvider
@@ -10,6 +12,9 @@ security:
         main:
             anonymous: ~
             logout: ~
+#            simple_preauth:
+#                authenticator: App\Security\ApiKeyAuthenticator
+#                provider: api_key_user_provider
 
             guard:
                 authenticators:

@@ -56,6 +56,7 @@ class ElasticsearchClient {
         //execute post
         $result = curl_exec($ch);
         $resp = json_decode($result);
+//		dd($resp);
         //close connection
         curl_close($ch);
 

@@ -26,6 +26,7 @@ class YesAuthenticator  extends AbstractGuardAuthenticator
 
     public function getCredentials(Request $request)
     {
+		print_r('get credentials in YesAuthenticator#->');
         return array(
             'token' => 'sdflsdklfjsdlkfjslkdfjsldk46541qsdf',
         );

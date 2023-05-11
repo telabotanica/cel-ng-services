@@ -233,3 +233,5 @@ services:
         arguments:
             - '%env(SSO_ANNUAIRE_URL)%'
             - '%env(IGNORE_SSL_ISSUES)%'
+            - '%env(TELA_API_KEY)%'
+            - '%env(PLANTNET_PULL_API_KEY)%'

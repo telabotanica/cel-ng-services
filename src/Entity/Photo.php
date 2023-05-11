@@ -46,55 +46,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     "formats"={"jsonld", "json", "jsonpatch"={"application/json-patch+json"}},
  *     "filters"={IsPublicFilter::class, CertaintyFilter::class, DateShotYearFilter::Class, DateShotMonthFilter::Class, DateShotDayFilter::Class, DateObservedYearFilter::class, DateObservedMonthFilter::class, DateObservedDayFilter::class, UserSciNameFilter::class, CountryFilter::class, CountyFilter::Class, FamilyFilter::Class, ProjectIdFilter::Class, TagFilter::Class}},
  *      itemOperations={
- *          "get"={"method"="GET", "access_control"="is_granted('view', object)"},
- *          "patch"={"method"="PATCH", "access_control"="is_granted('edit', object)"},
- *          "put"={"method"="PUT", "access_control"="is_granted('edit', object)"},
- *          "delete"={"method"="DELETE", "access_control"="is_granted('delete', object)"}
+ *          "get"={"method"="GET", "access_control"="is_granted('view', object)"}
  *      },
- *      collectionOperations={    
- *        "get",
- *        "post"={
- *            "method"="POST",
- *            "controller"=CreatePhotoAction::class,
- *            "defaults"={"_api_receive"=false},
- *        },
- *          "bulk"={
- *              "method"="PATCH",
- *              "controller"=PhotoBulkAction::class,
- *              "swagger_context"={
- *                  "parameters"={},
- *                  "responses"={ 
- *                      "207"= {
- *                          "description" = "The bulk operation was performed succesfully."
- *                      },
- *                      "500"= {
- *                          "description" = "An error occured during bulk operation."
- *                      }
- *                  },
- *                  "summary" = "Bulk treatment for DELETE and UPDATE operations for CEL2 photo resources.",
- *                  "consumes" = "json-patch+json",
- *                  "produces" = "application/json"
- *              }
- *          },
- *          "import"={
- *              "method"="GET",
- *              "path"="/photos/download",
- *              "controller"=ServeZippedPhotosAction::class,
- *              "swagger_context"={
- *                  "parameters"={},
- *                  "responses"={ 
- *                      "207"= {
- *                          "description" = "The import was performed succesfully."
- *                      },
- *                      "500"= {
- *                          "description" = "An error occured while constructing or serving the zip archive."
- *                      }
- *                  },
- *                  "summary" = "Serves zipped photos.",
- *                  "produces" = "application/zip"
- *              }
- *          }
- *    })
+ *     collectionOperations={
+ *          "get",
+ *     })
  * @ORM\Entity(repositoryClass="App\Repository\PhotoRepository")
  * @ORM\Table(name="photo", indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Les noms originaux doivent être uniques pour un même utilisateur."})
  * @Vich\Uploadable

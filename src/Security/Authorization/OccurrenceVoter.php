@@ -33,7 +33,7 @@ class OccurrenceVoter extends AbstractVoter {
      */
     protected function voteOnAttribute(
         $attribute, $subject, TokenInterface $token) {
-
+print_r('vote on attribute #-> ');
         $user = $token->getUser();
         $occ = $subject;
 

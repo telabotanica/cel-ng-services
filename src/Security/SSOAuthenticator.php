@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class SSOAuthenticator extends AbstractGuardAuthenticator {
 
     private $tokenUtils;
-
+	
     public function __construct(SSOUserExtractor $ssoUserExtractor) {
         $this->tokenUtils = $ssoUserExtractor;
     }
@@ -41,6 +41,7 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
      * be passed to getUser() as $credentials.
      */
     public function getCredentials(Request $request) {
+		print_r('get credentials in SSOAuthenticator #-> ');
         $token = $this->tokenUtils->extractTokenFromRequest($request);
 
         if (null == $token) {
@@ -60,6 +61,7 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
      */
     public function getUser(
         $credentials, UserProviderInterface $userProvider) {
+		print_r('get user in SSOAUthenticator #-> ');
         // REST Web services are stateless, pass a "blank" user to provider:
         return $userProvider->refreshUser(
             new TelaBotanicaUser('', '', '', '', '', '', '', array(), null, ''));
@@ -72,7 +74,7 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
      * success), else false.
      */
     public function checkCredentials($credentials, UserInterface $user) {
-
+print_r('check credential in SSOAUthenticator #-> ');
         $token = $credentials['token'];
         if (null === $token) {
             return false;
@@ -83,14 +85,14 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
 
     public function onAuthenticationSuccess(
         Request $request, TokenInterface $token, $providerKey) {
-
+		print_r('Autentication success #-> ');
         // Just let the request roll
         return null;
     }
 
     public function onAuthenticationFailure(
         Request $request, AuthenticationException $ex) {
-
+print_r('Autentication failure #-> ');
         $data = array(
             'message' => strtr($ex->getMessageKey(), $ex->getMessageData())
             // WHEN TRANSLATING, USE THIS:
@@ -105,7 +107,7 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
      */
     public function start(
         Request $request, AuthenticationException $ex = null) {
-
+print_r('start #-> ');
         $data = array(
             // you might translate this message
             'message' => 'Authentication Required'

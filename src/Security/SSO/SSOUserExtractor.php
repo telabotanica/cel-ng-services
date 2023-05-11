@@ -40,6 +40,7 @@ class SSOUserExtractor {
 
     public function extractUser(Request $request) {
         $token = $this->extractTokenFromRequest($request);
+		print_r('extract user #-> ');
         if ( null === $token) {
             throw new UnloggedAccessException('You must be logged into tela-botanica SSO system to access this part of the app.');
         }
@@ -47,46 +48,55 @@ class SSOUserExtractor {
     }
 
     public function extractUserFromToken(string $token) {
-
+print_r('extract user from token #-> ');
         if (null == $token) {
             return null;
         }
 
-// die(var_dump($tokenDecoder)); 
-        $userInfo = $this->ssoTokenDecoder->getUserFromToken($token);
-        //$role = new Role();
-        $roles = array();
-        if (in_array( 
-            SSOUserExtractor::ADMIN_PERMISSION,
-            $userInfo[SSOUserExtractor::PERMISSIONS_TOKEN_PROPERTY] ?? [])) {
-            /*
-            $role->setName(SSOAuthenticator::ADMIN_ROLE_NAME);
-            $role->setRole(SSOAuthenticator::ADMIN_ROLE);
-            */
-            $roles[] = SSOUserExtractor::ADMIN_ROLE;
-        }
-        else {
+		try {
+			$userInfo = $this->ssoTokenDecoder->getUserFromToken($token);
+			//$role = new Role();
+			$roles = array();
+			if (in_array(
+				SSOUserExtractor::ADMIN_PERMISSION,
+				$userInfo[SSOUserExtractor::PERMISSIONS_TOKEN_PROPERTY] ?? [])) {
+				/*
+				$role->setName(SSOAuthenticator::ADMIN_ROLE_NAME);
+				$role->setRole(SSOAuthenticator::ADMIN_ROLE);
+				*/
+				$roles[] = SSOUserExtractor::ADMIN_ROLE;
+			}
+			else {
+				
+				/*
+				$role->setName(SSOAuthenticator::USER_ROLE_NAME);
+				$role->setRole(SSOAuthenticator::USER_ROLE);
+				*/
+				$roles[] = SSOUserExtractor::USER_ROLE;
+			}
 
-            /*
-            $role->setName(SSOAuthenticator::USER_ROLE_NAME);
-            $role->setRole(SSOAuthenticator::USER_ROLE);
-            */
-            $roles[] = SSOUserExtractor::USER_ROLE;
-        }
-//die(var_dump($userInfo)); 
-        $user = new TelaBotanicaUser(
-            intval($userInfo['id']), $userInfo['sub'], $userInfo['prenom'], 
-            $userInfo['nom'], $userInfo['pseudo'], 
-            $userInfo['pseudoUtilise'], $userInfo['avatar'] ?? '',
-            $roles, null, $token);
-//die(var_dump($user));  
-        // Returns the user, checkCredentials() is gonna be called
+			$user = new TelaBotanicaUser(
+				intval($userInfo['id']), $userInfo['sub'], $userInfo['prenom'],
+				$userInfo['nom'], $userInfo['pseudo'],
+				$userInfo['pseudoUtilise'], $userInfo['avatar'] ?? '',
+				$roles, null, $token);
+
+			// Returns the user, checkCredentials() is gonna be called
+		} catch (\Exception $exception){
+			$user = $user = new TelaBotanicaUser(
+				69387, '', '',
+				'', '',
+				'', '',
+				['ROLE_API'], null, $token);
+		}
+//        dd($user);
         return $user;
     }
 
 
 
     public function extractTokenFromRequest(Request $request) {
+		print_r('extract token from request in SSOUserExtractor #-> ');
         return $request->headers->get(SSOUserExtractor::TOKEN_HEADER_NAME);
     }
 
@@ -97,11 +107,20 @@ class SSOUserExtractor {
      * success), else false.
      */
     public function validateToken(string $token): bool {
-
+print_r('validate token in SSOUserExtractor#-> ');
         if (null === $token) {
             return false;
         }
+		
+		if ($this->ssoTokenValidator->validateToken($token)){
+			return true;
+		} else {
+			return $this->ssoTokenValidator->validateAPIKey($token);
+		}
 
-        return $this->ssoTokenValidator->validateToken($token);
+//		dd($token);
+//		return true;
+//dd($this->ssoTokenValidator->validateToken($token));
+//        return $this->ssoTokenValidator->validateToken($token);
     }
 }

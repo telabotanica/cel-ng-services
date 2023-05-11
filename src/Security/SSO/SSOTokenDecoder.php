@@ -20,6 +20,7 @@ class SSOTokenDecoder {
 	 * Returns the information array for an unknown user.
 	 */
 	private function getUnknownUser() {
+		print_r('get unknown user #-> ');
 		return array(
 			'sub' => null,
 			'id' => null, 
@@ -33,15 +34,20 @@ class SSOTokenDecoder {
 	 * successful, returns the decoded user information.
 	 */
 	public function getUserFromToken($token) {
+		print_r('get user from token #-> ');
 		// unknown user, by default
 		$user = $this->getUnknownUser();
 		$valid = false;
 		//echo "Token : $token\n";
 		if ($token !== null) {
 			// decode user's email address from token
-			$tokenData = $this->decodeToken($token);
-			if ($tokenData != null && $tokenData["sub"] != "") {
-				$user = $tokenData;
+			try {
+				$tokenData = $this->decodeToken($token);
+				if ($tokenData != null && $tokenData["sub"] != "") {
+					$user = $tokenData;
+				}
+			} catch (\Exception $exception){
+				print_r('UNKNOWN USER FROM TOKEN DECODER #->');
 			}
 		}
 
@@ -52,6 +58,7 @@ class SSOTokenDecoder {
 	 * Verifies the authenticity of a token using the "annuaire" SSO service
 	 */
 	private function verifyToken($token) {
+		print_r('verify token from SSOTokenDecoder #-> ');
 		return $this->tokenValidator->validateToken($token);
 	}
 
@@ -60,6 +67,7 @@ class SSOTokenDecoder {
 	 * (payload / claims)
 	 */
 	public function decodeToken($token) {
+		print_r('decode token from SSOTokenDecoder #-> ');
 		$parts = explode('.', $token);
 		$payload = $parts[1];
 		$payload = $this->urlsafeB64Decode($payload);

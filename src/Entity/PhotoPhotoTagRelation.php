@@ -23,7 +23,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
  *     "denormalization_context"={"groups"={"write"}}
- * })
+ * },
+ *	 itemOperations={
+ *         "get"={"method"="GET"}
+ *     },
+ *     collectionOperations={
+ *          "get",
+ *     })
  * @ORM\Table(name="photo_tag_photo", options={"comment":"Table de jointure entre Photo et PhotoTag."})
  */
 class PhotoPhotoTagRelation {

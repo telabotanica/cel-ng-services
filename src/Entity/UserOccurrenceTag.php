@@ -26,7 +26,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "normalization_context"={"groups"={"read"}},
  *     "formats"={"jsonld", "json"},
  *     "denormalization_context"={"groups"={"write"}}
- * })
+ * },
+ *	 itemOperations={
+ *         "get"={"method"="GET", "read" = false, "output" = false}
+ *     },
+ *     collectionOperations={
+ *          "get",
+ *     })
  * @ORM\Entity(repositoryClass="App\Repository\UserOccurrenceTagRepository")
  * @ORM\Table(name="user_occurrence_tag", indexes={@ORM\Index(name="user_id_idx", columns={"user_id"})}, options={"comment":"Les noms de tags utilisateurs doivent être uniques (pour un même utilisateur)."})
  */

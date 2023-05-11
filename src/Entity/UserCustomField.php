@@ -17,7 +17,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
  *     "denormalization_context"={"groups"={"write"}}
- * })
+ * },
+ *	 itemOperations={
+ *         "get"={"method"="GET"}
+ *     },
+ *     collectionOperations={
+ *          "get",
+ *     })
  * @ORM\Entity
  * @ORM\Table(name="user_custom_field", options={"comment":"Champs personnalisés de l'utilisateur"})
  */

@@ -23,7 +23,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
  *     "denormalization_context"={"groups"={"write"}}
- * })
+ * },
+ *
+ *     itemOperations={
+ *         "get"={"method"="GET"}
+ *     },
+ *     collectionOperations={
+ *          "get",
+ *     })
  * @ORM\Table(name="occurrence_user_occurrence_tag", options={"comment":"Table de jointure entre occurrence et user_occurrence_tag."})
  */
 class OccurrenceUserOccurrenceTagRelation {

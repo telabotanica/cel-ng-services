@@ -26,6 +26,7 @@ class SSOUserProvider implements UserProviderInterface {
     }
 
     public function refreshUser(UserInterface $user) {
+		print_r('refresh user #->');
         $request = $this->requestStack->getCurrentRequest();
 
         return $this->ssoUserExtractor->extractUser($request);

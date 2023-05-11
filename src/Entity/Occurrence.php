@@ -50,68 +50,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      "filters"={IsPublicFilter::class, CertaintyFilter::class, DateObservedYearFilter::class, DateObservedMonthFilter::class, DateObservedDayFilter::class, UserSciNameFilter::class, CountryFilter::class, IdentiplanteScoreFilter::Class, IsIdentiplanteValidatedFilter::Class, CountyFilter::Class, FamilyFilter::Class, ProjectIdFilter::Class}},
  *      itemOperations={
  *          "get"={"method"="GET", "access_control"="is_granted('view', object)"},
- *          "patch"={"method"="PATCH", "access_control"="is_granted('edit', object)"},
- *          "put"={"method"="PUT", "access_control"="is_granted('edit', object)"},
- *          "delete"={"method"="DELETE", "access_control"="is_granted('delete', object)"}
  *      },
- *      collectionOperations={
+ *     collectionOperations={
  *          "get",
- *          "post"={"method"="POST"},
- *          "bulk"={
- *              "method"="PATCH",
- *              "controller"=OccurrenceBulkAction::class,
- *              "swagger_context"={
- *                  "parameters"={},
- *                  "responses"={ 
- *                      "207"= {
- *                          "description" = "The bulk operation was performed succesfully."
- *                      },
- *                      "500"= {
- *                          "description" = "An error occured during bulk operation."
- *                      }
- *                  },
- *                  "summary" = "Bulk treatment for DELETE and UPDATE operations for Occurrence resources.",
- *                  "consumes" = "json-patch+json",
- *                  "produces" = "application/json"
- *              }
- *          },
- *          "import"={
- *              "method"="POST",
- *              "path"="/occurrences/import",
- *              "controller"=ImportOccurrenceAction::class,
- *              "swagger_context"={
- *                  "parameters"={},
- *                  "responses"={ 
- *                      "207"= {
- *                          "description" = "The import was performed succesfully."
- *                      },
- *                      "500"= {
- *                          "description" = "An error occured during import."
- *                      }
- *                  },
- *                  "summary" = "Import Occurrence resources by uploading a spreadsheet file (excel or CSV).",
- *                  "produces" = "application/json"
- *              }
- *          },
- *          "export"={
- *              "method"="POST",
- *              "path"="/occurrences/export",
- *              "controller"=ExportOccurrenceAction::class,
- *              "swagger_context"={
- *                  "parameters"={},
- *                  "responses"={ 
- *                      "207"= {
- *                          "description" = "The export was performed succesfully."
- *                      },
- *                      "500"= {
- *                          "description" = "An error occured during export."
- *                      }
- *                  },
- *                  "summary" = "Export Occurrence resources by generating a spreadsheet file (excel or CSV).",
- *                  "produces" = "application/json"
- *              }
- *          }
- *      }
+ *     }
  * )
  *
  * //AT UniqueEntity(fields={"signature"}, message="It seems a duplicate occurrence already exists in CEL. Il semblerait que cette observation soit déjà présente dans votre carnet en ligne")

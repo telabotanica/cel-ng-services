@@ -26,11 +26,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"read"}},
  *     "denormalization_context"={"groups"={"write"}}},
- * collectionOperations={
- *     "post"={"method"="POST", "controller"=CreateProfileAction::class,
- *            "defaults"={"_api_receive"=false},},
- *     "get"={"method"="GET"}
- * })
+ *     itemOperations={
+ *         "get"={"method"="GET", "read" = false, "output" = false}
+ *     },
+ *     collectionOperations={
+ *          "get",
+ *     })
+ *	 )
  * @ApiFilter(SearchFilter::class, properties={"userId": "exact"})
  */
 class UserProfileCel {
