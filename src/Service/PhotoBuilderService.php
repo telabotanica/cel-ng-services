@@ -50,6 +50,13 @@ class PhotoBuilderService
             ->setUserEmail($occurrence->getUserEmail())
             ->setDateCreated(new \DateTimeImmutable());
 
+		$photo->setDateLinkedToOccurrence($occurrence->getDatePublished());
+		if ($occurrence->getGeometry()){
+			$coordinates = json_decode($occurrence->getGeometry());
+			$photo->setLongitude($coordinates->coordinates[0])
+				->setLatitude($coordinates->coordinates[1]);
+		}
+
         return $photo;
     }
 	
