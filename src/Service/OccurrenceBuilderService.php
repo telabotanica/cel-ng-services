@@ -8,14 +8,19 @@ use App\DBAL\LocationAccuracyEnumType;
 use App\Entity\Occurrence;
 use App\Model\AnnuaireUser;
 use App\Model\PlantnetOccurrence;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\NativeHttpClient;
 
 class OccurrenceBuilderService
 {
     private $taxoRepoService;
+	private $client;
 
     public function __construct(TaxoRepoService $taxoRepoService)
     {
         $this->taxoRepoService = $taxoRepoService;
+		$this->client = HttpClient::create();
+		
     }
 
     public function createOccurrence(AnnuaireUser $user, PlantnetOccurrence $pnOccurrence): Occurrence
@@ -30,8 +35,6 @@ class OccurrenceBuilderService
         $occurrence->setPlantnetId($pnOccurrence->getId());
         $occurrence->setCertainty(CertaintyEnumType::DOUBTFUL);
         $occurrence->setInputSource(InputSourceEnumType::PLANTNET);
-		//TODO: Gestion des obs  privées
-//        $occurrence->setIsPublic(true);
 
         return $occurrence;
     }
@@ -42,9 +45,6 @@ class OccurrenceBuilderService
         if (!$pnOccurrence->getCurrentName() && !$firstIdentificationResult) {
             return $occurrence;
         }
-//		print_r($pnOccurrence->getSpecies()->getName());
-//        $taxonName = $pnOccurrence->getCurrentName() ?? $firstIdentificationResult->getSpecies();
-		//TODO: pbl ici
 		$species = $pnOccurrence->getSpecies();
 		if (isset($species) && !empty($pnOccurrence->getSpecies()->getName())){
 			$taxonName = $pnOccurrence->getSpecies()->getName();
@@ -53,17 +53,16 @@ class OccurrenceBuilderService
 		} else {
 			$taxonName = $firstIdentificationResult->getSpecies();
 		}
-//        $taxonName = $pnOccurrence->getSpecies()->getName() ?? $firstIdentificationResult->getSpecies();
 
         // search taxon data
         $taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
 
-		//TODO: changer le date published ?
-		//TODO ajouter dateUpdatedRemote -> changer entity Occurrence
+		//TODO: Vérifier le fuseau horaire (basculer en UTC ?)
+		//TODO: Est-ce qu'on garde la date published pour l'update Remote ou on rajoute une colonne?
         $occurrence->setDateObserved($pnOccurrence->getDateObs())
-//            ->setDateCreated($pnOccurrence->getDateCreated())
+            ->setDateCreated($pnOccurrence->getDateCreated())
             ->setDateUpdated($pnOccurrence->getDateUpdated())
-            ->setDatePublished($pnOccurrence->getDateCreated());
+            ->setDatePublished(new \DateTime("now"));
 
         $occurrence->setTaxoRepo($taxonInfo['taxoRepo'])
             ->setUserSciName($taxonInfo['sciName'] ?? $taxonName)
@@ -74,6 +73,13 @@ class OccurrenceBuilderService
                 ($pnOccurrence->getSpecies() ? $pnOccurrence->getSpecies()->getFamily() : ''));
 
         if ($pnOccurrence->getGeo()->getLon() && $pnOccurrence->getGeo()->getLat()) {
+			$occurrence->setIsPublic(true);
+			
+			$altitude = $this->getAltitude($pnOccurrence->getGeo()->getLon(), $pnOccurrence->getGeo()->getLat());
+			if ($altitude){
+				$occurrence->setElevation($altitude);
+			}
+			
             $occurrence->setGeometry(json_encode([
                 'type' => 'Point',
                 'coordinates' => [
@@ -86,9 +92,26 @@ class OccurrenceBuilderService
             if ($pnOccurrence->getGeo()->getAccuracy()) {
                 $occurrence->setLocationAccuracy(LocationAccuracyEnumType::getAccuracyRangeForFloat($pnOccurrence->getGeo()->getAccuracy()));
             }
-        }
+        } else {
+			$occurrence->setIsPublic(false);
+		}
 
         return $occurrence;
     }
+	
+	public function getAltitude($longitude, $latitude){
+		$altitude = null;
+		$opentopodataApi = 'https://api.opentopodata.org/v1/mapzen?';
+		$response = $this->client->request('GET', $opentopodataApi.'locations='.$latitude.','.$longitude);
+		
+		if (200 !== $response->getStatusCode()) {
+			print_r('Erreur lors de la récupération de l\'altitude.');
+			
+		} else {
+			$response = json_decode($response->getContent(), true) ?? [];
+			$altitude = $response['results'][0]['elevation'];
+		}
+		return $altitude;
+	}
 
 }

@@ -91,16 +91,17 @@ class OccurrenceEventListener {
             return;
         }
 
-        $entity->setDateUpdated(new \DateTime());
+		// Why ?
+//        $entity->setDateUpdated(new \DateTime());
 
         // If isPublic status has been changed to true, set the occurrence 
         // datePublished to "now":
-        if ( $args->hasChangedField('isPublic') && 
-            $args->getNewValue('isPublic') == true) {
-
-			//TODO: changer ça?
-            $entity->setDatePublished(new \DateTime());
-        }
+//        if ( $args->hasChangedField('isPublic') &&
+//            $args->getNewValue('isPublic') == true) {
+//
+//			//TODO: changer ça?
+//            $entity->setDatePublished(new \DateTime());
+//        }
 
         $this->doCommon($entity);
 

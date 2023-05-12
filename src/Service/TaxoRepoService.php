@@ -137,12 +137,8 @@ class TaxoRepoService
 	
 	public function consulterRechercheNomsSciEflore($recherche) {
 		$url = $this->taxonInfoUrl.'/%s/noms?recherche=%s&masque=%s&retour.champs=id,nom_sci,auteur,nom_retenu.id,famille,num_taxonomique,nom_retenu_complet';
-//		$url = $this->taxonInfoUrl.'/%s/taxons?recherche=%s&masque=%s&retour.champs=id,nom_sci,auteur,nom_retenu.id,famille,num_taxonomique,nom_retenu_complet';
 		$urlRecherche = sprintf($url, strtolower($recherche['referentiel']), 'floue', urlencode
 ($recherche['recherche'].'%'));
-//		$urlRecherche = sprintf($url, strtolower($recherche['referentiel']), 'etendue', urlencode(utf8_encode
-//																							   ($recherche['recherche'])));
-//		echo $urlRecherche;
 		// Quand il n'y pas de résultats eflore renvoie une erreur 404 (l'imbécile !)
 		// or le cas où l'on n'a pas de résultats est parfaitement valide
 		$infos = @file_get_contents($urlRecherche);

@@ -33,9 +33,9 @@ class PlantnetPaginator
     /**
      * Start paginator and get first page content
      */
-    public function start(int $startDate = 0, string $email = ''): void
+    public function start(int $startDate = 0, string $email = '', int $endDate): void
     {
-        $this->content = $this->plantnetService->getOccurrences($startDate, $email);
+        $this->content = $this->plantnetService->getOccurrences($startDate, $email, $endDate);
     }
 
     /**

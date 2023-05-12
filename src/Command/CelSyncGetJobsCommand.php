@@ -61,6 +61,8 @@ final class CelSyncGetJobsCommand extends Command
                 'If set, don’t persist changes to database')
             ->addOption('from', null, InputOption::VALUE_REQUIRED,
                 'Get occurrences history from this timestamp')
+			->addOption('to', null, InputOption::VALUE_REQUIRED,
+                'Get occurrences history up to this timestamp')
             ->addOption('email', null, InputOption::VALUE_REQUIRED,
                  'Filter on author email')
         ;
@@ -78,17 +80,19 @@ final class CelSyncGetJobsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+		//TODO Ajout de stop date ?
         $stopwatch = new Stopwatch();
         $stopwatch->start('pn-sync-get-jobs');
         $dryRun = $input->getOption('dry-run');
         $startDate = (int) $input->getOption('from');
+        $endDate = (int) $input->getOption('to');
         $resume = $input->getOption('resume');
         if ($resume) {
             $startDate = $this->getLastJobUpdatedAt();
         }
         $email = (string) $input->getOption('email');
 
-        $this->plantnetPaginator->start($startDate, $email);
+		$this->plantnetPaginator->start($startDate, $email, $endDate);
 
         do {
             $occurrences = $this->plantnetPaginator->getContent();
@@ -111,9 +115,8 @@ final class CelSyncGetJobsCommand extends Command
                     if ($occurrence->isDeleted() || $occurrence->isCensored()) {
                         $this->addJob('delete', $occurrence->getId());
                     } else {
-						//TODO: check si dateUpdatedRemote > dateUpdated
-                        $this->addJob('update', $occurrence->getId());
-                    }
+						$this->addJob('update', $occurrence->getId());
+					}
                 // we got a not known occurrence, is its author a Telabotaniste?
                 } elseif ($this->annuaireService->isKnownUser($occurrence->getAuthor()->getEmail())) {
                     $this->addJob('create', $occurrence->getId());
@@ -126,14 +129,12 @@ final class CelSyncGetJobsCommand extends Command
         }
 
         $event = $stopwatch->stop('pn-sync-get-jobs');
-        if ($output->isVerbose()) {
             $this->io->success(sprintf(
                 'Success! Got %d new jobs, %d already know, out of %d total processed occurrences!',
                 $this->newJobsCount, $this->existingJobsCount, count($occurrences)
             ));
 
-            $this->io->comment(sprintf('Elapsed time: %.2f ms / Consumed memory: %.2f MB', $event->getDuration(), $event->getMemory() / (1024 ** 2)));
-        }
+            $this->io->comment(sprintf('Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000, $event->getMemory() / (1024 ** 2)));
 
         return 0;
     }
@@ -168,14 +169,22 @@ final class CelSyncGetJobsCommand extends Command
 
     private function getLastJobUpdatedAt(): int
     {
-        $lastDate = 0;
+		$lastDate = 0;
         $changelog = $this->changeLogRepository->findOneBy(['entityName' => 'plantnet'], ['id' => 'desc']);
+		// Si le process n'a pas été terminé (items encore présents dans le changelog) on récupère la dernière date
         if ($changelog) {
             $pnOccurrence = $this->plantnetService->getOccurrenceById($changelog->getEntityId());
             if ($pnOccurrence && $pnOccurrence->getDateUpdated()) {
-                $lastDate = $pnOccurrence->getDateUpdated()->format('U');
+				$lastDateSeconds = $pnOccurrence->getDateUpdated()->format('U');
+				$lastDate = $lastDateSeconds * 1000;
             }
-        }
+        } else { // Si le dernier process job s'est terminé on récupère la date de la dernière occurrence Plantnet
+			// mise à jour
+			$lastOccurrence = $this->occurrenceRepository->findOneBy(['inputSource' => 'PlantNet'], ['dateUpdated' =>
+				'desc']);
+			$lastDateSeconds = $lastOccurrence->getDateUpdated()->format('U');
+			$lastDate = $lastDateSeconds * 1000;
+		}
 
         return $lastDate;
     }
