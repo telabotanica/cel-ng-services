@@ -96,6 +96,8 @@ final class CelSyncProcessJobsCommand extends Command
                 'Order to take job, older first, or newer first', 'older')
             ->addOption('pn-occurrence-id', null, InputOption::VALUE_REQUIRED,
                 'PlantNet occurrence ID to process (forced update/create)')
+			->addOption('limit', null, InputOption::VALUE_REQUIRED,
+                'Nbr max of jobs')
         ;
     }
 
@@ -117,11 +119,12 @@ final class CelSyncProcessJobsCommand extends Command
             return 1;
         }
         $pnOccurrenceId = $input->getOption('pn-occurrence-id');
+		$limit = $input->getOption('limit');
 
         if ($pnOccurrenceId) {
             $jobs = $this->simulateJobs($pnOccurrenceId);
         } else {
-            $jobs = $this->getJobs($processOrder);
+            $jobs = $this->getJobs($processOrder, $limit);
         }
 
         /**
@@ -186,15 +189,14 @@ final class CelSyncProcessJobsCommand extends Command
         return 0;
     }
 
-    private function getJobs(string $mode): array
+    private function getJobs(string $mode, $limit): array
     {
         $order = 'asc';
         if ($mode === 'newer') {
             $order = 'desc';
         }
-		//TODO Augmenter ou supprimer la limite ?
-        return $this->changeLogRepository->findBy(['entityName' => 'plantnet'], ['id' => $order]);
-//        return $this->changeLogRepository->findBy(['entityName' => 'plantnet'], ['id' => $order], 100);
+		
+        return $this->changeLogRepository->findBy(['entityName' => 'plantnet'], ['id' => $order], $limit);
     }
 
     private function updateOccurrence(int $id): void
