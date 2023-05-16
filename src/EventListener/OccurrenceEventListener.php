@@ -54,16 +54,18 @@ class OccurrenceEventListener {
         // If isPublic status has just been set to true, set the occurrence
         // datePublished member value to "now":
 		// TODO: Pourquoi ?
-//        if ( $entity->getIsPublic() ) {
-//            $entity->setDatePublished(new \DateTime());
-//        }
+        if ( $entity->getIsPublic() ) {
+            $entity->setDatePublished(new \DateTime());
+        }
 		
 		//TODO A voir comment gérer le score identiplante
         $entity->setIdentiplanteScore(0);
 
         // For other sources duplicated occurrences
 		//TODO A supprimer ?
-//        $entity->setInputSource(InputSourceEnumType::CEL);
+		if (!$entity->getInputSource()){
+			$entity->setInputSource(InputSourceEnumType::CEL);
+		}
 
         if ($entity->getTaxoRepo() && $entity->getUserSciNameId()) {
             $taxon = $this->taxoRepo->getTaxonInfo(
@@ -92,16 +94,18 @@ class OccurrenceEventListener {
         }
 
 		// Why ?
-//        $entity->setDateUpdated(new \DateTime());
+		if (!$entity->getDateUpdated()){
+			$entity->setDateUpdated(new \DateTime());
+		}
 
         // If isPublic status has been changed to true, set the occurrence 
         // datePublished to "now":
-//        if ( $args->hasChangedField('isPublic') &&
-//            $args->getNewValue('isPublic') == true) {
-//
-//			//TODO: changer ça?
-//            $entity->setDatePublished(new \DateTime());
-//        }
+        if ( $args->hasChangedField('isPublic') &&
+            $args->getNewValue('isPublic') == true) {
+
+			//TODO: changer ça?
+            $entity->setDatePublished(new \DateTime());
+        }
 
         $this->doCommon($entity);
 

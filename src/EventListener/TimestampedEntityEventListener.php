@@ -28,8 +28,10 @@ class TimestampedEntityEventListener {
         if (!$entity instanceof TimestampedEntityInterface ) {
             return;
         }
-//		// TODO changer le date created ?
-//        $entity->setDateCreated(new \DateTime("now"));
+
+		if (!$entity->getDateCreated()){
+			$entity->setDateCreated(new \DateTime("now"));
+		}
     }
 
     /**
@@ -46,7 +48,11 @@ class TimestampedEntityEventListener {
         if (!$entity instanceof TimestampedEntityInterface  ) {
             return;
         }
-//        $entity->setDateUpdated(new \DateTime("now"));
+		
+		if (!$entity->getDateUpdated()){
+			$entity->setDateUpdated(new \DateTime("now"));
+		}
+    
     }
 
 }

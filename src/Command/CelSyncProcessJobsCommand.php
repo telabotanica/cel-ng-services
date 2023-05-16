@@ -212,6 +212,7 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
 		//On vérifie la date d'update plantnet pour ne récupérer que les obs ayant été update chez Plantnet
+		// TODO: transformer les dates UTC en date local ?
         $occurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $id]);
         if (!$occurrence || $occurrence->getDateUpdated() >= $pnOccurrence->getDateUpdated()) {
             $this->stats['ignored']++;

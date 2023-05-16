@@ -31,6 +31,7 @@ class OccurrenceBuilderService
             ->setUserEmail($user->getEmail())
             ->setUserPseudo($user->getIntitule())
             ->setObserver($user->getIntitule());
+		$occurrence->setIsPublic(true);
 
         $occurrence->setPlantnetId($pnOccurrence->getId());
         $occurrence->setCertainty(CertaintyEnumType::DOUBTFUL);
