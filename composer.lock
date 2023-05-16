@@ -134,7 +134,7 @@
         },
         {
             "name": "api-platform/core",
-            "version": "v2.5.7",
+            "version": "v2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/api-platform/core.git",
