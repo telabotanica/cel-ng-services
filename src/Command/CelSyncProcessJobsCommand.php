@@ -246,10 +246,13 @@ final class CelSyncProcessJobsCommand extends Command
         }
 		
 		$this->em->persist($occurrence);
-
+		
+		$user = $this->annuaireService->findUserInfo($pnOccurrence->getAuthor()->getEmail());
+		
         // update photos
         foreach ($pnOccurrence->getImages() as $image) {
             if (!$occurrence->isExistingPhoto($image)) {
+				// C'est une nouvelle photo
                 $file = $this->plantnetService->getImageFile($image);
                 $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
 
@@ -258,16 +261,21 @@ final class CelSyncProcessJobsCommand extends Command
                 $this->stats['new photo']++;
 				
 				// On enregistre le tag de la photo
-				$tag = $this->photoBuilderService->getTag($image);
-				if ($tag){
+				if ($image->getOrgan()){
+					$tag = $this->photoBuilderService->createTag($image->getOrgan(), $user->getId());
 					$this->photoBuilderService->savePhotoTag($tag, $photo);
 				}
 				
             } else {
-				//check tag -> update si différent, create si absent
-				$tag = $this->photoBuilderService->getTag($image);
-				if ($tag) {
-					$this->photoBuilderService->updatePhotoTag($tag, $image);
+				// La photo existe déjà
+				// On vérifie si le tag a changé
+				$tag = $this->photoBuilderService->getTag($image, $user->getId());
+				if (!$tag) {
+					// Le tag est différent -> on l'update
+					if ($image->getOrgan()){
+						$tag = $this->photoBuilderService->createTag($image->getOrgan(), $user->getId());
+						$this->photoBuilderService->updatePhotoTag($tag, $image);
+					}
 				}
 			}
         }
@@ -323,11 +331,16 @@ final class CelSyncProcessJobsCommand extends Command
 			
             $this->stats['new photo']++;
 			
-			$tag = $this->photoBuilderService->getTag($image);
-			
-			if ($tag){
+			if ($image->getOrgan()){
+				$tag = $this->photoBuilderService->createTag($image->getOrgan(), $user->getId());
 				$this->photoBuilderService->savePhotoTag($tag, $photo);
 			}
+//
+//			$tag = $this->photoBuilderService->getTag($image);
+//
+//			if ($tag){
+//				$this->photoBuilderService->savePhotoTag($tag, $photo);
+//			}
         }
 		
 		// Création du pnTbPair

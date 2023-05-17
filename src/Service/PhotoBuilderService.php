@@ -78,25 +78,38 @@ class PhotoBuilderService
 		$existingPhotoTag = $this->photoTagPhotoRepository->findOneBy(['photoId' => $photo->getId()]);
 		
 		if ($existingPhotoTag){
+			// Si le tag a changé
 			if ($existingPhotoTag !== $tag){
 				$existingPhotoTag->setPhotoTag($tag);
 				
 				$this->em->persist($existingPhotoTag);
 			}
-		} else {
-			$this->savePhotoTag($tag, $photo);
 		}
 	}
 	
-	public function getTag($image){
+	public function getTag($image, $userId){
 		$tagName = $image->getOrgan();
 		$tagName = self::PHOTO_TAG[$tagName];
-		$tag = $this->photoTagRepository->findOneBy(['name' => $tagName]);
+		$tag = $this->photoTagRepository->findOneBy(['name' => $tagName, 'userId' => $userId]);
 		
 		if ($tag){
 			return $tag;
 		}
 		
 		return null;
+	}
+	
+	public function createTag($tagName, $userId){
+		$tagName = self::PHOTO_TAG[$tagName];
+		
+		$tag = new PhotoTag();
+		
+		$tag->setName($tagName)
+			->setPath('/')
+			->setUserId($userId);
+		
+		$this->em->persist($tag);
+		
+		return $tag;
 	}
 }
