@@ -62,8 +62,7 @@ class OccurrenceBuilderService
 		//TODO: Est-ce qu'on garde la date published pour l'update Remote ou on rajoute une colonne?
         $occurrence->setDateObserved($pnOccurrence->getDateObs())
             ->setDateCreated($pnOccurrence->getDateCreated())
-            ->setDateUpdated($pnOccurrence->getDateUpdated())
-            ->setDatePublished(new \DateTime("now"));
+            ->setDateUpdated($pnOccurrence->getDateUpdated());
 
         $occurrence->setTaxoRepo($taxonInfo['taxoRepo'])
             ->setUserSciName($taxonInfo['sciName'] ?? $taxonName)
@@ -95,6 +94,10 @@ class OccurrenceBuilderService
             }
         } else {
 			$occurrence->setIsPublic(false);
+		}
+		
+		if ($occurrence->getIsPublic()){
+			$occurrence->setDatePublished(new \DateTime("now"));
 		}
 
         return $occurrence;

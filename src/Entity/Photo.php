@@ -284,10 +284,10 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
       }
       else {
          $exifExtractor   = new ExifExtractionUtils($this->file->getRealPath());
-		 if ($exifExtractor->getLatitude() && $exifExtractor->getLongitude()){
+//		 if ($exifExtractor->getLatitude() && $exifExtractor->getLongitude()){
 			 $this->latitude  = $exifExtractor->getLatitude();
 			 $this->longitude = $exifExtractor->getLongitude();
-		 }
+//		 }
          $this->dateShot  = $exifExtractor->getShootingDate() ?? new \DateTime();
       }
    }
