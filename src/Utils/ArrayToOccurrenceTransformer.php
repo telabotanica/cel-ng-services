@@ -50,7 +50,8 @@ class ArrayToOccurrenceTransformer {
             "Commune" => 'locality',
             "Identifiant Commune" => 'localityInseeCode',
             "Pays" => 'osmCountry',
-            'Référentiel taxonomique' => 'taxoRepo'
+            'Référentiel taxonomique' => 'taxoRepo',
+	    'Notes' => 'annotation'
         );
 
     const ALLOWED_TAXO_REPOS = array(
