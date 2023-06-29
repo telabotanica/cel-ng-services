@@ -36,7 +36,6 @@ class OccurrenceBuilderService
         $occurrence->setPlantnetId($pnOccurrence->getId());
         $occurrence->setCertainty(CertaintyEnumType::DOUBTFUL);
         $occurrence->setInputSource(InputSourceEnumType::PLANTNET);
-
         return $occurrence;
     }
 
@@ -47,6 +46,7 @@ class OccurrenceBuilderService
             return $occurrence;
         }
 		$species = $pnOccurrence->getSpecies();
+		
 		if (isset($species) && !empty($pnOccurrence->getSpecies()->getName())){
 			$taxonName = $pnOccurrence->getSpecies()->getName();
 		} elseif ($pnOccurrence->getCurrentName()){
@@ -54,12 +54,28 @@ class OccurrenceBuilderService
 		} else {
 			$taxonName = $firstIdentificationResult->getSpecies();
 		}
-
+		
         // search taxon data
-        $taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
-
-		//TODO: Vérifier le fuseau horaire (basculer en UTC ?)
-		//TODO: Est-ce qu'on garde la date published pour l'update Remote ou on rajoute une colonne?
+		//TODO faire passer le powo_id
+//        $taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
+	
+		print_r($pnOccurrence->getProject());
+		if ($species && $species->getPowoId()){
+			$taxonIpniId = $this->taxoRepoService->getTaxonInfoFromPowo($species->getPowoId());
+			if ($taxonIpniId){
+//				print_r(' avec powo Id /');
+//				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonIpniId, 'taxref');
+				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonIpniId, $pnOccurrence->getProject());
+			} else {
+//				print_r(' sans correspondance trouvé powo Id /');
+				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
+			}
+		} else {
+//			print_r(' sans powo Id /');
+			$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
+		}
+		
+			
         $occurrence->setDateObserved($pnOccurrence->getDateObs())
             ->setDateCreated($pnOccurrence->getDateCreated())
             ->setDateUpdated($pnOccurrence->getDateUpdated());
