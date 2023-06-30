@@ -53,7 +53,6 @@ class OccurrenceEventListener {
 
         // If isPublic status has just been set to true, set the occurrence
         // datePublished member value to "now":
-		// TODO: Pourquoi ?
         if ( $entity->getIsPublic() ) {
             $entity->setDatePublished(new \DateTime());
         }
@@ -62,7 +61,6 @@ class OccurrenceEventListener {
         $entity->setIdentiplanteScore(0);
 
         // For other sources duplicated occurrences
-		//TODO A supprimer ?
 		if (!$entity->getInputSource()){
 			$entity->setInputSource(InputSourceEnumType::CEL);
 		}
@@ -103,7 +101,6 @@ class OccurrenceEventListener {
         if ( $args->hasChangedField('isPublic') &&
             $args->getNewValue('isPublic') == true) {
 
-			//TODO: changer ça?
             $entity->setDatePublished(new \DateTime());
         }
 

@@ -56,25 +56,19 @@ class OccurrenceBuilderService
 		}
 		
         // search taxon data
-		//TODO faire passer le powo_id
-//        $taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
-	
-		print_r($pnOccurrence->getProject());
+
 		if ($species && $species->getPowoId()){
 			$taxonIpniId = $this->taxoRepoService->getTaxonInfoFromPowo($species->getPowoId());
 			if ($taxonIpniId){
-//				print_r(' avec powo Id /');
-//				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonIpniId, 'taxref');
 				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonIpniId, $pnOccurrence->getProject());
 			} else {
-//				print_r(' sans correspondance trouvé powo Id /');
+				// Si pas de correspondance on recherche avec le nom et le référentiel
 				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
 			}
 		} else {
-//			print_r(' sans powo Id /');
+			// Si pas de powoId on recherche avec le nom et le référentiel
 			$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
 		}
-		
 			
         $occurrence->setDateObserved($pnOccurrence->getDateObs())
             ->setDateCreated($pnOccurrence->getDateCreated())
@@ -111,7 +105,7 @@ class OccurrenceBuilderService
         } else {
 			$occurrence->setIsPublic(false);
 		}
-		
+
 		if ($occurrence->getIsPublic()){
 			$occurrence->setDatePublished(new \DateTime("now"));
 		}

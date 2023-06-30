@@ -80,7 +80,6 @@ final class CelSyncGetJobsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-		//TODO Ajout de stop date ?
         $stopwatch = new Stopwatch();
         $stopwatch->start('pn-sync-get-jobs');
         $dryRun = $input->getOption('dry-run');
@@ -107,8 +106,28 @@ final class CelSyncGetJobsCommand extends Command
                 if ($occurrence->getPartner()) {
                     continue;
                 }
+
+				/* TODO Vérifier la date updated (format différent entre plantnet et tela)
+				// TODO: Voir comment récupérer les maj d'obs tela faites sur PN (quelles infos récupérer?)
+				// TODO: récupérer le PN id de l'obs tela ? -> update ou non?
+				
+                if ($occurrence->getPartner()) {
+					if ($occurrence->getPartner()->getId() == 'tela'){
+						$telaOccurrence = $this->occurrenceRepository->findOneBy(['id' => $occurrence->getPartner()
+							->getObservationId()]);
+						
+						// Si l'occurrence n'a pas été update sur Plantnet on ne fait rien
+						if ($occurrence->getDateUpdated() <= $telaOccurrence->getDateUpdated()){
+							continue;
+						}
+					} else {
+						continue;
+					}
+                }
+				*/
 				
 				// TODO Vérifier si licence libre
+				// TODO si obs tela -> rajouter $existingOccurrenceTela et update PlantNetId
                 // already known occurrence ? need to update ? delete ?
                 $existingOccurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $occurrence->getId()]);
                 if ($existingOccurrence) {
