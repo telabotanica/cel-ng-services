@@ -103,6 +103,10 @@ final class CelSyncGetJobsCommand extends Command
             $occurrences = $occurrences->getData();
             foreach ($occurrences as $occurrence) {
                 // filter out partners occurrences && obs without images
+				if ($occurrence->getPartner() && $occurrence->getPartner()->getId() == 'tela'){
+					print_r($occurrence->getId());
+				}
+				
                 if ($occurrence->getPartner()) {
                     continue;
                 }
@@ -148,9 +152,12 @@ final class CelSyncGetJobsCommand extends Command
         }
 
         $event = $stopwatch->stop('pn-sync-get-jobs');
+		$now = new \DateTime("now");
+		$timeFinished = $now->format('d-m-Y H:i:s');
+		
             $this->io->success(sprintf(
-                'Success! Got %d new jobs, %d already know, out of %d total processed occurrences!',
-                $this->newJobsCount, $this->existingJobsCount, count($occurrences)
+                'Success! Got %d new jobs, %d already know, out of %d total processed occurrences! Job finished at %s',
+                $this->newJobsCount, $this->existingJobsCount, count($occurrences), $timeFinished
             ));
 
             $this->io->comment(sprintf('Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000, $event->getMemory() / (1024 ** 2)));

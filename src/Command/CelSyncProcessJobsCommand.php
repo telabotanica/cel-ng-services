@@ -179,13 +179,15 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
         $event = $stopwatch->stop('pn-sync-process-jobs');
+		$now = new \DateTime("now");
+		$timeFinished = $now->format('d-m-Y H:i:s');
 
-            $this->io->success('Success!');
-            foreach ($this->stats as $stat => $value) {
-                $this->io->text(' '.ucfirst($stat).': '.$value);
-            }
-            $this->io->text(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000,$event->getMemory() / (1024 ** 2)));
-
+		$this->io->success('Success!');
+		foreach ($this->stats as $stat => $value) {
+			$this->io->text(' '.ucfirst($stat).': '.$value);
+		}
+		$this->io->text(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB / Finished date: %s',
+								($event->getDuration())/60000,$event->getMemory() / (1024 ** 2), $timeFinished));
         return 0;
     }
 
