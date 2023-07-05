@@ -125,7 +125,9 @@ class TaxoRepoService
 	
 	private $taxonRechercheNomUrl;
 
-    public function __construct(string $baseNamesearchUrl, string $taxonInfoUrl, bool $useNativeHttpClient, string $taxonRechercheNomUrl)
+	private $taxrefLiens;
+    public function __construct(string $baseNamesearchUrl, string $taxonInfoUrl, bool $useNativeHttpClient, string
+	$taxonRechercheNomUrl, string $taxrefLiens)
     {
         if ($useNativeHttpClient) {
             $this->client = new NativeHttpClient();
@@ -135,13 +137,14 @@ class TaxoRepoService
         $this->baseNamesearchUrl = $baseNamesearchUrl;
         $this->taxonInfoUrl = $taxonInfoUrl;
 		$this->taxonRechercheNomUrl = $taxonRechercheNomUrl;
+		$this->taxrefLiens = $taxrefLiens;
     }
 	
 	// On récupère l'ipni id en fonction du powo Id
 	public function getTaxonInfoFromPowo(string $powoId)
 	{
 		$taxonNameId = null;
-		$cheminFichier = 'public/assets/TAXREF_LIENS.csv';
+		$cheminFichier = $this->taxrefLiens.'TAXREF_LIENS.csv';
 
 		// Ouvrir le fichier en mode lecture
 		$fichier = fopen($cheminFichier, 'r');
