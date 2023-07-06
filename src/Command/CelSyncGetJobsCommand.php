@@ -86,9 +86,15 @@ final class CelSyncGetJobsCommand extends Command
         $startDate = (int) $input->getOption('from');
         $endDate = (int) $input->getOption('to');
         $resume = $input->getOption('resume');
+		
         if ($resume) {
             $startDate = $this->getLastJobUpdatedAt();
+			
+			$dateResumeStart = new \DateTime("now");
+			$dateResumeStartS = $dateResumeStart->format('U');
+			$endDate = $dateResumeStartS * 1000;
         }
+		
         $email = (string) $input->getOption('email');
 
 		$this->plantnetPaginator->start($startDate, $email, $endDate);
@@ -103,10 +109,11 @@ final class CelSyncGetJobsCommand extends Command
             $occurrences = $occurrences->getData();
             foreach ($occurrences as $occurrence) {
                 // filter out partners occurrences && obs without images
+				/*
 				if ($occurrence->getPartner() && $occurrence->getPartner()->getId() == 'tela'){
 					print_r($occurrence->getId());
 				}
-				
+				*/
                 if ($occurrence->getPartner()) {
                     continue;
                 }
