@@ -45,8 +45,8 @@ class PlantnetPaginator
     {
         if ($this->content && $this->content->hasMore()) {
             // get new content
-            $this->content = $this->plantnetService->getOccurrencesByNextUrl($this->content->getNextStartDate());
-
+//            $this->content = $this->plantnetService->getOccurrencesByNextUrl($this->content->getNextStartDate());
+            $this->content = $this->plantnetService->getOccurrencesByNext($this->content->getNext());
             return true;
         }
 

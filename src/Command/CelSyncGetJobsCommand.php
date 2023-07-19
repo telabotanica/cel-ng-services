@@ -109,54 +109,50 @@ final class CelSyncGetJobsCommand extends Command
             $occurrences = $occurrences->getData();
             foreach ($occurrences as $occurrence) {
                 // filter out partners occurrences && obs without images
-				/*
-				if ($occurrence->getPartner() && $occurrence->getPartner()->getId() == 'tela'){
-					print_r($occurrence->getId());
-				}
-				*/
+				
                 if ($occurrence->getPartner()) {
                     continue;
                 }
-
-				/* TODO Vérifier la date updated (format différent entre plantnet et tela)
-				// TODO: Voir comment récupérer les maj d'obs tela faites sur PN (quelles infos récupérer?)
-				// TODO: récupérer le PN id de l'obs tela ? -> update ou non?
-				
-                if ($occurrence->getPartner()) {
-					if ($occurrence->getPartner()->getId() == 'tela'){
-						$telaOccurrence = $this->occurrenceRepository->findOneBy(['id' => $occurrence->getPartner()
-							->getObservationId()]);
-						
-						// Si l'occurrence n'a pas été update sur Plantnet on ne fait rien
-						if ($occurrence->getDateUpdated() <= $telaOccurrence->getDateUpdated()){
-							continue;
-						}
-					} else {
-						continue;
-					}
-                }
-				*/
 				
 				// TODO Vérifier si licence libre
 				// TODO si obs tela -> rajouter $existingOccurrenceTela et update PlantNetId
-                // already known occurrence ? need to update ? delete ?
-                $existingOccurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $occurrence->getId()]);
-                if ($existingOccurrence) {
-                    if ($occurrence->isDeleted() || $occurrence->isCensored()) {
-                        $this->addJob('delete', $occurrence->getId());
-                    } else {
-						$this->addJob('update', $occurrence->getId());
+
+				// On vérifie si l'obs vient d'un telabotaniste sinon on dégage
+				if ($this->annuaireService->isKnownUser($occurrence->getAuthor()->getEmail())){
+					
+					/*
+					 * TODO quoi updater ? (on ne veux pas réinitialisé le score identiplante ou le certainty par exemple)
+					// Si l'obs vient d'un partner autre que tela on zappe
+					if ($occurrence->getPartner()) {
+						$needUpdate = $this->checkUpdatedRemote($occurrence);
+						if (!$needUpdate){
+							continue;
+						}
 					}
-                // we got a not known occurrence, is its author a Telabotaniste?
-                } elseif ($this->annuaireService->isKnownUser($occurrence->getAuthor()->getEmail())) {
-                    $this->addJob('create', $occurrence->getId());
-                } // else we don't want to consider this occurrence
+					*/
+					
+					$existingOccurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $occurrence->getId()]);
+					
+					if ($existingOccurrence) {
+						if ($occurrence->isDeleted() || $occurrence->isCensored()) {
+							$this->addJob('delete', $occurrence->getId());
+						} else {
+							$this->addJob('update', $occurrence->getId());
+						}
+					} else {
+						$this->addJob('create', $occurrence->getId());
+					}
+				}
             }
+			// On push en bdd à chaque page pour pouvoir resume + facilement en cas de crash
+			if (!$dryRun) {
+				$this->em->flush();
+			}
         } while ($this->plantnetPaginator->nextPage());
 
-        if (!$dryRun) {
-            $this->em->flush();
-        }
+//        if (!$dryRun) {
+//            $this->em->flush();
+//        }
 
         $event = $stopwatch->stop('pn-sync-get-jobs');
 		$now = new \DateTime("now");
@@ -221,4 +217,18 @@ final class CelSyncGetJobsCommand extends Command
 
         return $lastDate;
     }
+	
+	private function checkUpdatedRemote(PlantnetOccurrence $occurrence){
+		if ($occurrence->getPartner()->getId() == 'tela') {
+			$telaOccurrence = $this->occurrenceRepository->findOneBy(['id' => $occurrence->getPartner()->getObservationId()]);
+			
+			// Si l'occurrence n'a pas été update sur Plantnet on ne fait rien
+			if ($occurrence->getDateUpdated() <= $telaOccurrence->getDateUpdated()){
+				return false;
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
