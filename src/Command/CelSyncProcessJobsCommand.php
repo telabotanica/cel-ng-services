@@ -111,6 +111,10 @@ final class CelSyncProcessJobsCommand extends Command
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('pn-sync-process-jobs');
+		
+		$start = new \DateTime("now");
+		$timeStarted = $start->format('d-m-Y H:i:s');
+		$this->io->comment(sprintf('Script started at %s .', ($timeStarted)));
 
         $dryRun = $input->getOption('dry-run');
         $processOrder = $input->getOption('process-order');
@@ -179,15 +183,15 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
         $event = $stopwatch->stop('pn-sync-process-jobs');
-		$now = new \DateTime("now");
-		$timeFinished = $now->format('d-m-Y H:i:s');
+		$end= new \DateTime("now");
+		$timeFinished = $end->format('d-m-Y H:i:s');
 
-		$this->io->success('Success!');
+		$this->io->success(sprintf('Success! Job started at %s, Job finished at %s', $timeStarted, $timeFinished));
 		foreach ($this->stats as $stat => $value) {
 			$this->io->text(' '.ucfirst($stat).': '.$value);
 		}
-		$this->io->text(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB / Finished date: %s',
-								($event->getDuration())/60000,$event->getMemory() / (1024 ** 2), $timeFinished));
+		$this->io->text(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB',
+								($event->getDuration())/60000,$event->getMemory() / (1024 ** 2)));
         return 0;
     }
 

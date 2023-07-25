@@ -60,7 +60,11 @@ class OccurrenceBuilderService
 		if ($species && $species->getPowoId()){
 			$taxonIpniId = $this->taxoRepoService->getTaxonInfoFromPowo($species->getPowoId());
 			if ($taxonIpniId){
-				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonIpniId, $pnOccurrence->getProject());
+				try {
+					$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonIpniId, $pnOccurrence->getProject());
+				} catch (\Exception $e) {
+					$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
+				}
 			} else {
 				// Si pas de correspondance on recherche avec le nom et le référentiel
 				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());

@@ -87,10 +87,14 @@ final class CelSyncGetJobsCommand extends Command
         $endDate = (int) $input->getOption('to');
         $resume = $input->getOption('resume');
 		
-        if ($resume) {
+		$start = new \DateTime("now");
+		$timeStarted = $start->format('d-m-Y H:i:s');
+		$this->io->comment(sprintf('script started at %s .', ($timeStarted)));
+		
+		if ($resume) {
             $startDate = $this->getLastJobUpdatedAt();
 			
-			$dateResumeStart = new \DateTime("now");
+			$dateResumeStart = $start;
 			$dateResumeStartS = $dateResumeStart->format('U');
 			$endDate = $dateResumeStartS * 1000;
         }
@@ -98,7 +102,6 @@ final class CelSyncGetJobsCommand extends Command
         $email = (string) $input->getOption('email');
 
 		$this->plantnetPaginator->start($startDate, $email, $endDate);
-
         do {
             $occurrences = $this->plantnetPaginator->getContent();
             if (!$occurrences) {
@@ -155,12 +158,12 @@ final class CelSyncGetJobsCommand extends Command
 //        }
 
         $event = $stopwatch->stop('pn-sync-get-jobs');
-		$now = new \DateTime("now");
-		$timeFinished = $now->format('d-m-Y H:i:s');
+		$end = new \DateTime("now");
+		$timeFinished = $end->format('d-m-Y H:i:s');
 		
             $this->io->success(sprintf(
-                'Success! Got %d new jobs, %d already know, out of %d total processed occurrences! Job finished at %s',
-                $this->newJobsCount, $this->existingJobsCount, count($occurrences), $timeFinished
+                'Success! Got %d new jobs, %d already know, out of %d total processed occurrences! Job started at %s, Job finished at %s',
+                $this->newJobsCount, $this->existingJobsCount, count($occurrences), $timeStarted, $timeFinished
             ));
 
             $this->io->comment(sprintf('Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000, $event->getMemory() / (1024 ** 2)));
@@ -223,7 +226,7 @@ final class CelSyncGetJobsCommand extends Command
 			$telaOccurrence = $this->occurrenceRepository->findOneBy(['id' => $occurrence->getPartner()->getObservationId()]);
 			
 			// Si l'occurrence n'a pas été update sur Plantnet on ne fait rien
-			if ($occurrence->getDateUpdated() <= $telaOccurrence->getDateUpdated()){
+			if (!$telaOccurrence || ($occurrence->getDateUpdated() <= $telaOccurrence->getDateUpdated())){
 				return false;
 			}
 			return true;
