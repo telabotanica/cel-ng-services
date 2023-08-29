@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\DBAL\CertaintyEnumType;
 use App\DBAL\InputSourceEnumType;
 use App\Entity\Occurrence;
 use App\Service\TaxoRepoService;
@@ -57,7 +58,6 @@ class OccurrenceEventListener {
             $entity->setDatePublished(new \DateTime());
         }
 		
-		//TODO A voir comment gérer le score identiplante
         $entity->setIdentiplanteScore(0);
 
         // For other sources duplicated occurrences

@@ -57,6 +57,8 @@ final class CelSyncGetJobsCommand extends Command
             ->setDescription('Creates sync jobs of PlantNet occurrences created by Telabotaniste')
             ->addOption('resume', null, InputOption::VALUE_NONE,
                 'If set, use last job updatedAt date to resume (overload from option)')
+			->addOption('yesterday', null, InputOption::VALUE_NONE,
+                'If set, get jobs from yesterday')
             ->addOption('dry-run', null, InputOption::VALUE_NONE,
                 'If set, don’t persist changes to database')
             ->addOption('from', null, InputOption::VALUE_REQUIRED,
@@ -86,18 +88,32 @@ final class CelSyncGetJobsCommand extends Command
         $startDate = (int) $input->getOption('from');
         $endDate = (int) $input->getOption('to');
         $resume = $input->getOption('resume');
+        $yesterday = $input->getOption('yesterday');
 		
-		$start = new \DateTime("now");
-		$timeStarted = $start->format('d-m-Y H:i:s');
+		$today = new \DateTime("now");
+
+		$timeStarted = $today->format('d-m-Y H:i:s');
 		$this->io->comment(sprintf('script started at %s .', ($timeStarted)));
 		
 		if ($resume) {
             $startDate = $this->getLastJobUpdatedAt();
-			
-			$dateResumeStart = $start;
-			$dateResumeStartS = $dateResumeStart->format('U');
-			$endDate = $dateResumeStartS * 1000;
+			$endDate = $today->getTimestamp() * 1000;
         }
+		
+		if ($yesterday){
+			// Calculer la date de la journée précédente
+			$datePrecedente = (clone $today)->modify('-1 day');
+			
+			// Définir la startDate au début de la journée précédente (00:00:00)
+			$startDateYesterday = $datePrecedente->setTime(0, 0, 0);
+			
+			// Définir la endDate à la fin de la journée précédente (23:59:59)
+			$endDateYesterday = (clone $datePrecedente)->setTime(23, 59, 59);
+			
+			// Convertir les dates en millisecondes
+			$startDate = $startDateYesterday->getTimestamp() * 1000;
+			$endDate = $endDateYesterday->getTimestamp() * 1000;
+		}
 		
         $email = (string) $input->getOption('email');
 
@@ -111,21 +127,23 @@ final class CelSyncGetJobsCommand extends Command
             // Switch from PlantnetOccurrences to PlantnetOccurrence[]
             $occurrences = $occurrences->getData();
             foreach ($occurrences as $occurrence) {
-                // filter out partners occurrences && obs without images
-				
-                if ($occurrence->getPartner()) {
+                // filter out occurrences
+                if (
+					$occurrence->getPartner() ||
+					!$occurrence->isValid() ||
+					$occurrence->getCurrentName() == '' ||
+					(count($occurrence->getImages()) == 1 && $occurrence->getImages()[0]->getQualityVotes()->getMinus() > 0) ||
+					!$occurrence->getLicense()
+				) {
                     continue;
                 }
-				
-				// TODO Vérifier si licence libre
-				// TODO si obs tela -> rajouter $existingOccurrenceTela et update PlantNetId
 
 				// On vérifie si l'obs vient d'un telabotaniste sinon on dégage
 				if ($this->annuaireService->isKnownUser($occurrence->getAuthor()->getEmail())){
 					
-					/*
-					 * TODO quoi updater ? (on ne veux pas réinitialisé le score identiplante ou le certainty par exemple)
+				// TODO quoi updater ? (on ne veux pas réinitialisé  le nom / nom Id et référentiel) -> job spécifique ?
 					// Si l'obs vient d'un partner autre que tela on zappe
+					/*
 					if ($occurrence->getPartner()) {
 						$needUpdate = $this->checkUpdatedRemote($occurrence);
 						if (!$needUpdate){
@@ -133,9 +151,8 @@ final class CelSyncGetJobsCommand extends Command
 						}
 					}
 					*/
-					
 					$existingOccurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $occurrence->getId()]);
-					
+					//TODO vérifier si l'update c'est juste le score/vote (on s'en balek du vote PN)
 					if ($existingOccurrence) {
 						if ($occurrence->isDeleted() || $occurrence->isCensored()) {
 							$this->addJob('delete', $occurrence->getId());

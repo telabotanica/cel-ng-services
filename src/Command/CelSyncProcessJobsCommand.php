@@ -330,23 +330,20 @@ final class CelSyncProcessJobsCommand extends Command
 
         // create Photos
         foreach ($pnOccurrence->getImages() as $image) {
-            $file = $this->plantnetService->getImageFile($image);
-            $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
-
-            $this->em->persist($photo);
-			
-            $this->stats['new photo']++;
-			
-			if ($image->getOrgan()){
-				$tag = $this->photoBuilderService->createTag($image->getOrgan(), $user->getId());
-				$this->photoBuilderService->savePhotoTag($tag, $photo);
+			//On ne récupère pas les photos ayant un avis négatif
+			if ($image->getQualityVotes()->getMinus() < 1){
+				$file = $this->plantnetService->getImageFile($image);
+				$photo = $this->photoBuilderService->createPhoto($file, $occurrence);
+				
+				$this->em->persist($photo);
+				
+				$this->stats['new photo']++;
+				
+				if ($image->getOrgan()){
+					$tag = $this->photoBuilderService->createTag($image->getOrgan(), $user->getId());
+					$this->photoBuilderService->savePhotoTag($tag, $photo);
+				}
 			}
-//
-//			$tag = $this->photoBuilderService->getTag($image);
-//
-//			if ($tag){
-//				$this->photoBuilderService->savePhotoTag($tag, $photo);
-//			}
         }
 		
 		// Création du pnTbPair

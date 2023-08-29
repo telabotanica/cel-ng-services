@@ -109,10 +109,8 @@ class OccurrenceBuilderService
         } else {
 			$occurrence->setIsPublic(false);
 		}
-
-		if ($occurrence->getIsPublic()){
+		
 			$occurrence->setDatePublished(new \DateTime("now"));
-		}
 
         return $occurrence;
     }
