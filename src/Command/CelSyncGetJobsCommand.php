@@ -7,6 +7,8 @@ use App\Entity\Occurrence;
 use App\Model\PlantnetOccurrence;
 use App\Model\PlantnetOccurrences;
 use App\Service\AnnuaireService;
+use App\Service\OccurrenceBuilderService;
+use App\Service\PhotoBuilderService;
 use App\Service\PlantnetPaginator;
 use App\Service\PlantnetService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +31,9 @@ final class CelSyncGetJobsCommand extends Command
     private $plantnetService;
     private $newJobsCount = 0;
     private $existingJobsCount = 0;
+	
+	private $occurrenceBuilderService;
+	private $photoBuilderService;
 
     /**
      * @var SymfonyStyle
@@ -39,7 +44,9 @@ final class CelSyncGetJobsCommand extends Command
         EntityManagerInterface $em,
         AnnuaireService $annuaireService,
         PlantnetPaginator $plantnetPaginator,
-        PlantnetService $plantnetService
+        PlantnetService $plantnetService,
+		OccurrenceBuilderService $occurrenceBuilderService,
+		PhotoBuilderService $photoBuilderService
     ) {
         $this->em = $em;
         $this->occurrenceRepository = $this->em->getRepository(Occurrence::class);
@@ -47,6 +54,8 @@ final class CelSyncGetJobsCommand extends Command
         $this->annuaireService = $annuaireService;
         $this->plantnetPaginator = $plantnetPaginator;
         $this->plantnetService = $plantnetService;
+		$this->occurrenceBuilderService = $occurrenceBuilderService;
+		$this->photoBuilderService = $photoBuilderService;
 
         parent::__construct();
     }
@@ -130,7 +139,7 @@ final class CelSyncGetJobsCommand extends Command
                 // filter out occurrences
                 if (
 					$occurrence->getPartner() ||
-					!$occurrence->isValid() ||
+//					!$occurrence->isValid() ||
 					$occurrence->getCurrentName() == '' ||
 					(count($occurrence->getImages()) == 1 && $occurrence->getImages()[0]->getQualityVotes()->getMinus() > 0) ||
 					!$occurrence->getLicense()
@@ -152,12 +161,23 @@ final class CelSyncGetJobsCommand extends Command
 					}
 					*/
 					$existingOccurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $occurrence->getId()]);
-					//TODO vérifier si l'update c'est juste le score/vote (on s'en balek du vote PN)
+					//TODO vérifier si l'update c'est juste le score/vote (on s'en balek du vote PN) donc on update que si le nom, les images ou la localisation a changée
 					if ($existingOccurrence) {
 						if ($occurrence->isDeleted() || $occurrence->isCensored()) {
 							$this->addJob('delete', $occurrence->getId());
 						} else {
-							$this->addJob('update', $occurrence->getId());
+							$previousSciNameId = $existingOccurrence->getAcceptedSciNameId();
+							$newSciNameId = $this->occurrenceBuilderService->getPnTaxon($occurrence)[1]['acceptedSciNameId'];
+							$imageChanged = $this->photoBuilderService->isImagesChanged($existingOccurrence, $occurrence);
+							$geoChanged = $this->occurrenceBuilderService->isGeoChanged($existingOccurrence, $occurrence);
+							
+							if (
+								$previousSciNameId != $newSciNameId ||
+								$imageChanged ||
+								$geoChanged
+							){
+								$this->addJob('update', $occurrence->getId());
+							}
 						}
 					} else {
 						$this->addJob('create', $occurrence->getId());

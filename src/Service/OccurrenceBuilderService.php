@@ -45,35 +45,10 @@ class OccurrenceBuilderService
         if (!$pnOccurrence->getCurrentName() && !$firstIdentificationResult) {
             return $occurrence;
         }
-		$species = $pnOccurrence->getSpecies();
+				
+		$taxonName = $this->getPnTaxon($pnOccurrence)[0];
+		$taxonInfo = $this->getPnTaxon($pnOccurrence)[1];
 		
-		if (isset($species) && !empty($pnOccurrence->getSpecies()->getName())){
-			$taxonName = $pnOccurrence->getSpecies()->getName();
-		} elseif ($pnOccurrence->getCurrentName()){
-			$taxonName = $pnOccurrence->getCurrentName();
-		} else {
-			$taxonName = $firstIdentificationResult->getSpecies();
-		}
-		
-        // search taxon data
-
-		if ($species && $species->getPowoId()){
-			$taxonIpniId = $this->taxoRepoService->getTaxonInfoFromPowo($species->getPowoId());
-			if ($taxonIpniId){
-				try {
-					$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonIpniId, $pnOccurrence->getProject());
-				} catch (\Exception $e) {
-					$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
-				}
-			} else {
-				// Si pas de correspondance on recherche avec le nom et le référentiel
-				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
-			}
-		} else {
-			// Si pas de powoId on recherche avec le nom et le référentiel
-			$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
-		}
-			
         $occurrence->setDateObserved($pnOccurrence->getDateObs())
             ->setDateCreated($pnOccurrence->getDateCreated())
             ->setDateUpdated($pnOccurrence->getDateUpdated());
@@ -86,6 +61,7 @@ class OccurrenceBuilderService
             ->setFamily($taxonInfo['family'] ??
                 ($pnOccurrence->getSpecies() ? $pnOccurrence->getSpecies()->getFamily() : ''));
 
+		// Ajout des données de localisation
         if ($pnOccurrence->getGeo()->getLon() && $pnOccurrence->getGeo()->getLat()) {
 			$occurrence->setIsPublic(true);
 			
@@ -110,7 +86,7 @@ class OccurrenceBuilderService
 			$occurrence->setIsPublic(false);
 		}
 		
-			$occurrence->setDatePublished(new \DateTime("now"));
+		$occurrence->setDatePublished(new \DateTime("now"));
 
         return $occurrence;
     }
@@ -129,5 +105,52 @@ class OccurrenceBuilderService
 		}
 		return $altitude;
 	}
+	
+	public function getPnTaxon(PlantnetOccurrence $pnOccurrence){
+		$firstIdentificationResult = $pnOccurrence->getIdentificationResults()[0] ?? false;
+		
+		$species = $pnOccurrence->getSpecies();
+		
+		if (isset($species) && !empty($pnOccurrence->getSpecies()->getName())){
+			$taxonName = $pnOccurrence->getSpecies()->getName();
+		} elseif ($pnOccurrence->getCurrentName()){
+			$taxonName = $pnOccurrence->getCurrentName();
+		} else {
+			$taxonName = $firstIdentificationResult->getSpecies();
+		}
+		
+		// search taxon data
+		if ($species && $species->getPowoId()){
+			$taxonIpniId = $this->taxoRepoService->getTaxonInfoFromPowo($species->getPowoId());
+			if ($taxonIpniId){
+				try {
+					$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonIpniId, $pnOccurrence->getProject());
+				} catch (\Exception $e) {
+					$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
+				}
+			} else {
+				// Si pas de correspondance on recherche avec le nom et le référentiel
+				$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
+			}
+		} else {
+			// Si pas de powoId on recherche avec le nom et le référentiel
+			$taxonInfo = $this->taxoRepoService->getTaxonInfo($taxonName, $pnOccurrence->getProject());
+		}
+		
+		return [$taxonName, $taxonInfo];
+	}
 
+	public function isGeoChanged(Occurrence $occurrence, PlantnetOccurrence $pnOccurrence){
+		$geo = json_encode([
+			'type' => 'Point',
+			'coordinates' => [
+				$pnOccurrence->getGeo()->getLon(),
+				$pnOccurrence->getGeo()->getLat()
+			]]);
+		if ($pnOccurrence->getGeo()->getPlace() != $occurrence->getLocality() || $geo != $occurrence->getGeometry()){
+			return true;
+		}
+		
+		return false;
+	}
 }

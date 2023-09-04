@@ -10,6 +10,7 @@ use App\Entity\PhotoTag;
 use App\Entity\PnTbPair;
 use App\Model\AnnuaireUser;
 use App\Model\PlantnetImage;
+use App\Model\PlantnetOccurrence;
 use App\Repository\PhotoRepository;
 use App\Repository\PhotoTagPhotoRepository;
 use App\Repository\PhotoTagRepository;
@@ -218,12 +219,41 @@ final class CelSyncProcessJobsCommand extends Command
         }
 
 		//On vérifie la date d'update plantnet pour ne récupérer que les obs ayant été update chez Plantnet
-		// TODO: transformer les dates UTC en date local ?
         $occurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $id]);
-        if (!$occurrence || $occurrence->getDateUpdated() >= $pnOccurrence->getDateUpdated()) {
+
+		// On transforme les dates en string car PN-> UTC, bdd tela ->local
+		if ($occurrence){
+			$occurrenceDateUpdated = $occurrence->getDateUpdated()->format('Y-m-d H:i:s.u');
+			$pnOccurrenceDateUpdated = $pnOccurrence->getDateUpdated()->format('Y-m-d H:i:s.u');
+		}
+		
+		// Si obs maj à tela après la maj à PN on skip
+        if (!$occurrence || $occurrenceDateUpdated >= $pnOccurrenceDateUpdated) {
             $this->stats['ignored']++;
             return;
         }
+		
+		// keep old sci name reference, easy to find if it changed after update
+		$previousSciNameId = $occurrence->getAcceptedSciNameId();
+		$newSciNameId = $this->occurrenceBuilderService->getPnTaxon($pnOccurrence)[1]['acceptedSciNameId'];
+		
+		$imageChanged = $this->photoBuilderService->isImagesChanged($occurrence, $pnOccurrence);
+
+		/*
+//		Si même nom et pas de changement d'image on skip
+		if (
+			$previousSciNameId == $newSciNameId &&
+			!$imageChanged
+		) {
+			$this->stats['ignored']++;
+			return;
+		}
+*/
+		// Si le nom a changé on réinitialise le score ID
+		if ($previousSciNameId != $newSciNameId){
+			$occurrence->setIdentiplanteScore(0);
+			$occurrence->setIsIdentiplanteValidated(0);
+		}
 		
 		//  update du pnTbPair
 		$pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
@@ -238,16 +268,13 @@ final class CelSyncProcessJobsCommand extends Command
 					$pnOccurrence->getDateUpdated(),
 				));
 		}
-		
-        // keep old sci name reference, easy to find if it changed after update
-        $previousSciNameId = $occurrence->getAcceptedSciNameId();
-
+				
         // update occurrence, all props are overwritten
         $occurrence = $this->occurrenceBuilderService->updateWithPlantnetOccurrence($occurrence, $pnOccurrence);
         $this->stats['updated']++;
 
         // if scientific name has changed, create new IP comment
-        if ($previousSciNameId !== $occurrence->getAcceptedSciNameId()) {
+        if ($previousSciNameId != $occurrence->getAcceptedSciNameId()) {
             $this->occurrencesToComment[] = $occurrence;
         }
 		
@@ -255,37 +282,50 @@ final class CelSyncProcessJobsCommand extends Command
 		
 		$user = $this->annuaireService->findUserInfo($pnOccurrence->getAuthor()->getEmail());
 		
-        // update photos
-        foreach ($pnOccurrence->getImages() as $image) {
-            if (!$occurrence->isExistingPhoto($image)) {
-				// C'est une nouvelle photo
-                $file = $this->plantnetService->getImageFile($image);
-                $photo = $this->photoBuilderService->createPhoto($file, $occurrence);
-
-                $this->em->persist($photo);
-                $photosIds[] = $image->getId();
-                $this->stats['new photo']++;
-				
-				// On enregistre le tag de la photo
-				if ($image->getOrgan()){
-					$tag = $this->photoBuilderService->createTag($image->getOrgan(), $user->getId());
-					$this->photoBuilderService->savePhotoTag($tag, $photo);
-				}
-				
-            } else {
-				// La photo existe déjà
-				// On vérifie si le tag a changé
-				$tag = $this->photoBuilderService->getTag($image, $user->getId());
-				if (!$tag) {
-					// Le tag est différent -> on l'update
-					if ($image->getOrgan()){
-						$tag = $this->photoBuilderService->createTag($image->getOrgan(), $user->getId());
-						$this->photoBuilderService->updatePhotoTag($tag, $image);
+		if ($imageChanged){
+			// update photos
+			foreach ($pnOccurrence->getImages() as $image) {
+				if (!$occurrence->isExistingPhoto($image)) {
+					// C'est une nouvelle photo
+					if ($image->getQualityVotes()->getMinus() == 0){
+						$file = $this->plantnetService->getImageFile($image);
+						$photo = $this->photoBuilderService->createPhoto($file, $occurrence);
+						
+						$this->em->persist($photo);
+//					$photosIds[] = $image->getId();
+						$this->stats['new photo']++;
+						
+						// On enregistre le tag de la photo
+						if ($image->getOrgan()){
+							$tag = $this->photoBuilderService->createTag($image->getOrgan(), $user->getId());
+							$this->photoBuilderService->savePhotoTag($tag, $photo);
+						}
+					}
+				} else {
+					// La photo existe déjà, on vérifie si le tag a changé
+					// Si nécessaire on crée un tag pour l'utilisateur
+					$tag = $this->photoBuilderService->getTag($image, $user->getId());
+					
+					//On récupère les données de la photo existante
+					$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId());
+					
+					$existingPhotoTag = $photo->getPhotoTags();
+					
+					if ($existingPhotoTag){
+						//On vérifie si le nouveau tag et l'ancien sont identiques
+						$tagChanged = $this->photoBuilderService->isTagChanged($tag, $photo);
+						
+						if ($tagChanged){
+							$this->photoBuilderService->updatePhotoTag($tag, $photo, $existingPhotoTag);
+						}
+					} else {
+						$this->photoBuilderService->savePhotoTag($tag, $photo);
+						$this->em->persist($photo);
 					}
 				}
 			}
-        }
-        // list photos, add new, remove deleted
+		}
+        // list photos, add new, TODO remove deleted
     }
 
     private function createOccurrence(int $id): void
