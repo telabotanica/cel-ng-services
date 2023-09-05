@@ -25,6 +25,16 @@ class PlantnetSpecies
      * @var string
      */
     private $genus;
+	
+	/**
+	 * @var ?string
+	 */
+	private $powoId;
+	
+	/**
+	 * @var ?string
+	 */
+	private $gbifId;
 
     /**
      * @return string
@@ -90,5 +100,36 @@ class PlantnetSpecies
 		$this->genus = $genus;
 	}
 	
+	/**
+	 * @return string|null
+	 */
+	public function getPowoId(): ?string
+	{
+		return $this->powoId;
+	}
+	
+	/**
+	 * @param string|null $powoId
+	 */
+	public function setPowoId(?string $powoId): void
+	{
+		$this->powoId = $powoId;
+	}
+	
+	/**
+	 * @return string|null
+	 */
+	public function getGbifId(): ?string
+	{
+		return $this->gbifId;
+	}
+	
+	/**
+	 * @param string|null $gbifId
+	 */
+	public function setGbifId(?string $gbifId): void
+	{
+		$this->gbifId = $gbifId;
+	}
 	
 }

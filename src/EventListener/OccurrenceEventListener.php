@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\DBAL\CertaintyEnumType;
 use App\DBAL\InputSourceEnumType;
 use App\Entity\Occurrence;
 use App\Service\TaxoRepoService;
@@ -53,16 +54,13 @@ class OccurrenceEventListener {
 
         // If isPublic status has just been set to true, set the occurrence
         // datePublished member value to "now":
-		// TODO: Pourquoi ?
         if ( $entity->getIsPublic() ) {
             $entity->setDatePublished(new \DateTime());
         }
 		
-		//TODO A voir comment gérer le score identiplante
         $entity->setIdentiplanteScore(0);
 
         // For other sources duplicated occurrences
-		//TODO A supprimer ?
 		if (!$entity->getInputSource()){
 			$entity->setInputSource(InputSourceEnumType::CEL);
 		}
@@ -103,7 +101,6 @@ class OccurrenceEventListener {
         if ( $args->hasChangedField('isPublic') &&
             $args->getNewValue('isPublic') == true) {
 
-			//TODO: changer ça?
             $entity->setDatePublished(new \DateTime());
         }
 

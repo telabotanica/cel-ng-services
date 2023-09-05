@@ -1319,7 +1319,7 @@ class Occurrence implements OwnedEntityFullInterface, TimestampedEntityInterface
     public function isExistingPhoto(PlantnetImage $image): bool
     {
         foreach ($this->getPhotos() as $photo) {
-            if ($photo->getOriginalName() === $image->getId()) {
+            if (strpos($photo->getOriginalName(), $image->getId()) === 0) {
                 return true;
             }
         }

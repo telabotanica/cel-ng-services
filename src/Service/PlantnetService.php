@@ -82,7 +82,6 @@ class PlantnetService
     public function getOccurrencesByNextUrl(string $nextUrl): PlantnetOccurrences
     {
         $apiKey = '&api-key='.$this->plantnetApiKey;
-
         $response = $this->client->request('GET', $nextUrl.$apiKey, [
             'headers' => [
                 'Accept' => 'application/json',
@@ -93,6 +92,22 @@ class PlantnetService
 
         return $this->deserializeOccurrences($response->getContent());
     }
+	
+	public function getOccurrencesByNext(string $next): PlantnetOccurrences
+	{
+//		print_r($next);
+//		print_r(' / ');
+		$apiKey = '&api-key='.$this->plantnetApiKey;
+		$response = $this->client->request('GET', $next.$apiKey, [
+			'headers' => [
+				'Accept' => 'application/json',
+			],
+		]);
+		
+//		$response = $this->handleOccurrencesResponse($response);
+		
+		return $this->deserializeOccurrences($response->getContent());
+	}
 
     /**
      * Some crash happens because of ONE bad data, so we try to move offset after

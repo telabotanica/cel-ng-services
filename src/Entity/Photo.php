@@ -25,6 +25,7 @@ use App\Entity\TimestampedEntityInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -499,19 +500,21 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
         $pptRelation = new PhotoPhotoTagRelation();
         $pptRelation->setPhotoTag($photoTag);
         $pptRelation->setPhoto($this);
-        $pptRelation->persist();
-        $this->photoTagRelations[] = $pptRelation;
+//        $pptRelation->persist();
+       return $this;
     }
 
-    public function removePhotoTag(PhotoTag $photoTag): self {
+    public function removePhotoTag(PhotoTag $photoTag, EntityManagerInterface $em): self {
 
-        $em = $this->getDoctrine()->getEntityManager();
+//        $em = $this->getDoctrine()->getEntityManager();
         foreach($this->photoTagRelations as $rel) {
             if ( $rel->getPhotoTag() ==  $photoTag) {
                 $em->remove($rel);
                 $em->flush();
             }
         }
+		
+		return $this;
    }
 
     public function getOccurrence(): ?Occurrence {
@@ -649,7 +652,10 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
        return $this;
    }
-
-
-
+	
+	private function getDoctrine()
+	{
+	}
+	
+	
 }

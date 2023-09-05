@@ -228,6 +228,7 @@ services:
             - '%env(EFLORE_TAXON_INFO_URL)%'
             - '%env(EFLORE_TAXON_RECHERCHE_NOM_URL)%'
             - '%env(USE_NATIVE_HTTP_CLIENT)%'
+            - '%env(TAXREF_LIENS)%'
 
     App\Security\SSO\SSOTokenValidator:
         arguments:
