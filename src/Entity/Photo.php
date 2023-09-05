@@ -500,8 +500,9 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
         $pptRelation = new PhotoPhotoTagRelation();
         $pptRelation->setPhotoTag($photoTag);
         $pptRelation->setPhoto($this);
-//        $pptRelation->persist();
-       return $this;
+        $pptRelation->persist();
+		$this->photoTagRelations[] = $pptRelation;
+//       return $this;
     }
 
     public function removePhotoTag(PhotoTag $photoTag, EntityManagerInterface $em): self {
@@ -652,10 +653,6 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
        return $this;
    }
-	
-	private function getDoctrine()
-	{
-	}
 	
 	
 }
