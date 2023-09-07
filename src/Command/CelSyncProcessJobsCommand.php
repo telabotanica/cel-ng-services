@@ -115,7 +115,7 @@ final class CelSyncProcessJobsCommand extends Command
 		
 		$start = new \DateTime("now");
 		$timeStarted = $start->format('d-m-Y H:i:s');
-		$this->io->comment(sprintf('Script started at %s .', ($timeStarted)));
+		$this->io->title(sprintf('Script started at %s .', ($timeStarted)));
 
         $dryRun = $input->getOption('dry-run');
         $processOrder = $input->getOption('process-order');
@@ -191,7 +191,7 @@ final class CelSyncProcessJobsCommand extends Command
 		foreach ($this->stats as $stat => $value) {
 			$this->io->text(' '.ucfirst($stat).': '.$value);
 		}
-		$this->io->text(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB',
+		$this->io->comment(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB',
 								($event->getDuration())/60000,$event->getMemory() / (1024 ** 2)));
         return 0;
     }

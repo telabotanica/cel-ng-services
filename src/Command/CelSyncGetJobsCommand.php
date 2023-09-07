@@ -68,6 +68,10 @@ final class CelSyncGetJobsCommand extends Command
                 'If set, use last job updatedAt date to resume (overload from option)')
 			->addOption('yesterday', null, InputOption::VALUE_NONE,
                 'If set, get jobs from yesterday')
+			->addOption('yesterdayAM', null, InputOption::VALUE_NONE,
+                'If set, get jobs from yesterday')
+			->addOption('yesterdayPM', null, InputOption::VALUE_NONE,
+                'If set, get jobs from yesterday')
             ->addOption('dry-run', null, InputOption::VALUE_NONE,
                 'If set, don’t persist changes to database')
             ->addOption('from', null, InputOption::VALUE_REQUIRED,
@@ -98,26 +102,37 @@ final class CelSyncGetJobsCommand extends Command
         $endDate = (int) $input->getOption('to');
         $resume = $input->getOption('resume');
         $yesterday = $input->getOption('yesterday');
+		// Adding yesterdayAM & yesterday PM in order to run 2 processes at the same time to speed up the script
+        $yesterdayAM = $input->getOption('yesterdayAM');
+        $yesterdayPM = $input->getOption('yesterdayPM');
 		
 		$today = new \DateTime("now");
 
 		$timeStarted = $today->format('d-m-Y H:i:s');
-		$this->io->comment(sprintf('script started at %s .', ($timeStarted)));
+		$this->io->title(sprintf('script started at %s .', ($timeStarted)));
 		
 		if ($resume) {
             $startDate = $this->getLastJobUpdatedAt();
 			$endDate = $today->getTimestamp() * 1000;
         }
 		
-		if ($yesterday){
+		if ($yesterday || $yesterdayAM || $yesterdayPM){
 			// Calculer la date de la journée précédente
 			$datePrecedente = (clone $today)->modify('-1 day');
 			
-			// Définir la startDate au début de la journée précédente (00:00:00)
-			$startDateYesterday = $datePrecedente->setTime(0, 0, 0);
+			if (!$yesterdayPM){
+				// Définir la startDate au début de la journée précédente (00:00:00)
+				$startDateYesterday = $datePrecedente->setTime(0, 0, 0);
+			} else {
+				$startDateYesterday = $datePrecedente->setTime(12, 0, 0);
+			}
 			
-			// Définir la endDate à la fin de la journée précédente (23:59:59)
-			$endDateYesterday = (clone $datePrecedente)->setTime(23, 59, 59);
+			if (!$yesterdayAM){
+				// Définir la endDate à la fin de la journée précédente (23:59:59)
+				$endDateYesterday = (clone $datePrecedente)->setTime(23, 59, 59);
+			} else {
+				$endDateYesterday = (clone $datePrecedente)->setTime(11, 59, 59);
+			}
 			
 			// Convertir les dates en millisecondes
 			$startDate = $startDateYesterday->getTimestamp() * 1000;
@@ -128,66 +143,67 @@ final class CelSyncGetJobsCommand extends Command
 
 		$this->plantnetPaginator->start($startDate, $email, $endDate);
         do {
-            $occurrences = $this->plantnetPaginator->getContent();
-            if (!$occurrences) {
-                break;
-            }
-
-            // Switch from PlantnetOccurrences to PlantnetOccurrence[]
-            $occurrences = $occurrences->getData();
-            foreach ($occurrences as $occurrence) {
-                // filter out occurrences
-                if (
-					$occurrence->getPartner() ||
-//					!$occurrence->isValid() ||
-					$occurrence->getCurrentName() == '' ||
-					(count($occurrence->getImages()) == 1 && $occurrence->getImages()[0]->getQualityVotes()->getMinus() > 0) ||
-					!$occurrence->getLicense()
-				) {
-                    continue;
-                }
-
-				// On vérifie si l'obs vient d'un telabotaniste sinon on dégage
-				if ($this->annuaireService->isKnownUser($occurrence->getAuthor()->getEmail())){
-					
-				// TODO quoi updater ? (on ne veux pas réinitialisé  le nom / nom Id et référentiel) -> job spécifique ?
-					// Si l'obs vient d'un partner autre que tela on zappe
-					/*
-					if ($occurrence->getPartner()) {
-						$needUpdate = $this->checkUpdatedRemote($occurrence);
-						if (!$needUpdate){
-							continue;
-						}
+			$occurrences = $this->plantnetPaginator->getContent();
+			if ( !$occurrences) {
+				break;
+			}
+			
+			// Switch from PlantnetOccurrences to PlantnetOccurrence[]
+			$occurrences = $occurrences->getData();
+			foreach ($occurrences as $occurrence) {
+				try {
+				// filter out occurrences (if isValid filter out too many occurences -> remove it)
+					if ($occurrence->getPartner() ||
+						!$occurrence->isValid() ||
+						$occurrence->getCurrentName() == '' ||
+						(count($occurrence->getImages()) == 1 && $occurrence->getImages()[0]->getQualityVotes()->getMinus() > 0) ||
+						!$occurrence->getLicense()) {
+						continue;
 					}
-					*/
-					$existingOccurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $occurrence->getId()]);
-					//TODO vérifier si l'update c'est juste le score/vote (on s'en balek du vote PN) donc on update que si le nom, les images ou la localisation a changée
-					if ($existingOccurrence) {
-						if ($occurrence->isDeleted() || $occurrence->isCensored()) {
-							$this->addJob('delete', $occurrence->getId());
-						} else {
-							$previousSciNameId = $existingOccurrence->getAcceptedSciNameId();
-							$newSciNameId = $this->occurrenceBuilderService->getPnTaxon($occurrence)[1]['acceptedSciNameId'];
-							$imageChanged = $this->photoBuilderService->isImagesChanged($existingOccurrence, $occurrence);
-							$geoChanged = $this->occurrenceBuilderService->isGeoChanged($existingOccurrence, $occurrence);
-							
-							if (
-								$previousSciNameId != $newSciNameId ||
-								$imageChanged ||
-								$geoChanged
-							){
-								$this->addJob('update', $occurrence->getId());
+					
+					// On vérifie si l'obs vient d'un telabotaniste sinon on dégage
+					if ($this->annuaireService->isKnownUser($occurrence->getAuthor()->getEmail())) {
+						
+						// TODO quoi updater ? (on ne veux pas réinitialisé  le nom / nom Id et référentiel) -> job spécifique ?
+						// Si l'obs vient d'un partner autre que tela on zappe
+						/*
+						if ($occurrence->getPartner()) {
+							$needUpdate = $this->checkUpdatedRemote($occurrence);
+							if (!$needUpdate){
+								continue;
 							}
 						}
-					} else {
-						$this->addJob('create', $occurrence->getId());
+						*/
+						$existingOccurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $occurrence->getId()]);
+						//TODO vérifier si l'update c'est juste le score/vote (on s'en balek du vote PN) donc on update que si le nom, les images ou la localisation a changée
+						if ($existingOccurrence) {
+							if ($occurrence->isDeleted() || $occurrence->isCensored()) {
+								$this->addJob('delete', $occurrence->getId());
+							} else {
+								$previousSciNameId = $existingOccurrence->getAcceptedSciNameId();
+								$newSciNameId      = $this->occurrenceBuilderService->getPnTaxon($occurrence)[1]['acceptedSciNameId'];
+								$imageChanged      = $this->photoBuilderService->isImagesChanged($existingOccurrence, $occurrence);
+								$geoChanged        = $this->occurrenceBuilderService->isGeoChanged($existingOccurrence, $occurrence);
+								
+								if ($previousSciNameId != $newSciNameId || $imageChanged || $geoChanged) {
+									$this->addJob('update', $occurrence->getId());
+								}
+							}
+						} else {
+							$this->addJob('create', $occurrence->getId());
+						}
 					}
+				} catch (\Exception $e){
+					$this->io->error(sprintf('Erreur avec l\'occurrence %s : ' . $e->getMessage(), $occurrence->getId()));
+					// On continue le script même s'il y a une erreur
+					continue;
 				}
-            }
+			}
 			// On push en bdd à chaque page pour pouvoir resume + facilement en cas de crash
-			if (!$dryRun) {
+			if ( !$dryRun) {
 				$this->em->flush();
 			}
+			
         } while ($this->plantnetPaginator->nextPage());
 
 //        if (!$dryRun) {
@@ -198,12 +214,26 @@ final class CelSyncGetJobsCommand extends Command
 		$end = new \DateTime("now");
 		$timeFinished = $end->format('d-m-Y H:i:s');
 		
-            $this->io->success(sprintf(
-                'Success! Got %d new jobs, %d already know, out of %d total processed occurrences! Job started at %s, Job finished at %s',
-                $this->newJobsCount, $this->existingJobsCount, count($occurrences), $timeStarted, $timeFinished
-            ));
+		$startDateInSeconds = $startDate / 1000;
+		$startDateForInfo = (new \DateTime())->setTimestamp($startDateInSeconds);
+		$startDateForInfo = $startDateForInfo->format('d/m/Y H:i');
+		
+		$endDateInSeconds = $endDate / 1000;
+		$endDateForInfo = (new \DateTime())->setTimestamp($endDateInSeconds);
+		$endDateForInfo = $endDateForInfo->format('d/m/Y H:i');
+		
+		$this->io->success([
+			sprintf('Success! Got %d new jobs, %d already know, out of %d total processed occurrences!',
+			$this->newJobsCount, $this->existingJobsCount, count($occurrences)
+		),
+		   sprintf('Job started at %s, Job finished at %s, get datas from %s to %s',$timeStarted, $timeFinished, $startDateForInfo, $endDateForInfo)
+		]);
+		
+		if ($email){
+			$this->io->success(sprintf('get datas from user %s', $email));
+		}
 
-            $this->io->comment(sprintf('Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000, $event->getMemory() / (1024 ** 2)));
+		$this->io->comment(sprintf('Elapsed time: %.2f m / Consumed memory: %.2f MB', ($event->getDuration())/60000, $event->getMemory() / (1024 ** 2)));
 
         return 0;
     }
@@ -229,11 +259,11 @@ final class CelSyncGetJobsCommand extends Command
         } else {
 			$changelog->setActionType($type);
 			$this->em->persist($changelog);
-            $this->existingJobsCount++;
+			$this->existingJobsCount++;
 			if (0 === $this->existingJobsCount % 50) {
 				$this->em->flush();
 			}
-        }
+		}
     }
 
     private function getLastJobUpdatedAt(): int

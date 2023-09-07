@@ -101,7 +101,7 @@ class PhotoBuilderService
 		$tag = new PhotoTag();
 		
 		$tag->setName($tagName)
-			->setPath('/')
+			->setPath('/'.$tagName.'/')
 			->setUserId($userId);
 		
 		$this->em->persist($tag);
@@ -121,7 +121,7 @@ class PhotoBuilderService
 				// La photo existe déjà, on vérifie si le tag a changé
 				$tag = $this->getTag($image, $user->getId());
 				
-				$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId());
+				$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId(), $user->getId());
 				
 				$tagChanged = $this->isTagChanged($tag, $photo);
 
