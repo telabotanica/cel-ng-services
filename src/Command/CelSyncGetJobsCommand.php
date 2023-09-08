@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Process\Process;
 
 final class CelSyncGetJobsCommand extends Command
 {
@@ -141,7 +142,9 @@ final class CelSyncGetJobsCommand extends Command
 		
         $email = (string) $input->getOption('email');
 
-		$this->plantnetPaginator->start($startDate, $email, $endDate);
+//		$this->plantnetPaginator->start($startDate, $email, $endDate);
+		$process = new Process($this->plantnetPaginator->start($startDate, $email, $endDate));
+		$process->start();
         do {
 			$occurrences = $this->plantnetPaginator->getContent();
 			if ( !$occurrences) {
@@ -194,7 +197,8 @@ final class CelSyncGetJobsCommand extends Command
 						}
 					}
 				} catch (\Exception $e){
-					$this->io->error(sprintf('Erreur avec l\'occurrence %s : ' . $e->getMessage(), $occurrence->getId()));
+					$this->io->error(sprintf('Erreur avec l\'occurrence %s : %s', $occurrence->getId(), $e->getMessage())
+					);
 					// On continue le script même s'il y a une erreur
 					continue;
 				}
