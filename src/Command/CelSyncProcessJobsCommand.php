@@ -156,7 +156,7 @@ final class CelSyncProcessJobsCommand extends Command
 					} catch (\Exception $e) {
 						$this->stats['ignored']++;
 						
-						$output->writeln(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
+//						$output->writeln(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
 					}
 					
                     break;
@@ -166,7 +166,7 @@ final class CelSyncProcessJobsCommand extends Command
 					}  catch (\Exception $e) {
 						$this->stats['ignored']++;
 						
-						$output->writeln(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
+//						$output->writeln(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
 					}
 
                     break;
