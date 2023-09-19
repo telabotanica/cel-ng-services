@@ -307,7 +307,7 @@ final class CelSyncProcessJobsCommand extends Command
 					$tag = $this->photoBuilderService->getTag($image, $user->getId());
 					
 					//On récupère les données de la photo existante
-					$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId());
+					$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId(), $user->getId());
 					
 					$existingPhotoTag = $photo->getPhotoTags();
 					
