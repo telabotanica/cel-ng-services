@@ -96,7 +96,7 @@ class PhotoBuilderService
 	}
 	
 	public function createTag($tagName, $userId){
-		$tagName = self::PHOTO_TAG[$tagName];
+		$tagName = self::PHOTO_TAG[$tagName] ? : 'autre';
 		
 		$tag = new PhotoTag();
 		
