@@ -59,6 +59,8 @@ final class CelSyncProcessJobsCommand extends Command
      * @var SymfonyStyle
      */
     private $io;
+	
+	private $jobsCount = 0;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -145,6 +147,7 @@ final class CelSyncProcessJobsCommand extends Command
                         $this->em->remove($pnTbPair);
 
                         $this->stats['deleted']++;
+						$this->jobsCount++;
                     } else {
                         $this->stats['ignored']++;
                     }
@@ -153,9 +156,9 @@ final class CelSyncProcessJobsCommand extends Command
                 case 'update':
 					try {
 						$this->updateOccurrence($job->getEntityId());
+						$this->jobsCount++;
 					} catch (\Exception $e) {
 						$this->stats['ignored']++;
-						
 //						$output->writeln(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
 					}
 					
@@ -163,9 +166,9 @@ final class CelSyncProcessJobsCommand extends Command
                 case 'create':
 					try {
 						$this->createOccurrence($job->getEntityId());
+						$this->jobsCount++;
 					}  catch (\Exception $e) {
 						$this->stats['ignored']++;
-						
 //						$output->writeln(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
 					}
 
@@ -175,6 +178,10 @@ final class CelSyncProcessJobsCommand extends Command
                     break;
             }
             $this->em->remove($job);
+			if (0 === $this->jobsCount % 100) {
+				$this->em->flush();
+				$this->em->flush();
+			}
         }
 
         if (!$dryRun) {

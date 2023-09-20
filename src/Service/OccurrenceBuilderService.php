@@ -49,8 +49,9 @@ class OccurrenceBuilderService
 		$taxonName = $this->getPnTaxon($pnOccurrence)[0];
 		$taxonInfo = $this->getPnTaxon($pnOccurrence)[1];
 		
-        $occurrence->setDateObserved($pnOccurrence->getDateObs())
-            ->setDateCreated($pnOccurrence->getDateCreated())
+		$pnOccurrence->getDateObs() ? $occurrence->setDateObserved($pnOccurrence->getDateObs()) : $occurrence->setDateObserved($pnOccurrence->getDateCreated());
+		
+        $occurrence->setDateCreated($pnOccurrence->getDateCreated())
             ->setDateUpdated($pnOccurrence->getDateUpdated());
 
         $occurrence->setTaxoRepo($taxonInfo['taxoRepo'])
