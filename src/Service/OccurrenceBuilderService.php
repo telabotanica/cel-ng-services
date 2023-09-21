@@ -64,7 +64,12 @@ class OccurrenceBuilderService
 
 		// Ajout des données de localisation
         if ($pnOccurrence->getGeo()->getLon() && $pnOccurrence->getGeo()->getLat()) {
-			$occurrence->setIsPublic(true);
+			// Parfois il n'y a pas d'acceptedSciName ou de userSciNammeId, donc dans ce cas on ne veut pas que l'obs soit public
+			if ($occurrence->getAcceptedSciNameId()){
+				$occurrence->setIsPublic(true);
+			} else {
+				$occurrence->setIsPublic(false);
+			}
 			
 			$altitude = $this->getAltitude($pnOccurrence->getGeo()->getLon(), $pnOccurrence->getGeo()->getLat());
 			if ($altitude){
