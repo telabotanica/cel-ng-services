@@ -55,7 +55,7 @@ class OccurrenceBuilderService
             ->setDateUpdated($pnOccurrence->getDateUpdated());
 
         $occurrence->setTaxoRepo($taxonInfo['taxoRepo'])
-            ->setUserSciName($taxonInfo['sciName'] ?? $taxonName)
+            ->setUserSciName($taxonName)
             ->setUserSciNameId($taxonInfo['sciNameId'])
             ->setAcceptedSciName($taxonInfo['acceptedSciName'])
             ->setAcceptedSciNameId($taxonInfo['acceptedSciNameId'])
