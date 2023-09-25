@@ -49,12 +49,13 @@ class OccurrenceBuilderService
 		$taxonName = $this->getPnTaxon($pnOccurrence)[0];
 		$taxonInfo = $this->getPnTaxon($pnOccurrence)[1];
 		
-        $occurrence->setDateObserved($pnOccurrence->getDateObs())
-            ->setDateCreated($pnOccurrence->getDateCreated())
+		$pnOccurrence->getDateObs() ? $occurrence->setDateObserved($pnOccurrence->getDateObs()) : $occurrence->setDateObserved($pnOccurrence->getDateCreated());
+		
+        $occurrence->setDateCreated($pnOccurrence->getDateCreated())
             ->setDateUpdated($pnOccurrence->getDateUpdated());
 
         $occurrence->setTaxoRepo($taxonInfo['taxoRepo'])
-            ->setUserSciName($taxonInfo['sciName'] ?? $taxonName)
+            ->setUserSciName($taxonName)
             ->setUserSciNameId($taxonInfo['sciNameId'])
             ->setAcceptedSciName($taxonInfo['acceptedSciName'])
             ->setAcceptedSciNameId($taxonInfo['acceptedSciNameId'])
@@ -63,7 +64,12 @@ class OccurrenceBuilderService
 
 		// Ajout des données de localisation
         if ($pnOccurrence->getGeo()->getLon() && $pnOccurrence->getGeo()->getLat()) {
-			$occurrence->setIsPublic(true);
+			// Parfois il n'y a pas d'acceptedSciName ou de userSciNammeId, donc dans ce cas on ne veut pas que l'obs soit public
+			if ($occurrence->getAcceptedSciNameId()){
+				$occurrence->setIsPublic(true);
+			} else {
+				$occurrence->setIsPublic(false);
+			}
 			
 			$altitude = $this->getAltitude($pnOccurrence->getGeo()->getLon(), $pnOccurrence->getGeo()->getLat());
 			if ($altitude){

@@ -204,6 +204,10 @@ class TaxoRepoService
 			$recherche = ['recherche' => $taxonNameId, 'referentiel' => $taxoRepo];
 			$infos = $this->consulterRechercheNomsSciEflore($recherche);
 			if (isset($infos['resultat'])){
+				// Au cas où le référentiel ne soit pas le bon et qui'il a donc été changé lors de la recherche par nom.
+				if (isset($infos['referentiel'])){
+					$taxoRepo = $infos['referentiel'];
+				}
 				foreach ($infos['resultat'] as $taxonInfo){
 					if ($this->startsWith($taxonInfo['nom_sci_complet'], $taxonNameId) || $taxonInfo['nom_sci'] ===
 						$taxonNameId){
@@ -238,6 +242,24 @@ class TaxoRepoService
 		// or le cas où l'on n'a pas de résultats est parfaitement valide
 		$infos = @file_get_contents($urlRecherche);
 		$infos = json_decode($infos, true);
+		
+		// Si on ne trouve pas le taxon, on essaie avec tous les référentiels
+		// Oui c'est dégueullasse : TODO faire un truc propre
+		if (!$infos){
+			foreach (self::TELABOTANICA_TAXO_REPOS as $repo){
+				$recherche['referentiel'] = $repo;
+				$url = $this->taxonInfoUrl.'/%s/noms?recherche=%s&masque=%s&retour.champs=id,nom_sci,auteur,nom_retenu.id,famille,num_taxonomique,nom_retenu_complet';
+				$urlRecherche = sprintf($url, strtolower($recherche['referentiel']), 'floue', urlencode
+				($recherche['recherche'].'%'));
+				
+				$infos = @file_get_contents($urlRecherche);
+				$infos = json_decode($infos, true);
+				if ($infos){
+					$infos['referentiel'] = $repo;
+					break;
+				}
+			}
+		}
 		return $infos;
 	}
 

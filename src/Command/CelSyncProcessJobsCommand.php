@@ -59,6 +59,8 @@ final class CelSyncProcessJobsCommand extends Command
      * @var SymfonyStyle
      */
     private $io;
+	
+	private $jobsCount = 0;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -115,7 +117,7 @@ final class CelSyncProcessJobsCommand extends Command
 		
 		$start = new \DateTime("now");
 		$timeStarted = $start->format('d-m-Y H:i:s');
-		$this->io->comment(sprintf('Script started at %s .', ($timeStarted)));
+		$this->io->title(sprintf('Script started at %s .', ($timeStarted)));
 
         $dryRun = $input->getOption('dry-run');
         $processOrder = $input->getOption('process-order');
@@ -145,6 +147,7 @@ final class CelSyncProcessJobsCommand extends Command
                         $this->em->remove($pnTbPair);
 
                         $this->stats['deleted']++;
+						$this->jobsCount++;
                     } else {
                         $this->stats['ignored']++;
                     }
@@ -153,20 +156,20 @@ final class CelSyncProcessJobsCommand extends Command
                 case 'update':
 					try {
 						$this->updateOccurrence($job->getEntityId());
+						$this->jobsCount++;
 					} catch (\Exception $e) {
 						$this->stats['ignored']++;
-						
-						$output->writeln(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
+//						$output->writeln(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
 					}
 					
                     break;
                 case 'create':
 					try {
 						$this->createOccurrence($job->getEntityId());
+						$this->jobsCount++;
 					}  catch (\Exception $e) {
 						$this->stats['ignored']++;
-						
-						$output->writeln(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
+//						$output->writeln(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
 					}
 
                     break;
@@ -175,6 +178,10 @@ final class CelSyncProcessJobsCommand extends Command
                     break;
             }
             $this->em->remove($job);
+			if (0 === $this->jobsCount % 100) {
+				$this->em->flush();
+				$this->em->flush();
+			}
         }
 
         if (!$dryRun) {
@@ -191,7 +198,7 @@ final class CelSyncProcessJobsCommand extends Command
 		foreach ($this->stats as $stat => $value) {
 			$this->io->text(' '.ucfirst($stat).': '.$value);
 		}
-		$this->io->text(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB',
+		$this->io->comment(sprintf('  Elapsed time: %.2f m / Consumed memory: %.2f MB',
 								($event->getDuration())/60000,$event->getMemory() / (1024 ** 2)));
         return 0;
     }
@@ -307,7 +314,7 @@ final class CelSyncProcessJobsCommand extends Command
 					$tag = $this->photoBuilderService->getTag($image, $user->getId());
 					
 					//On récupère les données de la photo existante
-					$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId());
+					$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId(), $user->getId());
 					
 					$existingPhotoTag = $photo->getPhotoTags();
 					

@@ -35,11 +35,15 @@ class PhotoRepository extends ServiceEntityRepository
             ->getResult();
     }
 	
-	public function findOneByOriginalNameStartingWith($imagePrefix)
+	public function findOneByOriginalNameStartingWith($imagePrefix, $userId)
 	{
 		return $this->createQueryBuilder('p')
 					->andWhere('p.originalName LIKE :prefix')
 					->setParameter('prefix', $imagePrefix . '%')
+					->andWhere('p.userId = :val1')
+					->setParameter('val1', $userId)
+					->orderBy('p.id', 'DESC')
+					->setMaxResults(1)
 					->getQuery()
 					->getOneOrNullResult();
 	}
