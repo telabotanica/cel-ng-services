@@ -83,11 +83,21 @@ class OccurrenceBuilderService
                     $pnOccurrence->getGeo()->getLat()
                 ]
             ], JSON_THROW_ON_ERROR));
-
-            $occurrence->setLocality($pnOccurrence->getGeo()->getPlace());
-            if ($pnOccurrence->getGeo()->getAccuracy()) {
-                $occurrence->setLocationAccuracy(LocationAccuracyEnumType::getAccuracyRangeForFloat($pnOccurrence->getGeo()->getAccuracy()));
-            }
+			
+			if ($pnOccurrence->getGeo()->getPlace()){
+				$occurrence->setLocality($pnOccurrence->getGeo()->getPlace());
+				if ($pnOccurrence->getGeo()->getAccuracy()) {
+					$occurrence->setLocationAccuracy(LocationAccuracyEnumType::getAccuracyRangeForFloat($pnOccurrence->getGeo()->getAccuracy()));
+				}
+			} else {
+				$locality = $this->getLocality($pnOccurrence->getGeo()->getLon(), $pnOccurrence->getGeo()->getLat());
+				$occurrence->setLocality($locality[0]);
+				$occurrence->setSublocality($locality[1]);
+				$occurrence->setLocalityInseeCode($locality[2]);
+				if ($pnOccurrence->getGeo()->getAccuracy()) {
+					$occurrence->setLocationAccuracy(LocationAccuracyEnumType::getAccuracyRangeForFloat($pnOccurrence->getGeo()->getAccuracy()));
+				}
+			}
         } else {
 			$occurrence->setIsPublic(false);
 		}
@@ -96,6 +106,24 @@ class OccurrenceBuilderService
 
         return $occurrence;
     }
+	
+	public function getLocality($longitude, $latitude){
+		$infos = null;
+		$bigDataApi = 'https://api.bigdatacloud.net/data/reverse-geocode-client?';
+		$response = $this->client->request('GET', $bigDataApi.'latitude='.$latitude.'&longitude='.$longitude.'&localityLanguage=fr');
+		
+		if (200 !== $response->getStatusCode()) {
+			print_r('Erreur lors de la récupération de la localité.');
+		} else {
+			$response = json_decode($response->getContent(), true) ?? [];
+			$infos = [
+				$response['city'],
+				$response['locality'],
+				$response['postcode']
+			];
+		}
+		return $infos;
+	}
 	
 	public function getAltitude($longitude, $latitude){
 		$altitude = null;
