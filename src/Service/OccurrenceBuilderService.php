@@ -93,7 +93,7 @@ class OccurrenceBuilderService
 				$locality = $this->getLocality($pnOccurrence->getGeo()->getLon(), $pnOccurrence->getGeo()->getLat());
 				$occurrence->setLocality($locality[0]);
 				$occurrence->setSublocality($locality[1]);
-				$occurrence->setLocalityInseeCode($locality[2]);
+//				$occurrence->setLocalityInseeCode($locality[2]);
 				if ($pnOccurrence->getGeo()->getAccuracy()) {
 					$occurrence->setLocationAccuracy(LocationAccuracyEnumType::getAccuracyRangeForFloat($pnOccurrence->getGeo()->getAccuracy()));
 				}
