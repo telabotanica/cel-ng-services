@@ -119,21 +119,24 @@ class PhotoBuilderService
 				return true;
 			} else {
 				// La photo existe déjà, on vérifie si le tag a changé
-				$tag = $this->getTag($image, $user->getId());
-				
-				$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId(), $user->getId());
-				
-				$tagChanged = $this->isTagChanged($tag, $photo);
-
-				// Si le tag de la photo a changé; la photo a changé
-				if ($tagChanged){
-					return true;
+				if ($user){
+					$tag = $this->getTag($image, $user->getId());
+					
+					$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId(), $user->getId());
+					
+					$tagChanged = $this->isTagChanged($tag, $photo);
+					
+					// Si le tag de la photo a changé; la photo a changé
+					if ($tagChanged){
+						return true;
+					}
+					
+					// Si la photo existante n'a pas de tag mais la nouvelle en a la photo a changé
+					if (!$photo->getPhotoTags() && $tag){
+						return true;
+					}
 				}
 				
-				// Si la photo existante n'a pas de tag mais la nouvelle en a la photo a changé
-				if (!$photo->getPhotoTags() && $tag){
-					return true;
-				}
 			}
 		}
 		return false;
