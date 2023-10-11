@@ -159,7 +159,8 @@ final class CelSyncProcessJobsCommand extends Command
 						$this->jobsCount++;
 					} catch (\Exception $e) {
 						$this->stats['ignored']++;
-//						$output->writeln(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
+						$this->io->error(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
+						continue;
 					}
 					
                     break;
@@ -169,7 +170,8 @@ final class CelSyncProcessJobsCommand extends Command
 						$this->jobsCount++;
 					}  catch (\Exception $e) {
 						$this->stats['ignored']++;
-//						$output->writeln(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
+						$this->io->error(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
+						continue;
 					}
 
                     break;
