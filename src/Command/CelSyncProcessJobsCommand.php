@@ -334,8 +334,10 @@ final class CelSyncProcessJobsCommand extends Command
 							$this->photoBuilderService->updatePhotoTag($tag, $photo, $existingPhotoTag);
 						}
 					} else {
-						$this->photoBuilderService->savePhotoTag($tag, $photo);
-						$this->em->persist($photo);
+						if ($tag){
+							$this->photoBuilderService->savePhotoTag($tag, $photo);
+							$this->em->persist($photo);
+						}
 					}
 				}
 			}
