@@ -160,7 +160,7 @@ final class CelSyncProcessJobsCommand extends Command
 					} catch (\Exception $e) {
 						$this->stats['ignored']++;
 						$this->io->error(sprintf('Erreur lors du traitement d\'update du job %d: %s',$job->getEntityId(),$e->getMessage()));
-						continue;
+						break;
 					}
 					
                     break;
@@ -171,7 +171,7 @@ final class CelSyncProcessJobsCommand extends Command
 					}  catch (\Exception $e) {
 						$this->stats['ignored']++;
 						$this->io->error(sprintf('Erreur lors du traitement de création du job %d: %s',$job->getEntityId(), $e->getMessage()));
-						continue;
+						break;
 					}
 
                     break;
@@ -313,13 +313,19 @@ final class CelSyncProcessJobsCommand extends Command
 				} else {
 					// La photo existe déjà, on vérifie si le tag a changé
 					// Si nécessaire on crée un tag pour l'utilisateur
-					$tag = $this->photoBuilderService->getTag($image, $user->getId());
-					
-					//On récupère les données de la photo existante
-					$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId(), $user->getId());
-					
-					$existingPhotoTag = $photo->getPhotoTags();
-					
+					try {
+						if ($user) {
+							$tag = $this->photoBuilderService->getTag($image, $user->getId());
+							
+							//On récupère les données de la photo existante
+							$photo = $this->photoRepository->findOneByOriginalNameStartingWith($image->getId(), $user->getId());
+						}
+						if ($photo && $photo->getPhotoTags()){
+							$existingPhotoTag = $photo->getPhotoTags();
+						}
+					} catch (\Exception $e) {
+						continue;
+					}
 					if ($existingPhotoTag){
 						//On vérifie si le nouveau tag et l'ancien sont identiques
 						$tagChanged = $this->photoBuilderService->isTagChanged($tag, $photo);
@@ -328,8 +334,10 @@ final class CelSyncProcessJobsCommand extends Command
 							$this->photoBuilderService->updatePhotoTag($tag, $photo, $existingPhotoTag);
 						}
 					} else {
-						$this->photoBuilderService->savePhotoTag($tag, $photo);
-						$this->em->persist($photo);
+						if ($tag){
+							$this->photoBuilderService->savePhotoTag($tag, $photo);
+							$this->em->persist($photo);
+						}
 					}
 				}
 			}
