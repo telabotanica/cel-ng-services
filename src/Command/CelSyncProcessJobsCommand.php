@@ -291,7 +291,7 @@ final class CelSyncProcessJobsCommand extends Command
 		
 		$user = $this->annuaireService->findUserInfo($pnOccurrence->getAuthor()->getEmail());
 		
-		if ($imageChanged){
+		if ($user && $imageChanged){
 			// update photos
 			foreach ($pnOccurrence->getImages() as $image) {
 				if (!$occurrence->isExistingPhoto($image)) {
