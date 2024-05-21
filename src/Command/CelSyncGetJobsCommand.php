@@ -157,7 +157,7 @@ final class CelSyncGetJobsCommand extends Command
 				try {
 				// filter out occurrences (if isValid filter out too many occurences -> remove it)
 					if ($occurrence->getPartner() ||
-						!$occurrence->isValid() ||
+//						!$occurrence->isValid() ||
 						$occurrence->getCurrentName() == '' ||
 						(count($occurrence->getImages()) == 1 && $occurrence->getImages()[0]->getQualityVotes()->getMinus() > 0) ||
 						!$occurrence->getLicense()) {
