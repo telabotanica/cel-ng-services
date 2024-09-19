@@ -144,6 +144,9 @@ final class CelSyncProcessJobsCommand extends Command
                     if ($occurrence) {
                         $pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
                         $this->em->remove($occurrence);
+                        if ($pnTbPair) {
+							$this->em->remove($pnTbPair);
+						}
                         $this->em->remove($pnTbPair);
 
                         $this->stats['deleted']++;
