@@ -143,16 +143,21 @@ final class CelSyncProcessJobsCommand extends Command
                     $occurrence = $this->occurrenceRepository->findOneBy(['plantnetId' => $job->getEntityId()]);
                     if ($occurrence) {
                         $pnTbPair = $this->pnTbPairRepository->findOneBy(['occurrence' => $occurrence]);
-                        $this->em->remove($occurrence);
-                        if ($pnTbPair) {
-							$this->em->remove($pnTbPair);
-						}
-                        $this->em->remove($pnTbPair);
-
-                        $this->stats['deleted']++;
-						$this->jobsCount++;
+                        try {
+							$this->em->remove($occurrence);
+							if ($pnTbPair) {
+								$this->em->remove($pnTbPair);
+							}
+                            $this->stats['deleted']++;
+                            $this->jobsCount++;
+						} catch (\Exception $e) {
+                            $this->stats['ignored']++;
+                            $this->io->error(sprintf('Erreur lors de la suppression de l\'occurrence %d: %s', $job->getEntityId(), $e->getMessage()));
+                            break;
+                        }
                     } else {
                         $this->stats['ignored']++;
+                        $this->io->error(sprintf('Erreur lors de la suppression de l\'occurrence %d: occurrence non trouvée', $job->getEntityId()));
                     }
 
                     break;
