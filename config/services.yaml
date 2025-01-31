@@ -234,3 +234,12 @@ services:
         arguments:
             - '%env(SSO_ANNUAIRE_URL)%'
             - '%env(IGNORE_SSL_ISSUES)%'
+
+    App\DataProvider\ExportTotalProvider:
+        public: true
+        tags:
+            - { name: 'api_platform.data_provider' }
+
+    App\Repository\ExportTotalRepository:
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
