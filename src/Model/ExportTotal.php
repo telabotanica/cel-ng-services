@@ -6,15 +6,27 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
+use App\filter\ExportTotalFilter;
 
 /**
  * @ApiResource(
- *     collectionOperations={"get"},
+ *     description="Export Total des obs publics avec image",
+ *     collectionOperations={
+ *         "get"={
+ *             "method"="GET",
+ *             "swagger_context"={
+ *                 "summary"="Récupère la liste des exports avec filtres",
+ *                 "description"="Cette route permet de récupérer la liste des exports des observations publiques avec des options de pagination et de tri.",
+ *             }
+ *         }
+ *     },
  *     itemOperations={"get"},
  *     normalizationContext={"groups"={"read"}},
  *     denormalizationContext={"groups"={"write"}},
- *     formats={"json"}
+ *     formats={"json"},
+ *     attributes={"pagination_enabled"=false}
  * )
+ * @ApiFilter(ExportTotalFilter::class)
  */
 class ExportTotal
 {

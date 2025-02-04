@@ -10,7 +10,7 @@ monolog:
             level: warning
             # max number of log files to keep
             # defaults to zero, which means infinite files
-            max_files: 10
+            max_files: 3
         doctrine:
             type: stream
             path: "%kernel.project_dir%/var/log/doctrine.log"
@@ -28,7 +28,7 @@ monolog:
             type: rotating_file
             path: "%kernel.logs_dir%/debug.log"
             level: debug
-            max_files: 10
+            max_files: 3
 #            channels: [ "!event", "!doctrine" ]
 #        error:
 #            type: stream

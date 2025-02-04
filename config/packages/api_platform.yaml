@@ -1,4 +1,10 @@
 api_platform:
+    enable_swagger_ui: true
+    enable_re_doc: true
+    enable_entrypoint: true
+    enable_docs: true
+    title: 'Services du CEL'
+    version: '2.0.0'
     mapping:
         paths: ['%kernel.project_dir%/src/Entity', '%kernel.project_dir%/src/Model']
     formats:

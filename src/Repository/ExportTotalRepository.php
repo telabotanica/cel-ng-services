@@ -78,7 +78,6 @@ class ExportTotalRepository
             __FILE__.':'.__LINE__;
 
         //TODO: mapper infos et resultats dans un tableau
-//        dd($query);
         $stmt = $this->connection->executeQuery($query);
 
         return $stmt->fetchAllAssociative();
