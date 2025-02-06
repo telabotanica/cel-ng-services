@@ -31,7 +31,9 @@ class ExportTotalRepository
         $date_debut = "'{$date_debut}'";
         $date_fin = "'{$date_fin}'";
 
-        $query = 'SELECT * FROM cel_export_total 
+        $query = 'SELECT * FROM cel_export_total AS ce LEFT JOIN cel_images_export AS i ON ce.id_observation = i.ce_observation WHERE ce.date_modification >= '.$date_debut.' AND ce.date_modification <= '.$date_fin.' AND ce.images IS NOT NULL AND ce.transmission = "1"';
+
+        $queryTotal = 'SELECT COUNT(*) FROM cel_export_total 
          WHERE date_modification >= '.$date_debut.' 
          AND date_modification <= '.$date_fin.' 
          AND images IS NOT NULL
@@ -39,30 +41,37 @@ class ExportTotalRepository
 
         if (isset($this->parametres['masque.referentiel']) && $this->parametres['masque.referentiel'] != '') {
             $query .= ' AND nom_referentiel = "' . $this->parametres['masque.referentiel'] .'"';
+            $queryTotal .= ' AND nom_referentiel = "' . $this->parametres['masque.referentiel'] .'"';
         }
 
         if (isset($this->parametres['masque.nom_ret']) && $this->parametres['masque.nom_ret'] != '') {
             $query .= ' AND nom_ret LIKE "%' . $this->parametres['masque.nom_ret'] .'%"';
+            $queryTotal .= ' AND nom_ret LIKE "%' . $this->parametres['masque.nom_ret'] .'%"';
         }
 
         if (isset($this->parametres['masque.nom_ret_nn']) && $this->parametres['masque.nom_ret_nn'] != '') {
             $query .= ' AND nom_ret_nn = "' . $this->parametres['masque.nom_ret_nn'] .'"';
+            $queryTotal .= ' AND nom_ret_nn = "' . $this->parametres['masque.nom_ret_nn'] .'"';
         }
 
         if (isset($this->parametres['masque.famille']) && $this->parametres['masque.famille'] != '') {
             $query .= ' AND famille LIKE "%' . $this->parametres['masque.famille'] .'%"';
+            $queryTotal .= ' AND famille LIKE "%' . $this->parametres['masque.famille'] .'%"';
         }
 
         if (isset($this->parametres['masque.projet']) && $this->parametres['masque.projet'] != '') {
             $query .= ' AND programme LIKE "%' . $this->parametres['masque.projet'] .'%"';
+            $queryTotal .= ' AND programme LIKE "%' . $this->parametres['masque.projet'] .'%"';
         }
 
         if (isset($this->parametres['masque.mots_cles']) && $this->parametres['masque.mots_cles'] != '') {
-            $query .= ' AND mots_cles_texte LIKE "%' . $this->parametres['masque.mots_cles'] .'%"';
+            $query .= ' AND ce.mots_cles_texte LIKE "%' . $this->parametres['masque.mots_cles'] .'%"';
+            $queryTotal .= ' AND mots_cles_texte LIKE "%' . $this->parametres['masque.mots_cles'] .'%"';
         }
 
         if (isset($this->parametres['masque.cp']) && $this->parametres['masque.cp'] != '') {
             $query .= ' AND ce_zone_geo = "' . $this->parametres['masque.cp'] .'"';
+            $queryTotal .= ' AND ce_zone_geo = "' . $this->parametres['masque.cp'] .'"';
         }
 
         if (isset($this->parametres['masque']) && $this->parametres['masque'] != '') {
@@ -71,22 +80,37 @@ class ExportTotalRepository
             OR courriel_utilisateur LIKE "%' . $this->parametres['masque'] .'%"
             OR pseudo_utilisateur LIKE "%' . $this->parametres['masque'] .'%")
             ';
+            $queryTotal .= ' AND ( nom_ret LIKE "%' . $this->parametres['masque'] .'%"
+            OR famille LIKE "%' . $this->parametres['masque'] .'%"
+            OR courriel_utilisateur LIKE "%' . $this->parametres['masque'] .'%"
+            OR pseudo_utilisateur LIKE "%' . $this->parametres['masque'] .'%")
+            ';
         }
 
-        $query .=  ' ORDER BY date_modification ' . $ordre . ' 
+        $query .=  ' GROUP BY ce.id_observation ORDER BY ce.date_modification ' . $ordre . ' 
          LIMIT '.$depart.','.$limite .' -- '.
             __FILE__.':'.__LINE__;
 
-        //TODO: mapper infos et resultats dans un tableau
         $stmt = $this->connection->executeQuery($query);
+        $stmtTotal = $this->connection->executeQuery($queryTotal);
 
-        return $stmt->fetchAllAssociative();
+        $resultats = $stmt->fetchAllAssociative();
+
+        foreach ($resultats as &$resultat) {
+            $resultat = $this->transformImagesToArray($resultat);
+            unset($resultat);
+        }
+
+        //TODO: serialize les résultats
+        return ['total' => $stmtTotal->fetchColumn(), 'resultats' => $resultats];
     }
 
     public function find(int $id): ?array
     {
         $query = 'SELECT * FROM cel_export_total WHERE id_observation = :id';
         $result = $this->connection->fetchAssociative($query, ['id' => $id]);
+
+        $result = $this->transformImagesToArray($result);
 
         return $result ? $result : null;
     }
@@ -223,6 +247,26 @@ class ExportTotalRepository
                 $this->parametres['ordre'] = 'desc';
             }
         }
+    }
+
+    private function transformImagesToArray(array $resultat): array {
+        if (isset($resultat['images'])) {
+            $images = [];
+            $idimg = explode(',', $resultat['images']);
+            foreach ($idimg as $img) {
+                if ($img !== '') {
+                    $images[] = [
+                        'url' => $img,
+                        'id_image' => $resultat['id_image'],
+                        'nom_original' => $resultat['nom_original'],
+                        'date_prise_de_vue' => $resultat['date_prise_de_vue'],
+                    ];
+                }
+            }
+            $resultat['images'] = $images;
+        }
+
+        return $resultat;
     }
 
 //    public function findVerifiedObservations(int $page,int $limit=12): array

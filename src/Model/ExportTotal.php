@@ -402,7 +402,7 @@ class ExportTotal
     private $score_identiplante;
 
     /**
-     * @var string|null
+     * @var array|null
      *
      * @Groups({"read"})
      */
@@ -476,11 +476,11 @@ class ExportTotal
      * @param int|null $validation_identiplante
      * @param \DateTime|null $date_validation
      * @param int|null $score_identiplante
-     * @param string|null $images
+     * @param array|null $images
      * @param int|null $cd_nom
      * @param int|null $grade
      */
-    public function __construct(int $id_observation, string $guid, bool $donnees_standard, bool $transmission, ?int $id_plantnet, ?int $ce_utilisateur, ?string $pseudo_utilisateur, ?string $courriel_utilisateur, ?string $nom_sel, ?int $nom_sel_nn, ?string $nom_ret, ?int $nom_ret_nn, ?string $famille, ?string $nom_referentiel, ?string $pays, ?string $ce_zone_geo, ?string $dept, ?string $zone_geo, ?string $lieudit, ?string $station, ?string $milieu, ?float $latitude, ?float $longitude, ?int $altitude, ?string $geodatum, ?string $geometry, ?float $lat_prive, ?float $long_prive, ?string $localisation_precision, ?string $localisation_floutage, ?bool $localisation_coherence, ?\DateTime $date_observation, ?string $programme, ?string $mots_cles_texte, ?string $commentaire, ?\DateTime $date_creation, ?\DateTime $date_modification, ?\DateTime $date_transmission, ?string $abondance, ?string $certitude, ?string $phenologie, ?bool $spontaneite, ?string $observateur, ?string $observateur_structure, ?string $type_donnees, ?string $biblio, ?string $source, ?bool $herbier, ?string $determinateur, ?string $url_identiplante, ?int $validation_identiplante, ?\DateTime $date_validation, ?int $score_identiplante, ?string $images, ?int $cd_nom, ?int $grade)
+    public function __construct(int $id_observation, string $guid, bool $donnees_standard, bool $transmission, ?int $id_plantnet, ?int $ce_utilisateur, ?string $pseudo_utilisateur, ?string $courriel_utilisateur, ?string $nom_sel, ?int $nom_sel_nn, ?string $nom_ret, ?int $nom_ret_nn, ?string $famille, ?string $nom_referentiel, ?string $pays, ?string $ce_zone_geo, ?string $dept, ?string $zone_geo, ?string $lieudit, ?string $station, ?string $milieu, ?float $latitude, ?float $longitude, ?int $altitude, ?string $geodatum, ?string $geometry, ?float $lat_prive, ?float $long_prive, ?string $localisation_precision, ?string $localisation_floutage, ?bool $localisation_coherence, ?\DateTime $date_observation, ?string $programme, ?string $mots_cles_texte, ?string $commentaire, ?\DateTime $date_creation, ?\DateTime $date_modification, ?\DateTime $date_transmission, ?string $abondance, ?string $certitude, ?string $phenologie, ?bool $spontaneite, ?string $observateur, ?string $observateur_structure, ?string $type_donnees, ?string $biblio, ?string $source, ?bool $herbier, ?string $determinateur, ?string $url_identiplante, ?int $validation_identiplante, ?\DateTime $date_validation, ?int $score_identiplante, ?array $images, ?int $cd_nom, ?int $grade)
     {
         $this->id_observation = $id_observation;
         $this->guid = $guid;
@@ -978,7 +978,7 @@ class ExportTotal
     }
 
     /**
-     * @return string|null
+     * @return array|null
      */
     public function getImages(): ?string
     {

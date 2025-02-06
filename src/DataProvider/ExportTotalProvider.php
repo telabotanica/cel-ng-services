@@ -17,11 +17,13 @@ final class ExportTotalProvider implements CollectionDataProviderInterface, Item
         $this->repository = $repository;
     }
 
-    public function getCollection(string $resourceClass, string $operationName = null,  array $context = []): array
+    public function getCollection(string $resourceClass, string $operationName = null,  array $context = [])
     {
         $filters = $context['filters'] ?? [];
+        $resultats = $this->repository->findAll($filters);
 
-        return $this->repository->findAll($filters);
+        return $resultats;
+//        return new JsonResponse($this->serializer->serialize($resultats, 'json', ['groups' => 'read']), 201, [], true);
     }
 
     public function getItem(string $resourceClass, $id_observation, ?string $operationName = null, array $context = [])
