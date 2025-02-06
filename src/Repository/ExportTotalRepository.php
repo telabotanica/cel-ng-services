@@ -16,8 +16,6 @@ class ExportTotalRepository
         $this->parametres = $parametres;
     }
 
-
-
     public function findAll($parametres = []): array
     {
         $this->setParametres($parametres);
@@ -91,30 +89,33 @@ class ExportTotalRepository
          LIMIT '.$depart.','.$limite .' -- '.
             __FILE__.':'.__LINE__;
 
-        $stmt = $this->connection->executeQuery($query);
-        $stmtTotal = $this->connection->executeQuery($queryTotal);
-
-        $resultats = $stmt->fetchAllAssociative();
+        $resultats = $this->connection->fetchAllAssociative($query);
+        $total = $this->connection->fetchOne($queryTotal);
 
         foreach ($resultats as &$resultat) {
             $resultat = $this->transformImagesToArray($resultat);
             unset($resultat);
         }
 
-        //TODO: serialize les résultats
-        return ['total' => $stmtTotal->fetchColumn(), 'resultats' => $resultats];
+        $exportTotals = [];
+        foreach ($resultats as $row) {
+            $exportTotals[] = $this->mapRowToExportTotal($row);
+        }
+
+        return ['total' => $total, 'resultats' => $exportTotals];
     }
 
-    public function find(int $id): ?array
+    public function find(int $id): ?ExportTotal
     {
-        $query = 'SELECT * FROM cel_export_total WHERE id_observation = :id';
-        $result = $this->connection->fetchAssociative($query, ['id' => $id]);
+        $query = 'SELECT * FROM cel_export_total AS ce LEFT JOIN cel_images_export AS i ON ce.id_observation = i.ce_observation WHERE id_observation = ' . $id;
+        $result = $this->connection->fetchAssociative($query, ['id_observation' => $id]);
 
         $result = $this->transformImagesToArray($result);
+        $result = $this->mapRowToExportTotal($result);
 
         return $result ? $result : null;
     }
-
+/*
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null): array
     {
         // Construction de la requête SQL avec les critères dynamiques
@@ -154,7 +155,7 @@ class ExportTotalRepository
 //            );
 //        }, $result);
     }
-
+*/
     /**
      * Mapper une ligne de résultat de la base de données vers un objet ExportTotal
      *
@@ -164,63 +165,63 @@ class ExportTotalRepository
     private function mapRowToExportTotal(array $row): ExportTotal
     {
         return new ExportTotal(
-            $row['id_observation'],
-            $row['guid'],
-            $row['donnees_standard'],
-            $row['transmission'],
-            $row['id_plantnet'],
-            $row['ce_utilisateur'],
-            $row['pseudo_utilisateur'],
-            $row['courriel_utilisateur'],
-            $row['nom_sel'],
-            $row['nom_sel_nn'],
-            $row['nom_ret'],
-            $row['nom_ret_nn'],
-            $row['famille'],
-            $row['nom_referentiel'],
-            $row['pays'],
-            $row['ce_zone_geo'],
-            $row['dept'],
-            $row['zone_geo'],
-            $row['lieudit'],
-            $row['station'],
-            $row['milieu'],
-            $row['latitude'],
-            $row['longitude'],
-            $row['altitude'],
-            $row['geodatum'],
-            $row['geometry'],
-            $row['lat_prive'],
-            $row['long_prive'],
-            $row['localisation_precision'],
-            $row['localisation_floutage'],
-            $row['localisation_coherence'],
-            $this->convertToDate($row['date_observation']),
-            $row['programme'],
-            $row['mots_cles_texte'],
-            $row['commentaire'],
-            $this->convertToDate($row['date_creation']),
-            $this->convertToDate($row['date_modification']),
-            $this->convertToDate($row['date_transmission']),
-            $row['abondance'],
-            $row['certitude'],
-            $row['phenologie'],
-            $row['spontaneite'],
-            $row['observateur'],
-            $row['observateur_structure'],
-            $row['type_donnees'],
-            $row['biblio'],
-            $row['source'],
-            $row['herbier'],
-            $row['determinateur'],
-            $row['url_identiplante'],
-            $row['validation_identiplante'],
-            $row['date_validation'],
-            $row['score_identiplante'],
-            $row['images'],
-            $row['cd_nom'],
-            $row['grade']
-        );
+            $row['id_observation'] ?? 0,
+            $row['guid'] ?? '',
+            $row['donnees_standard'] ?? false,
+            $row['transmission'] ?? false,
+            $row['id_plantnet'] ?? null,
+            $row['ce_utilisateur'] ?? null,
+            $row['pseudo_utilisateur'] ?? null,
+            $row['courriel_utilisateur'] ?? null,
+            $row['nom_sel'] ?? null,
+            $row['nom_sel_nn'] ?? null,
+            $row['nom_ret'] ?? null,
+            $row['nom_ret_nn'] ?? null,
+            $row['famille'] ?? null,
+            $row['nom_referentiel'] ?? null,
+            $row['pays'] ?? null,
+            $row['ce_zone_geo'] ?? null,
+            $row['dept'] ?? null,
+            $row['zone_geo'] ?? null,
+            $row['lieudit'] ?? null,
+            $row['station'] ?? null,
+            $row['milieu'] ?? null,
+            $row['latitude'] ?? null,
+            $row['longitude'] ?? null,
+            $row['altitude'] ?? null,
+            $row['geodatum'] ?? null,
+            $row['geometry'] ?? null,
+            $row['lat_prive'] ?? null,
+            $row['long_prive'] ?? null,
+            $row['localisation_precision'] ?? null,
+            $row['localisation_floutage'] ?? null,
+            $row['localisation_coherence'] ?? null,
+            new \DateTime($row['date_observation'] ?? null),
+            $row['programme'] ?? null,
+            $row['mots_cles_texte'] ?? null,
+            $row['commentaire'] ?? null,
+            new \DateTime($row['date_creation'] ?? null),
+            new \DateTime($row['date_modification'] ?? null),
+            new \DateTime($row['date_transmission'] ?? null),
+            $row['abondance'] ?? null,
+            $row['certitude'] ?? null,
+            $row['phenologie'] ?? null,
+            $row['spontaneite'] ?? null,
+            $row['observateur'] ?? null,
+            $row['observateur_structure'] ?? null,
+            $row['type_donnees'] ?? null,
+            $row['biblio'] ?? null,
+            $row['source'] ?? null,
+            $row['herbier'] ?? null,
+            $row['determinateur'] ?? null,
+            $row['url_identiplante'] ?? null,
+            $row['validation_identiplante'] ?? null,
+            new \DateTime($row['date_validation'] ?? null),
+            $row['score_identiplante'] ?? null,
+            $row['images'] ?? '[]',
+            $row['cd_nom'] ?? null,
+            $row['grade'] ?? null
+        );;
     }
 
     private function convertToDate(?string $dateString): ?\DateTime

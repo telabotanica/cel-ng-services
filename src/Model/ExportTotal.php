@@ -7,6 +7,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\filter\ExportTotalFilter;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
  * @ApiResource(
@@ -21,8 +22,8 @@ use App\filter\ExportTotalFilter;
  *         }
  *     },
  *     itemOperations={"get"},
- *     normalizationContext={"groups"={"read"}},
- *     denormalizationContext={"groups"={"write"}},
+ *     normalizationContext={"groups"={"exportTotal_read"}},
+ *     denormalizationContext={"groups"={"exportTotal_write"}},
  *     formats={"json"},
  *     attributes={"pagination_enabled"=false}
  * )
@@ -33,184 +34,181 @@ class ExportTotal
     /**
      * @var int
      *
-     * @Groups({"read"})
-     *
-     * @ApiProperty(identifier=true)
+     * @Groups({"exportTotal_read"})
      */
-    private $id_observation;
+    private $idObservation;
 
     /**
      * @var string
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $guid;
 
     /**
      * @var bool
-     *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $donnees_standard;
+    private $donneesStandard;
 
     /**
      * @var bool
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $transmission;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $id_plantnet;
+    private $idPlantnet;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $ce_utilisateur;
+    private $ceUtilisateur;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $pseudo_utilisateur;
+    private $pseudoUtilisateur;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $courriel_utilisateur;
+    private $courrielUtilisateur;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $nom_sel;
+    private $nomSel;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $nom_sel_nn;
+    private $nomSelNn;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $nom_ret;
+    private $nomRet;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $nom_ret_nn;
+    private $nomRetNn;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $famille;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $nom_referentiel;
+    private $referentiel;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $pays;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $ce_zone_geo;
+    private $ceZoneGeo;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $dept;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $zone_geo;
+    private $zoneGeo;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $lieudit;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $station;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $milieu;
 
     /**
      * @var float|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $latitude;
 
     /**
      * @var float|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $longitude;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $altitude;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $geodatum;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $geometry;
 
@@ -218,229 +216,229 @@ class ExportTotal
      * @var float|null
      *
      */
-    private $lat_prive;
+    private $latPrive;
 
     /**
      * @var float|null
      *
      */
-    private $long_prive;
+    private $longPrive;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $localisation_precision;
+    private $localisationPrecise;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $localisation_floutage;
+    private $localisationFloutage;
 
     /**
      * @var bool|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $localisation_coherence;
+    private $localisationCoherence;
 
     /**
      * @var \DateTime|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $date_observation;
+    private $dateObservation;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $programme;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $mots_cles_texte;
+    private $motsClesTexte;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $commentaire;
 
     /**
      * @var \DateTime|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $date_creation;
+    private $dateCreation;
 
     /**
      * @var \DateTime|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $date_modification;
+    private $dateModification;
 
     /**
      * @var \DateTime|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $date_transmission;
+    private $dateTransmission;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $abondance;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $certitude;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $phenologie;
 
     /**
      * @var bool|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $spontaneite;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $observateur;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $observateur_structure;
+    private $observateurStructure;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $type_donnees;
+    private $typeDonnees;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $biblio;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $source;
 
     /**
      * @var bool|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $herbier;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $determinateur;
 
     /**
      * @var string|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $url_identiplante;
+    private $urlIdentiplante;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $validation_identiplante;
+    private $validationIdentiplante;
 
     /**
      * @var \DateTime|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $date_validation;
+    private $dateValidation;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $score_identiplante;
+    private $scoreIdentiplante;
 
     /**
      * @var array|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $images;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
-    private $cd_nom;
+    private $cdcNom;
 
     /**
      * @var int|null
      *
-     * @Groups({"read"})
+     * @Groups({"exportTotal_read"})
      */
     private $grade;
 
     /**
-     * @param int $id_observation
+     * @param int $idObservation
      * @param string $guid
-     * @param bool $donnees_standard
+     * @param bool $donneesStandard
      * @param bool $transmission
-     * @param int|null $id_plantnet
-     * @param int|null $ce_utilisateur
-     * @param string|null $pseudo_utilisateur
-     * @param string|null $courriel_utilisateur
-     * @param string|null $nom_sel
-     * @param int|null $nom_sel_nn
-     * @param string|null $nom_ret
-     * @param int|null $nom_ret_nn
+     * @param int|null $idPlantnet
+     * @param int|null $ceUtilisateur
+     * @param string|null $pseudoUtilisateur
+     * @param string|null $courrielUtilisateur
+     * @param string|null $nomSel
+     * @param int|null $nomSelNn
+     * @param string|null $nomRet
+     * @param int|null $nomRetNn
      * @param string|null $famille
-     * @param string|null $nom_referentiel
+     * @param string|null $referentiel
      * @param string|null $pays
-     * @param string|null $ce_zone_geo
+     * @param string|null $ceZoneGeo
      * @param string|null $dept
-     * @param string|null $zone_geo
+     * @param string|null $zoneGeo
      * @param string|null $lieudit
      * @param string|null $station
      * @param string|null $milieu
@@ -449,57 +447,57 @@ class ExportTotal
      * @param int|null $altitude
      * @param string|null $geodatum
      * @param string|null $geometry
-     * @param float|null $lat_prive
-     * @param float|null $long_prive
-     * @param string|null $localisation_precision
-     * @param string|null $localisation_floutage
-     * @param bool|null $localisation_coherence
-     * @param \DateTime|null $date_observation
+     * @param float|null $latPrive
+     * @param float|null $longPrive
+     * @param string|null $localisationPrecise
+     * @param string|null $localisationFloutage
+     * @param bool|null $localisationCoherence
+     * @param \DateTime|null $dateObservation
      * @param string|null $programme
-     * @param string|null $mots_cles_texte
+     * @param string|null $motsClesTexte
      * @param string|null $commentaire
-     * @param \DateTime|null $date_creation
-     * @param \DateTime|null $date_modification
-     * @param \DateTime|null $date_transmission
+     * @param \DateTime|null $dateCreation
+     * @param \DateTime|null $dateModification
+     * @param \DateTime|null $dateTransmission
      * @param string|null $abondance
      * @param string|null $certitude
      * @param string|null $phenologie
      * @param bool|null $spontaneite
      * @param string|null $observateur
-     * @param string|null $observateur_structure
-     * @param string|null $type_donnees
+     * @param string|null $observateurStructure
+     * @param string|null $typeDonnees
      * @param string|null $biblio
      * @param string|null $source
      * @param bool|null $herbier
      * @param string|null $determinateur
-     * @param string|null $url_identiplante
-     * @param int|null $validation_identiplante
-     * @param \DateTime|null $date_validation
-     * @param int|null $score_identiplante
+     * @param string|null $urlIdentiplante
+     * @param int|null $validationIdentiplante
+     * @param \DateTime|null $dateValidation
+     * @param int|null $scoreIdentiplante
      * @param array|null $images
-     * @param int|null $cd_nom
+     * @param int|null $cdcNom
      * @param int|null $grade
      */
-    public function __construct(int $id_observation, string $guid, bool $donnees_standard, bool $transmission, ?int $id_plantnet, ?int $ce_utilisateur, ?string $pseudo_utilisateur, ?string $courriel_utilisateur, ?string $nom_sel, ?int $nom_sel_nn, ?string $nom_ret, ?int $nom_ret_nn, ?string $famille, ?string $nom_referentiel, ?string $pays, ?string $ce_zone_geo, ?string $dept, ?string $zone_geo, ?string $lieudit, ?string $station, ?string $milieu, ?float $latitude, ?float $longitude, ?int $altitude, ?string $geodatum, ?string $geometry, ?float $lat_prive, ?float $long_prive, ?string $localisation_precision, ?string $localisation_floutage, ?bool $localisation_coherence, ?\DateTime $date_observation, ?string $programme, ?string $mots_cles_texte, ?string $commentaire, ?\DateTime $date_creation, ?\DateTime $date_modification, ?\DateTime $date_transmission, ?string $abondance, ?string $certitude, ?string $phenologie, ?bool $spontaneite, ?string $observateur, ?string $observateur_structure, ?string $type_donnees, ?string $biblio, ?string $source, ?bool $herbier, ?string $determinateur, ?string $url_identiplante, ?int $validation_identiplante, ?\DateTime $date_validation, ?int $score_identiplante, ?array $images, ?int $cd_nom, ?int $grade)
+    public function __construct(int $idObservation, string $guid, bool $donneesStandard, bool $transmission, ?int $idPlantnet, ?int $ceUtilisateur, ?string $pseudoUtilisateur, ?string $courrielUtilisateur, ?string $nomSel, ?int $nomSelNn, ?string $nomRet, ?int $nomRetNn, ?string $famille, ?string $referentiel, ?string $pays, ?string $ceZoneGeo, ?string $dept, ?string $zoneGeo, ?string $lieudit, ?string $station, ?string $milieu, ?float $latitude, ?float $longitude, ?int $altitude, ?string $geodatum, ?string $geometry, ?float $latPrive, ?float $longPrive, ?string $localisationPrecise, ?string $localisationFloutage, ?bool $localisationCoherence, ?\DateTime $dateObservation, ?string $programme, ?string $motsClesTexte, ?string $commentaire, ?\DateTime $dateCreation, ?\DateTime $dateModification, ?\DateTime $dateTransmission, ?string $abondance, ?string $certitude, ?string $phenologie, ?bool $spontaneite, ?string $observateur, ?string $observateurStructure, ?string $typeDonnees, ?string $biblio, ?string $source, ?bool $herbier, ?string $determinateur, ?string $urlIdentiplante, ?int $validationIdentiplante, ?\DateTime $dateValidation, ?int $scoreIdentiplante, ?array $images, ?int $cdcNom, ?int $grade)
     {
-        $this->id_observation = $id_observation;
+        $this->idObservation = $idObservation;
         $this->guid = $guid;
-        $this->donnees_standard = $donnees_standard;
+        $this->donneesStandard = $donneesStandard;
         $this->transmission = $transmission;
-        $this->id_plantnet = $id_plantnet;
-        $this->ce_utilisateur = $ce_utilisateur;
-        $this->pseudo_utilisateur = $pseudo_utilisateur;
-        $this->courriel_utilisateur = $courriel_utilisateur;
-        $this->nom_sel = $nom_sel;
-        $this->nom_sel_nn = $nom_sel_nn;
-        $this->nom_ret = $nom_ret;
-        $this->nom_ret_nn = $nom_ret_nn;
+        $this->idPlantnet = $idPlantnet;
+        $this->ceUtilisateur = $ceUtilisateur;
+        $this->pseudoUtilisateur = $pseudoUtilisateur;
+        $this->courrielUtilisateur = $courrielUtilisateur;
+        $this->nomSel = $nomSel;
+        $this->nomSelNn = $nomSelNn;
+        $this->nomRet = $nomRet;
+        $this->nomRetNn = $nomRetNn;
         $this->famille = $famille;
-        $this->nom_referentiel = $nom_referentiel;
+        $this->referentiel = $referentiel;
         $this->pays = $pays;
-        $this->ce_zone_geo = $ce_zone_geo;
+        $this->ceZoneGeo = $ceZoneGeo;
         $this->dept = $dept;
-        $this->zone_geo = $zone_geo;
+        $this->zoneGeo = $zoneGeo;
         $this->lieudit = $lieudit;
         $this->station = $station;
         $this->milieu = $milieu;
@@ -508,38 +506,37 @@ class ExportTotal
         $this->altitude = $altitude;
         $this->geodatum = $geodatum;
         $this->geometry = $geometry;
-        $this->lat_prive = $lat_prive;
-        $this->long_prive = $long_prive;
-        $this->localisation_precision = $localisation_precision;
-        $this->localisation_floutage = $localisation_floutage;
-        $this->localisation_coherence = $localisation_coherence;
-        $this->date_observation = $date_observation;
+        $this->latPrive = $latPrive;
+        $this->longPrive = $longPrive;
+        $this->localisationPrecise = $localisationPrecise;
+        $this->localisationFloutage = $localisationFloutage;
+        $this->localisationCoherence = $localisationCoherence;
+        $this->dateObservation = $dateObservation;
         $this->programme = $programme;
-        $this->mots_cles_texte = $mots_cles_texte;
+        $this->motsClesTexte = $motsClesTexte;
         $this->commentaire = $commentaire;
-        $this->date_creation = $date_creation;
-        $this->date_modification = $date_modification;
-        $this->date_transmission = $date_transmission;
+        $this->dateCreation = $dateCreation;
+        $this->dateModification = $dateModification;
+        $this->dateTransmission = $dateTransmission;
         $this->abondance = $abondance;
         $this->certitude = $certitude;
         $this->phenologie = $phenologie;
         $this->spontaneite = $spontaneite;
         $this->observateur = $observateur;
-        $this->observateur_structure = $observateur_structure;
-        $this->type_donnees = $type_donnees;
+        $this->observateurStructure = $observateurStructure;
+        $this->typeDonnees = $typeDonnees;
         $this->biblio = $biblio;
         $this->source = $source;
         $this->herbier = $herbier;
         $this->determinateur = $determinateur;
-        $this->url_identiplante = $url_identiplante;
-        $this->validation_identiplante = $validation_identiplante;
-        $this->date_validation = $date_validation;
-        $this->score_identiplante = $score_identiplante;
+        $this->urlIdentiplante = $urlIdentiplante;
+        $this->validationIdentiplante = $validationIdentiplante;
+        $this->dateValidation = $dateValidation;
+        $this->scoreIdentiplante = $scoreIdentiplante;
         $this->images = $images;
-        $this->cd_nom = $cd_nom;
+        $this->cdcNom = $cdcNom;
         $this->grade = $grade;
     }
-
 
     /**
      * Méthode d'identification utilisée par API Platform
@@ -550,7 +547,7 @@ class ExportTotal
      */
     public function getId(): int
     {
-        return $this->id_observation;
+        return $this->idObservation;
     }
 
     /**
@@ -558,7 +555,7 @@ class ExportTotal
      */
     public function getIdObservation(): int
     {
-        return $this->id_observation;
+        return $this->idObservation;
     }
 
     /**
@@ -572,9 +569,9 @@ class ExportTotal
     /**
      * @return bool
      */
-    public function isDonneesStandard(): bool
+    public function getDonneesStandard(): bool
     {
-        return $this->donnees_standard;
+        return $this->donneesStandard;
     }
 
     /**
@@ -590,7 +587,7 @@ class ExportTotal
      */
     public function getIdPlantnet(): ?int
     {
-        return $this->id_plantnet;
+        return $this->idPlantnet;
     }
 
     /**
@@ -598,7 +595,7 @@ class ExportTotal
      */
     public function getCeUtilisateur(): ?int
     {
-        return $this->ce_utilisateur;
+        return $this->ceUtilisateur;
     }
 
     /**
@@ -606,7 +603,7 @@ class ExportTotal
      */
     public function getPseudoUtilisateur(): ?string
     {
-        return $this->pseudo_utilisateur;
+        return $this->pseudoUtilisateur;
     }
 
     /**
@@ -614,7 +611,7 @@ class ExportTotal
      */
     public function getCourrielUtilisateur(): ?string
     {
-        return $this->courriel_utilisateur;
+        return $this->courrielUtilisateur;
     }
 
     /**
@@ -622,7 +619,7 @@ class ExportTotal
      */
     public function getNomSel(): ?string
     {
-        return $this->nom_sel;
+        return $this->nomSel;
     }
 
     /**
@@ -630,7 +627,7 @@ class ExportTotal
      */
     public function getNomSelNn(): ?int
     {
-        return $this->nom_sel_nn;
+        return $this->nomSelNn;
     }
 
     /**
@@ -638,7 +635,7 @@ class ExportTotal
      */
     public function getNomRet(): ?string
     {
-        return $this->nom_ret;
+        return $this->nomRet;
     }
 
     /**
@@ -646,7 +643,7 @@ class ExportTotal
      */
     public function getNomRetNn(): ?int
     {
-        return $this->nom_ret_nn;
+        return $this->nomRetNn;
     }
 
     /**
@@ -660,9 +657,9 @@ class ExportTotal
     /**
      * @return string|null
      */
-    public function getNomReferentiel(): ?string
+    public function getReferentiel(): ?string
     {
-        return $this->nom_referentiel;
+        return $this->referentiel;
     }
 
     /**
@@ -678,7 +675,7 @@ class ExportTotal
      */
     public function getCeZoneGeo(): ?string
     {
-        return $this->ce_zone_geo;
+        return $this->ceZoneGeo;
     }
 
     /**
@@ -694,7 +691,7 @@ class ExportTotal
      */
     public function getZoneGeo(): ?string
     {
-        return $this->zone_geo;
+        return $this->zoneGeo;
     }
 
     /**
@@ -766,7 +763,7 @@ class ExportTotal
      */
     public function getLatPrive(): ?float
     {
-        return $this->lat_prive;
+        return $this->latPrive;
     }
 
     /**
@@ -774,7 +771,7 @@ class ExportTotal
      */
     public function getLongPrive(): ?float
     {
-        return $this->long_prive;
+        return $this->longPrive;
     }
 
     /**
@@ -782,7 +779,7 @@ class ExportTotal
      */
     public function getLocalisationPrecision(): ?string
     {
-        return $this->localisation_precision;
+        return $this->localisationPrecise;
     }
 
     /**
@@ -790,7 +787,7 @@ class ExportTotal
      */
     public function getLocalisationFloutage(): ?string
     {
-        return $this->localisation_floutage;
+        return $this->localisationFloutage;
     }
 
     /**
@@ -798,7 +795,7 @@ class ExportTotal
      */
     public function getLocalisationCoherence(): ?bool
     {
-        return $this->localisation_coherence;
+        return $this->localisationCoherence;
     }
 
     /**
@@ -806,7 +803,7 @@ class ExportTotal
      */
     public function getDateObservation(): ?\DateTime
     {
-        return $this->date_observation;
+        return $this->dateObservation;
     }
 
     /**
@@ -822,7 +819,7 @@ class ExportTotal
      */
     public function getMotsClesTexte(): ?string
     {
-        return $this->mots_cles_texte;
+        return $this->motsClesTexte;
     }
 
     /**
@@ -838,7 +835,7 @@ class ExportTotal
      */
     public function getDateCreation(): ?\DateTime
     {
-        return $this->date_creation;
+        return $this->dateCreation;
     }
 
     /**
@@ -846,7 +843,7 @@ class ExportTotal
      */
     public function getDateModification(): ?\DateTime
     {
-        return $this->date_modification;
+        return $this->dateModification;
     }
 
     /**
@@ -854,7 +851,7 @@ class ExportTotal
      */
     public function getDateTransmission(): ?\DateTime
     {
-        return $this->date_transmission;
+        return $this->dateTransmission;
     }
 
     /**
@@ -902,7 +899,7 @@ class ExportTotal
      */
     public function getObservateurStructure(): ?string
     {
-        return $this->observateur_structure;
+        return $this->observateurStructure;
     }
 
     /**
@@ -910,7 +907,7 @@ class ExportTotal
      */
     public function getTypeDonnees(): ?string
     {
-        return $this->type_donnees;
+        return $this->typeDonnees;
     }
 
     /**
@@ -950,7 +947,7 @@ class ExportTotal
      */
     public function getUrlIdentiplante(): ?string
     {
-        return $this->url_identiplante;
+        return $this->urlIdentiplante;
     }
 
     /**
@@ -958,7 +955,7 @@ class ExportTotal
      */
     public function getValidationIdentiplante(): ?int
     {
-        return $this->validation_identiplante;
+        return $this->validationIdentiplante;
     }
 
     /**
@@ -966,7 +963,7 @@ class ExportTotal
      */
     public function getDateValidation(): ?\DateTime
     {
-        return $this->date_validation;
+        return $this->dateValidation;
     }
 
     /**
@@ -974,13 +971,13 @@ class ExportTotal
      */
     public function getScoreIdentiplante(): ?int
     {
-        return $this->score_identiplante;
+        return $this->scoreIdentiplante;
     }
 
     /**
      * @return array|null
      */
-    public function getImages(): ?string
+    public function getImages(): ?array
     {
         return $this->images;
     }
@@ -990,7 +987,7 @@ class ExportTotal
      */
     public function getCdNom(): ?int
     {
-        return $this->cd_nom;
+        return $this->cdcNom;
     }
 
     /**
