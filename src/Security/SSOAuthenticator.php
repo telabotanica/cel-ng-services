@@ -31,6 +31,11 @@ class SSOAuthenticator extends AbstractGuardAuthenticator {
      * @internal Should this authenticator be used for the request?
      */
     public function supports(Request $request) {
+        // Exclure la route api/export_totals
+        if (preg_match('/^\/api\/export_totals/', $request->getPathInfo())) {
+            return false;
+        }
+
         //We want credentials to be checked for all requests to the API
         return ( preg_match('/.*\\/api\\/.+/', $request->getUri() ) );
     }
