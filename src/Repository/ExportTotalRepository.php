@@ -29,12 +29,12 @@ class ExportTotalRepository
         $date_debut = "'{$date_debut}'";
         $date_fin = "'{$date_fin}'";
 
-        $query = 'SELECT * FROM cel_export_total AS ce LEFT JOIN cel_images_export AS i ON ce.id_observation = i.ce_observation WHERE ce.date_modification >= '.$date_debut.' AND ce.date_modification <= '.$date_fin.' AND ce.images IS NOT NULL AND ce.transmission = "1"';
+        $query = 'SELECT * FROM cel_export_total AS ce LEFT JOIN cel_images_export AS i ON ce.id_observation = i.ce_observation WHERE ce.date_modification >= '.$date_debut.' AND ce.date_modification <= '.$date_fin.' AND ce.images IS NOT NULL AND ce.images NOT LIKE "" AND ce.transmission = "1"';
 
         $queryTotal = 'SELECT COUNT(*) FROM cel_export_total 
          WHERE date_modification >= '.$date_debut.' 
          AND date_modification <= '.$date_fin.' 
-         AND images IS NOT NULL
+         AND images IS NOT NULL AND images NOT LIKE ""
          AND transmission = "1"';
 
         if (isset($this->parametres['masque.referentiel']) && $this->parametres['masque.referentiel'] != '') {
