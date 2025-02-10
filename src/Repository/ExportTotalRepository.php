@@ -72,6 +72,22 @@ class ExportTotalRepository
             $queryTotal .= ' AND ce_zone_geo = "' . $this->parametres['masque.cp'] .'"';
         }
 
+        if (isset($this->parametres['masque.standard']) && $this->parametres['masque.standard'] == "1") {
+            $auteurFilter = ' AND donnees_standard = "' . $this->parametres['masque.standard'] . '"';
+            $query .= $auteurFilter;
+            $queryTotal .= $auteurFilter;
+        }
+
+        if (isset($this->parametres['masque.auteur']) && $this->parametres['masque.auteur'] != '') {
+            $auteurFilter = ' AND (
+        (TRIM(courriel_utilisateur) LIKE "%' . $this->parametres['masque.auteur'] . '%" AND courriel_utilisateur IS NOT NULL AND courriel_utilisateur != "") 
+        OR (TRIM(pseudo_utilisateur) LIKE "%' . $this->parametres['masque.auteur'] . '%" AND pseudo_utilisateur IS NOT NULL AND pseudo_utilisateur != "") 
+        OR (ce_utilisateur = "' . $this->parametres['masque.auteur'] . '" AND ce_utilisateur IS NOT NULL AND ce_utilisateur != "")
+    )';
+            $query .= $auteurFilter;
+            $queryTotal .= $auteurFilter;
+        }
+
         if (isset($this->parametres['masque']) && $this->parametres['masque'] != '') {
             $query .= ' AND ( nom_ret LIKE "%' . $this->parametres['masque'] .'%"
             OR famille LIKE "%' . $this->parametres['masque'] .'%"
@@ -238,6 +254,10 @@ class ExportTotalRepository
 
         if (!isset($parametres['date.fin'])) {
             $this->parametres['date.fin'] = time();
+        }
+
+        if (!isset($parametres['masque.standard'])) {
+            $this->parametres['masque.standard'] = '1';
         }
 
         if (! isset($parametres['ordre'])) {

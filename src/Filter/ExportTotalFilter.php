@@ -142,6 +142,26 @@ class ExportTotalFilter implements FilterInterface
                     'type' => 'string',
                 ],
             ],
+            'masque.auteur' => [
+                'property' => 'masque.auteur',
+                'type' => 'string',
+                'required' => false,
+                'swagger' => [
+                    'description' => 'Recherche d\'obs par auteur (pseudo, email ou id)',
+                    'name' => 'masque.auteur',
+                    'type' => 'string',
+                ],
+            ],
+            'masque.standard' => [
+                'property' => 'masque.standard',
+                'type' => 'boolean',
+                'required' => false,
+                'swagger' => [
+                    'description' => 'Recherche seulement les obs standard ou non (obs standard par défaut)',
+                    'name' => 'masque.standard',
+                    'type' => 'boolean',
+                ],
+            ],
         ];
     }
 }
