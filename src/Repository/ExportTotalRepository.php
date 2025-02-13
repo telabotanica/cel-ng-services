@@ -89,16 +89,14 @@ class ExportTotalRepository
         }
 
         if (isset($this->parametres['masque']) && $this->parametres['masque'] != '') {
-            $query .= ' AND ( nom_ret LIKE "%' . $this->parametres['masque'] .'%"
+            $masqueFilter = ' AND ( nom_ret LIKE "%' . $this->parametres['masque'] .'%"
+            OR nom_sel LIKE "%' . $this->parametres['masque'] .'%"
             OR famille LIKE "%' . $this->parametres['masque'] .'%"
             OR courriel_utilisateur LIKE "%' . $this->parametres['masque'] .'%"
             OR pseudo_utilisateur LIKE "%' . $this->parametres['masque'] .'%")
             ';
-            $queryTotal .= ' AND ( nom_ret LIKE "%' . $this->parametres['masque'] .'%"
-            OR famille LIKE "%' . $this->parametres['masque'] .'%"
-            OR courriel_utilisateur LIKE "%' . $this->parametres['masque'] .'%"
-            OR pseudo_utilisateur LIKE "%' . $this->parametres['masque'] .'%")
-            ';
+            $query .= $masqueFilter;
+            $queryTotal .= $masqueFilter;
         }
 
         $query .=  ' GROUP BY ce.id_observation ORDER BY ce.date_modification ' . $ordre . ' 
