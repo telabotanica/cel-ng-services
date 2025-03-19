@@ -52,7 +52,10 @@ class TelaBotanicaUser implements UserInterface, EquatableInterface {
     }
 
     public function isTelaBotanicaAdmin() {
-        return in_array(TelaBotanicaUser::ADMIN_ROLE, $this->roles);
+        if (in_array(TelaBotanicaUser::ADMIN_ROLE, $this->roles) || in_array("ROLE_ADMIN", $this->roles))  {
+            return true;
+        }
+        return false;
     }
 
     public function isProjectAdmin() {
