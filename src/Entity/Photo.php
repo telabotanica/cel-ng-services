@@ -133,7 +133,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
    /**
      * Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné.
      *
-     * @Groups({"none"})
+     * @Groups({"photo_read", "read"})
      * @Assert\NotNull
      * @ORM\Column(name="user_pseudo", type="string", nullable=true, options={"comment":"Pseudo de l'utilisateur propriétaire de la photo. Nom/Prénom si non renseigné."})
      */
