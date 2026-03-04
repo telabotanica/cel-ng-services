@@ -291,7 +291,7 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 //		 }
           if ($exifExtractor->getShootingDate()){
               $this->dateShot = $exifExtractor->getShootingDate();
-          } else if ($this->getOccurrence()->getDateObserved()){
+          } else if ($this->getOccurrence() && $this->getOccurrence()->getDateObserved()){
               $this->dateShot = $this->getOccurrence()->getDateObserved();
           } else {
               $this->dateShot = new \DateTime();
