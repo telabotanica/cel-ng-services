@@ -94,7 +94,9 @@ final class CreatePhotoAction {
 
         // This will be handled by API Platform which will return a 
         // validation error:
-        throw new \Exception(CreatePhotoAction::DUPLICATE_NAME_MSG);
+
+        throw new \Exception("Une photo avec le même nom (".$originalName." ) éxiste déjà "
+            . "dans la gallery utilisateur. Ce n'est pas autorisé.");
     }
 
 }

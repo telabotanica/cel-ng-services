@@ -55,9 +55,29 @@ class ElasticsearchClient {
 
         //execute post
         $result = curl_exec($ch);
-        $resp = json_decode($result);
-        //close connection
+        $curlError = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+        if ($result === false) {
+            throw new \RuntimeException(
+                sprintf('Curl error lors du count Elasticsearch: %s', $curlError)
+            );
+        }
+
+        $resp = json_decode($result);
+
+        if (!is_object($resp)) {
+            throw new \RuntimeException(
+                sprintf('Réponse Elasticsearch invalide (HTTP %d): %s', $httpCode, $result)
+            );
+        }
+
+        if (!isset($resp->count)) {
+            throw new \RuntimeException(
+                sprintf('Propriété "count" absente dans la réponse Elasticsearch: %s', $result)
+            );
+        }
 
         return intVal($resp->count);
     }
@@ -124,11 +144,27 @@ class ElasticsearchClient {
         }
         if ($resourceTypeName == 'photo')  {
             $url = getenv('ELASTICSEARCH_PHOTO_INDEX_URL');
-        }      
-        // @refactor Else we should raise a custom exception  
-        $url .= $resourceTypeName;
+        }
 
-        return $url;
+        // getenv() retourne false si la variable n'est pas définie
+        if ($url === false || $url === null || $url === '') {
+            throw new \RuntimeException(
+                sprintf(
+                    'URL Elasticsearch non configurée pour le type "%s". ' .
+                    'Vérifiez ELASTICSEARCH_%s_INDEX_URL dans .env.local',
+                    $resourceTypeName,
+                    strtoupper($resourceTypeName)
+                )
+            );
+        }
+
+        if (!in_array($resourceTypeName, ['occurrence', 'photo'], true)) {
+            throw new \RuntimeException(
+                sprintf('Type Elasticsearch inconnu : "%s"', $resourceTypeName)
+            );
+        }
+
+        return $url . $resourceTypeName;
     }
 
 }
