@@ -280,10 +280,21 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
 
 
     public function fillPropertiesWithImageExif() {
+        if ($this->file === null) {
+            return;
+        }
+
+        $realPath = $this->file->getRealPath();
+
+        // getRealPath() retourne false si le fichier n'existe pas
+        if ($realPath === false || $realPath === '') {
+            return;
+        }
+
       if  ( !exif_imagetype( $this->file->getRealPath() ) ) {
           throw new InvalidImageException('The file you tried to associate to this Photo is not a valid image.');
       }
-      else {
+
          $exifExtractor   = new ExifExtractionUtils($this->file->getRealPath());
 //		 if ($exifExtractor->getLatitude() && $exifExtractor->getLongitude()){
 			 $this->latitude  = $exifExtractor->getLatitude();
@@ -296,23 +307,32 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
           } else {
               $this->dateShot = new \DateTime();
           }
-      }
+
    }
 
     public function fillPropertiesFromJsonFile($jsonPath, $forbiddenKeys) {
-      if  ( isset($jsonPath) ) {
-         $jsonAsString = file_get_contents($jsonPath);
-         $json = json_decode($jsonAsString, true);
+        if (!isset($jsonPath)) {
+            return;
+        }
 
-         foreach ($json as $key => $value) {
+        $jsonAsString = \file_get_contents($jsonPath);
+        if ($jsonAsString === false) {
+            throw new \RuntimeException(sprintf('Cannot read JSON file at path: %s', $jsonPath));
+        }
+
+        $json = \json_decode($jsonAsString, true);
+        if (!\is_array($json)) {
+            throw new \RuntimeException(sprintf('Invalid JSON in file: %s', $jsonPath));
+        }
+
+        foreach ($json as $key => $value) {
             // All properties can be updated with the ones in the JSON file
             // So we purge the associative array of all entries with keys belonging
             // to the set of property names which are not to be updated.
-            if (! in_array($key, $forbiddenKeys) ) {
-               $this->$key = $value;
+            if (!in_array($key, $forbiddenKeys, true)) {
+                $this->$key = $value;
             }
-         }
-      }
+        }
    }
 
    /**
@@ -322,7 +342,9 @@ class Photo implements OwnedEntityFullInterface, TimestampedEntityInterface {
     public function onPreUpdate() {
 
       $this->dateUpdated = new \DateTime();
-      $this->fillPropertiesWithImageExif();
+        if ($this->file !== null) {
+            $this->fillPropertiesWithImageExif();
+        }
    }
 
     public function getId(): ?int {
